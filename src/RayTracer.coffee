@@ -17,8 +17,8 @@ class RayTracer
 
 
     createShaders: ->
-        vert = [gl.VERTEX_SHADER,   ShaderSources.vertex]
-        frag = [gl.FRAGMENT_SHADER, ShaderSources.fragment]
+        vert = [gl.VERTEX_SHADER,   RayTracer.vertShaderSource]
+        frag = [gl.FRAGMENT_SHADER, RayTracer.fragShaderSource]
 
         @program = GLCommon.createShader(gl, [vert, frag])
 
