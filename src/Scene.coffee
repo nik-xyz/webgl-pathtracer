@@ -1,10 +1,19 @@
 class Scene
-    constructor: (@gl, @triangles) ->
+    constructor: (@gl) ->
         @texSizeLimit = @gl.getParameter(@gl.MAX_TEXTURE_SIZE)
 
-        @floatDataTex = @createTexture(@triangles)
-        @floatDataMask = @floatDataTex.width - 1
-        @floatDataShift = Math.log2(@floatDataTex.width)
+    addTriangles: (triangles) ->
+        @createTexture(@processTriangles(triangles))
+        @triangleAddressEnd = 3 * triangles.length
+
+
+    processTriangles: (triangles) ->
+        data = []
+        for triangle in triangles
+            # TODO: use better method of appending here
+            data = data.concat(triangle.encode())
+
+        return data
 
 
     createTexture: (data) ->
@@ -18,11 +27,13 @@ class Scene
             throw "Required texture size of #{size} exceeds limit of #{sizeLimit}"
 
         paddedData = new Float32Array(size * channels)
-        for value, index in data
-            paddedData[index] = value
+        paddedData.set(data)
 
         width = Math.min(size, @texSizeLimit)
         height = size / width
 
-        return new Texture(
+        @floatDataTex = new Texture(
             @gl, width, height, @gl.RGB32F, @gl.RGB, @gl.FLOAT, paddedData)
+
+        @floatDataMask = @floatDataTex.width - 1
+        @floatDataShift = Math.log2(@floatDataTex.width)

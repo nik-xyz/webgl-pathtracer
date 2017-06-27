@@ -7,15 +7,18 @@ class RayTracer
         if gl is null
             throw "Unable to create WebGL2 context"
 
-        triangles = [
-            0.0, 0.0, 0.0,
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            1.0, 1.0, 1.0,
-            -3.0, 0.0, 0.0,
-            0.0, -3.0, 0.0,
-        ]
-        @scene = new Scene(gl, triangles)
+        @scene = new Scene(gl)
+
+        # Generate random test triangles for testing
+        @scene.addTriangles(
+            for i in [0...100]
+                r = -> Math.random() * 2 - 1
+                new Triangle(
+                    new Vec3(r(), r(), r()),
+                    new Vec3(r(), r(), r()),
+                    new Vec3(r(), r(), r())
+                )
+        )
 
         @createShader()
 
@@ -48,7 +51,6 @@ class RayTracer
 
         gl.uniform1f(@program.uniforms.cullDistance, 10000)
         gl.uniform3f(@program.uniforms.cameraPosition, 0, 0, -2)
-        gl.uniform1ui(@program.uniforms.triangleAddressEnd, 6)
 
 
     setupTextureDataBuffers: ->
@@ -56,6 +58,7 @@ class RayTracer
         gl.uniform1i(@program.uniforms.floatBufferSampler, 0)
         gl.uniform1ui(@program.uniforms.floatBufferAddressMask, @scene.floatDataMask)
         gl.uniform1ui(@program.uniforms.floatBufferAddressShift, @scene.floatDataShift)
+        gl.uniform1ui(@program.uniforms.triangleAddressEnd, @scene.triangleAddressEnd)
 
 
     render: ->
