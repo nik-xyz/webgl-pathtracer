@@ -4,12 +4,31 @@ class RayTracer
         @canvas = document.createElement("canvas")
 
         gl = @canvas.getContext("webgl2")
-        return if gl is null
+        if gl is null
+            throw "Unable to create WebGL2 context"
+
+        triangles = [
+            0.0, 0.0, 0.0,
+            1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            1.0, 1.0, 1.0,
+            -3.0, 0.0, 0.0,
+            0.0, -3.0, 0.0,
+        ]
+        @scene = new Scene(gl, triangles)
+
+        @createShader()
 
         @screenVBO = new Buffer(gl, new Float32Array([
-            -1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1
+            -1, -1, -1, +1, +1, +1,
+            +1, +1, +1, -1, -1, -1
         ]))
 
+        @vao = new VertexArray(gl)
+        @vao.setupAttrib(@program.uniforms.vertPos, @screenVBO, 2, gl.FLOAT, 0, 0)
+
+
+    createShader: ->
         sources = [
             [gl.VERTEX_SHADER,   RayTracer.vertShaderSource]
             [gl.FRAGMENT_SHADER, RayTracer.fragShaderSource]
@@ -17,6 +36,7 @@ class RayTracer
 
         uniforms = [
             "cullDistance",
+            "cameraPosition"
             "floatBufferSampler",
             "floatBufferAddressShift",
             "floatBufferAddressMask",
@@ -27,35 +47,25 @@ class RayTracer
         @program.use()
 
         gl.uniform1f(@program.uniforms.cullDistance, 10000)
-        gl.uniform1i(@program.uniforms.floatBufferSampler, 0)
-        gl.uniform1ui(@program.uniforms.floatBufferAddressMask, 2 - 1)
-        gl.uniform1ui(@program.uniforms.floatBufferAddressShift, 1)
+        gl.uniform3f(@program.uniforms.cameraPosition, 0, 0, -2)
         gl.uniform1ui(@program.uniforms.triangleAddressEnd, 6)
 
-        @screenVBO.bind()
-        gl.enableVertexAttribArray(@program.uniforms.vertPos)
-        gl.vertexAttribPointer(@program.uniforms.vertPos, 2, gl.FLOAT, false, 0, 0)
 
-        floatBuffer = new Float32Array([
-            0.0, 0.0, 2.0, 0.0,
-            1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 0.0,
-            1.0, 1.0, 3.0, 0.0,
-            -3.0, 0.0, 0.0, 0.0,
-            0.0, -3.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0
-        ]);
-
-        @floatBufferTex = new Texture(gl, 2, 4, gl.RGBA32F, gl.RGBA, gl.FLOAT, floatBuffer)
+    setupTextureDataBuffers: ->
+        @scene.floatDataTex.bind(gl.TEXTURE0)
+        gl.uniform1i(@program.uniforms.floatBufferSampler, 0)
+        gl.uniform1ui(@program.uniforms.floatBufferAddressMask, @scene.floatDataMask)
+        gl.uniform1ui(@program.uniforms.floatBufferAddressShift, @scene.floatDataShift)
 
 
     render: ->
         gl.viewport(0, 0, @canvas.width, @canvas.height)
-        gl.clearColor(0.5, 0.5, 0.5, 1.0)
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+        gl.clearColor(1.0, 1.0, 1.0, 1.0)
+        gl.clear(gl.COLOR_BUFFER_BIT)
 
-        @floatBufferTex.bind(gl.TEXTURE0)
+        @setupTextureDataBuffers()
 
         @program.use()
+        @vao.bind()
+
         gl.drawArrays(gl.TRIANGLES, 0, 6)

@@ -81,15 +81,31 @@ class Buffer
 
 
 class Texture
-    constructor: (@gl, width, height, internalFormat, format, type, data) ->
+    constructor: (@gl, @width, @height, internalFormat, format, type, data) ->
         @tex = @gl.createTexture()
         @gl.bindTexture(@gl.TEXTURE_2D, @tex)
         @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST)
         @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
         @gl.texImage2D(@gl.TEXTURE_2D, 0, internalFormat,
-            width, height, 0, format, type, data)
+            @width, @height, 0, format, type, data)
 
 
     bind: (unit) ->
         @gl.activeTexture(unit)
         @gl.bindTexture(@gl.TEXTURE_2D, @tex)
+
+
+class VertexArray
+    constructor: (@gl) ->
+        @vao = @gl.createVertexArray()
+
+
+    setupAttrib: (location, buffer, size, type, stride, offset) ->
+        @bind()
+        buffer.bind()
+        @gl.enableVertexAttribArray(location)
+        @gl.vertexAttribPointer(location, size, type, false, stride, offset)
+
+
+    bind: ->
+        @gl.bindVertexArray(@vao)

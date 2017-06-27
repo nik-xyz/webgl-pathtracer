@@ -7,6 +7,7 @@ in  vec2 fragPos;
 out vec4 fragColor;
 
 uniform float cullDistance;
+uniform vec3 cameraPosition;
 
 uniform sampler2D floatBufferSampler;
 uniform uint floatBufferAddressMask;
@@ -67,21 +68,21 @@ HitTestResult hitTest(Tri tri, Ray ray) {
 }
 
 
-vec4 readData(uint address) {
+vec3 readData(uint address) {
     /* Map address to 2D texel */
     ivec2 texelCoord = ivec2(
         address &  floatBufferAddressMask,
         address >> floatBufferAddressShift
     );
-    return texelFetch(floatBufferSampler, texelCoord, 0);
+    return texelFetch(floatBufferSampler, texelCoord, 0).rgb;
 }
 
 
 Tri readTri(uint address) {
     return Tri(
-        readData(address + 0u).xyz,
-        readData(address + 1u).xyz,
-        readData(address + 2u).xyz
+        readData(address + 0u),
+        readData(address + 1u),
+        readData(address + 2u)
     );
 }
 
@@ -110,9 +111,8 @@ vec4 rayTraceScene(Ray ray) {
 
 
 void main() {
-    vec3 origin = vec3(0.0, 0.0, 0.0);
     vec3 dir = normalize(vec3(fragPos.x, fragPos.y, 1.0));
-    Ray ray = Ray(origin, dir);
+    Ray ray = Ray(cameraPosition, dir);
 
     fragColor = rayTraceScene(ray);
 }

@@ -1,6 +1,7 @@
 
 SRCS  = src/App.coffee
 SRCS += src/GLCommon.coffee
+SRCS += src/Scene.coffee
 SRCS += src/RayTracer.coffee
 SRCS += shaders/RayTraceVert.coffee
 SRCS += shaders/RayTraceFrag.coffee
