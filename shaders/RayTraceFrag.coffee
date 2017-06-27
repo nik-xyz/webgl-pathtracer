@@ -3,6 +3,9 @@ precision mediump float;
 varying vec2 fragPos;
 
 
+uniform sampler2D floatBuffer;
+
+
 struct Tri {
     vec3 vert, edge0, edge1;
 };
@@ -56,26 +59,57 @@ HitTestResult hitTest(Tri tri, Ray ray) {
 }
 
 
+vec3 readData(int address) {
+    if(address == 0) return vec3(0.0, 0.0, 2.0);
+    if(address == 1) return vec3(1.0, 0.0, 0.0);
+    if(address == 2) return vec3(0.0, 1.0, 0.0);
+    if(address == 3) return vec3(1.0, 1.0, 3.0);
+    if(address == 4) return vec3(-3.0, 0.0, 0.0);
+    if(address == 5) return vec3(0.0, -3.0, 0.0);
+
+    return vec3(0.0);
+}
+
+
+Tri readTri(int address) {
+    return Tri(readData(address), readData(address + 1), readData(address + 2));
+}
+
+
+vec4 rayTraceScene(Ray ray) {
+    const int triLimit = 6;
+
+    // TODO: make uniform
+    const float cullDistance = 10000.0;
+
+    HitTestResult closestHit;
+    closestHit.distance = cullDistance;
+    Tri closestTri;
+
+    for(int addr = 0; addr < triLimit; addr += 3) {
+        Tri tri = readTri(addr);
+
+        HitTestResult htr = hitTest(tri, ray);
+        if(htr.hit && htr.distance < closestHit.distance) {
+            closestHit = htr;
+            closestTri = tri;
+        }
+    }
+
+    if(!closestHit.hit) {
+        return vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    return vec4(closestHit.edge0, closestHit.edge1, 1.0, 1.0);
+}
+
+
 void main() {
     vec3 origin = vec3(0.0, 0.0, 0.0);
     vec3 dir = normalize(vec3(fragPos.x, fragPos.y, 1.0));
     Ray ray = Ray(origin, dir);
 
-    Tri tri = Tri(vec3(0.0, 0.0, 2.0), vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
-    Tri tri2 = Tri(vec3(2.0, 2.0, 3.0), vec3(0.0, -5.0, 0.0), vec3(-5.0, 0.0, 0.0));
-
-    HitTestResult htr = hitTest(tri, ray);
-    HitTestResult htr2 = hitTest(tri2, ray);
-
-    vec4 color = vec4(vec3(0.0), 1.0);
-    if(htr.hit) {
-        color = vec4(htr.edge0, htr.edge1, 0.5, 1.0);
-    }
-    if(htr2.hit && (!htr.hit || htr2.distance < htr.distance)) {
-        color = vec4(htr2.edge0, 0.5, htr2.edge1, 1.0);
-    }
-
-    gl_FragColor = color;
+    gl_FragColor = rayTraceScene(ray);
 }
 
 """

@@ -76,3 +76,7 @@ class Buffer
 
     bind: ->
         @gl.bindBuffer(@type, @buffer)
+
+
+class Texture
+    constructor: (@gl, @width, @height) ->

@@ -4,7 +4,7 @@ class RayTracer
         @canvas = document.createElement("canvas")
 
         gl = @canvas.getContext("webgl2")
-        return if not gl
+        return if gl is null
 
         @screenVBO = new Buffer(gl, new Float32Array([
             -1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1
