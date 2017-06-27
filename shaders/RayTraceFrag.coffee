@@ -3,11 +3,15 @@ RayTracer.fragShaderSource = """
 
 precision mediump float;
 
-in vec2 fragPos;
+in  vec2 fragPos;
 out vec4 fragColor;
 
 uniform float cullDistance;
-uniform sampler2D floatBuffer;
+
+uniform sampler2D floatBufferSampler;
+uniform uint floatBufferAddressMask;
+uniform uint floatBufferAddressShift;
+uniform uint triangleAddressEnd;
 
 
 struct Tri {
@@ -64,16 +68,12 @@ HitTestResult hitTest(Tri tri, Ray ray) {
 
 
 vec4 readData(uint address) {
-    if(address == 0u) return vec4(0.0, 0.0, 2.0, 0.0);
-    if(address == 1u) return vec4(1.0, 0.0, 0.0, 0.0);
-    if(address == 2u) return vec4(0.0, 1.0, 0.0, 0.0);
-    if(address == 3u) return vec4(1.0, 1.0, 3.0, 0.0);
-    if(address == 4u) return vec4(-3.0, 0.0, 0.0, 0.0);
-    if(address == 5u) return vec4(0.0, -3.0, 0.0, 0.0);
-
-    //vec4 data = texelFetch(floatBuffer, ivec2(0));
-
-    return vec4(0.0);
+    /* Map address to 2D texel */
+    ivec2 texelCoord = ivec2(
+        address &  floatBufferAddressMask,
+        address >> floatBufferAddressShift
+    );
+    return texelFetch(floatBufferSampler, texelCoord, 0);
 }
 
 
@@ -87,13 +87,11 @@ Tri readTri(uint address) {
 
 
 vec4 rayTraceScene(Ray ray) {
-    const uint triLimit = 6u;
-
     HitTestResult closestHit;
     closestHit.distance = cullDistance;
     Tri closestTri;
 
-    for(uint addr = 0u; addr < triLimit; addr += 3u) {
+    for(uint addr = 0u; addr < triangleAddressEnd; addr += 3u) {
         Tri tri = readTri(addr);
 
         HitTestResult htr = hitTest(tri, ray);
