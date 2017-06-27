@@ -12,7 +12,10 @@ class RayTracer
 
         vert = [gl.VERTEX_SHADER,   RayTracer.vertShaderSource]
         frag = [gl.FRAGMENT_SHADER, RayTracer.fragShaderSource]
-        @program = new ShaderProgram(gl, [vert, frag], [], ["vertPos"])
+        @program = new ShaderProgram(gl, [vert, frag], ["cullDistance"], ["vertPos"])
+        @program.use()
+
+        gl.uniform1f(@program.uniforms.cullDistance, 10000)
 
         @screenVBO.bind()
         gl.enableVertexAttribArray(@program.uniforms.vertPos)

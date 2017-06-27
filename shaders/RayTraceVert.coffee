@@ -1,6 +1,8 @@
 RayTracer.vertShaderSource = """
-attribute vec2 vertPos;
-varying vec2 fragPos;
+#version 300 es
+
+in vec2 vertPos;
+out vec2 fragPos;
 
 void main() {
     fragPos = vertPos;
