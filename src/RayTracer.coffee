@@ -6,27 +6,17 @@ class RayTracer
         gl = @canvas.getContext("webgl2")
         return if not gl
 
-        @createBuffers()
-        @createShaders()
-
-
-    createBuffers: ->
-        @screenVBO = GLCommon.createBuffer(gl, new Float32Array([
+        @screenVBO = new Buffer(gl, new Float32Array([
             -1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1
-        ]), gl.STATIC_DRAW)
+        ]))
 
-
-    createShaders: ->
         vert = [gl.VERTEX_SHADER,   RayTracer.vertShaderSource]
         frag = [gl.FRAGMENT_SHADER, RayTracer.fragShaderSource]
+        @program = new ShaderProgram(gl, [vert, frag], [], ["vertPos"])
 
-        @program = GLCommon.createShader(gl, [vert, frag])
-
-        gl.useProgram(@program)
-        @vertPosAttrib = gl.getAttribLocation(@program, "vertPos")
-        gl.bindBuffer(gl.ARRAY_BUFFER, @screenVBO)
-        gl.enableVertexAttribArray(@vertPosAttrib)
-        gl.vertexAttribPointer(@vertPosAttrib, 2, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 2, 0)
+        @screenVBO.bind()
+        gl.enableVertexAttribArray(@program.uniforms.vertPos)
+        gl.vertexAttribPointer(@program.uniforms.vertPos, 2, gl.FLOAT, false, 0, 0)
 
 
     render: ->
@@ -34,6 +24,5 @@ class RayTracer
         gl.clearColor(0.5, 0.5, 0.5, 1.0)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-        gl.useProgram(@program)
-
+        @program.use()
         gl.drawArrays(gl.TRIANGLES, 0, 6)
