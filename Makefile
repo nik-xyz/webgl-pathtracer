@@ -3,6 +3,7 @@ SRCS  = src/App.coffee
 SRCS += src/GLCommon.coffee
 SRCS += src/Vec3.coffee
 SRCS += src/Triangle.coffee
+SRCS += src/Octree.coffee
 SRCS += src/Scene.coffee
 SRCS += src/RayTracer.coffee
 SRCS += shaders/RayTraceVert.coffee

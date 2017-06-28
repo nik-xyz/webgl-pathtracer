@@ -95,6 +95,43 @@ class Texture
         @gl.bindTexture(@gl.TEXTURE_2D, @tex)
 
 
+class DataTexture extends Texture
+    constructor: (@gl, type, channels, data) ->
+        if type isnt @gl.FLOAT
+            throw "Data type not supported"
+
+        if channels not in [1..4]
+            throw "Invalid number of channels: #{channels}"
+
+        # Must pad the data to be a power-of-two length
+        # so that it can be uploaded to a power-of-two texture
+        paddedSize = Math.pow(2, Math.ceil(Math.log2(data.length / channels)))
+
+        sizeLimit = @gl.getParameter(@gl.MAX_TEXTURE_SIZE)
+        sizeLimitSq = @texSizeLimit * @texSizeLimit
+        if paddedSize > sizeLimitSq
+            throw "Required texture size of #{paddedSize} exceeds limit of #{sizeLimitSq}"
+
+        paddedData = new Float32Array(paddedSize * channels)
+        paddedData.set(data)
+
+        # Choose width & height so that the texture is large enough to
+        # store the data while staying inside the size limits
+        width = Math.min(paddedSize, sizeLimit)
+        height = paddedSize / width
+
+        # Choose a format that can store the required number of channels and type
+        internalFormat = [@gl.R32F, @gl.RG32F, @gl.RGB32F, @gl.RGBA32F][channels - 1]
+        format         = [@gl.RED,  @gl.RG,    @gl.RGB,    @gl.RGBA   ][channels - 1]
+
+        super(@gl, width, height, internalFormat, format, type, paddedData)
+
+        # Calculate address mask and shift values to allow
+        # the texture to be accessed with a 1D index
+        @dataMask  = width - 1
+        @dataShift = Math.log2(width)
+
+
 class VertexArray
     constructor: (@gl) ->
         @vao = @gl.createVertexArray()

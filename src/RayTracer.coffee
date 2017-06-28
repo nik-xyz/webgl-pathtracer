@@ -54,10 +54,10 @@ class RayTracer
 
 
     setupTextureDataBuffers: ->
-        @scene.floatDataTex.bind(gl.TEXTURE0)
+        @scene.triangleDataTex.bind(gl.TEXTURE0)
         gl.uniform1i(@program.uniforms.floatBufferSampler, 0)
-        gl.uniform1ui(@program.uniforms.floatBufferAddressMask, @scene.floatDataMask)
-        gl.uniform1ui(@program.uniforms.floatBufferAddressShift, @scene.floatDataShift)
+        gl.uniform1ui(@program.uniforms.floatBufferAddressMask,  @scene.triangleDataTex.dataMask)
+        gl.uniform1ui(@program.uniforms.floatBufferAddressShift, @scene.triangleDataTex.dataShift)
         gl.uniform1ui(@program.uniforms.triangleAddressEnd, @scene.triangleAddressEnd)
 
 
