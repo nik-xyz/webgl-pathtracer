@@ -1,18 +1,21 @@
 class Triangle
-    constructor: (@vert0, @vert1, @vert2) ->
+    constructor: (vert0, vert1, vert2) ->
+        @verts = [vert0, vert1, vert2]
+
+        @minBound = @verts.reduce((a, b) -> a.min(b))
+        @maxBound = @verts.reduce((a, b) -> a.max(b))
+
+        # Pick the vertex that is the closest to the center to be the base
+        center = @verts.reduce((a, b) -> a.add(b)).scale(1 / 3)
+        distances = @verts.map((vert) -> vert.dist(center))
+
+        selector = (best, dist, index) -> (if dist < distances[best] then index else best)
+        closest = distances.reduce(selector, 0)
+
+        @base = @verts[closest]
+        @edge0 = @verts[(closest + 1) % 3].sub(@base)
+        @edge1 = @verts[(closest + 2) % 3].sub(@base)
 
 
     encode: ->
-        # Pick the vertex that is the closest to the centeroid to be the base
-        center = @vert0.add(@vert1).add(@vert2).scale(1 / 3)
-        verts = [@vert0, @vert1, @vert2]
-        distances = (vert.dist(center) for vert in verts)
-
-        closest = if distances[0] < distances[1] then 0 else 1
-        closest = if distances[closest] < distances[2] then closest else 2
-
-        base = verts[closest]
-        edge0 = verts[(closest + 1) % 3].sub(base)
-        edge1 = verts[(closest + 2) % 3].sub(base)
-
-        return base.array().concat(edge0.array()).concat(edge1.array())
+        return @base.array().concat(@edge0.array()).concat(@edge1.array())

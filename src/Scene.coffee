@@ -4,6 +4,7 @@ class Scene
 
     addTriangles: (triangles) ->
         @triangleAddressEnd = 3 * triangles.length
+        @octree = new Octree(triangles)
         data = @processTriangles(triangles)
         @triangleDataTex = new DataTexture(@gl, @gl.FLOAT, 3, data)
 
@@ -11,7 +12,6 @@ class Scene
     processTriangles: (triangles) ->
         data = []
         for triangle in triangles
-            # TODO: use better method of appending here
             data = data.concat(triangle.encode())
 
         return data

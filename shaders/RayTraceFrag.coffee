@@ -9,9 +9,9 @@ out vec4 fragColor;
 uniform float cullDistance;
 uniform vec3 cameraPosition;
 
-uniform sampler2D floatBufferSampler;
-uniform uint floatBufferAddressMask;
-uniform uint floatBufferAddressShift;
+uniform sampler2D triangleBufferSampler;
+uniform uint triangleBufferMask;
+uniform uint triangleBufferShift;
 uniform uint triangleAddressEnd;
 
 
@@ -71,10 +71,10 @@ HitTestResult hitTest(Tri tri, Ray ray) {
 vec3 readData(uint address) {
     /* Map address to 2D texel */
     ivec2 texelCoord = ivec2(
-        address &  floatBufferAddressMask,
-        address >> floatBufferAddressShift
+        address &  triangleBufferMask,
+        address >> triangleBufferShift
     );
-    return texelFetch(floatBufferSampler, texelCoord, 0).rgb;
+    return texelFetch(triangleBufferSampler, texelCoord, 0).rgb;
 }
 
 

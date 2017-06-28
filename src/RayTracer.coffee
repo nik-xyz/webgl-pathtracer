@@ -11,12 +11,13 @@ class RayTracer
 
         # Generate random test triangles for testing
         @scene.addTriangles(
-            for i in [0...100]
-                r = -> Math.random() * 2 - 1
+            for i in [0...1000]
+                r = (s = 0.2) -> s * (Math.random() * 2 - 1)
+                o = new Vec3(r(1), r(1), r(1))
                 new Triangle(
-                    new Vec3(r(), r(), r()),
-                    new Vec3(r(), r(), r()),
-                    new Vec3(r(), r(), r())
+                    new Vec3(r(), r(), r()).add(o),
+                    new Vec3(r(), r(), r()).add(o),
+                    new Vec3(r(), r(), r()).add(o)
                 )
         )
 
@@ -40,9 +41,9 @@ class RayTracer
         uniforms = [
             "cullDistance",
             "cameraPosition"
-            "floatBufferSampler",
-            "floatBufferAddressShift",
-            "floatBufferAddressMask",
+            "triangleBufferSampler",
+            "triangleBufferShift",
+            "triangleBufferMask",
             "triangleAddressEnd"
         ]
 
@@ -55,9 +56,9 @@ class RayTracer
 
     setupTextureDataBuffers: ->
         @scene.triangleDataTex.bind(gl.TEXTURE0)
-        gl.uniform1i(@program.uniforms.floatBufferSampler, 0)
-        gl.uniform1ui(@program.uniforms.floatBufferAddressMask,  @scene.triangleDataTex.dataMask)
-        gl.uniform1ui(@program.uniforms.floatBufferAddressShift, @scene.triangleDataTex.dataShift)
+        gl.uniform1i(@program.uniforms.triangleBufferSampler, 0)
+        gl.uniform1ui(@program.uniforms.triangleBufferMask,  @scene.triangleDataTex.dataMask)
+        gl.uniform1ui(@program.uniforms.triangleBufferShift, @scene.triangleDataTex.dataShift)
         gl.uniform1ui(@program.uniforms.triangleAddressEnd, @scene.triangleAddressEnd)
 
 
