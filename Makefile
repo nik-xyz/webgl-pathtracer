@@ -9,4 +9,4 @@ SRCS += shaders/RayTraceVert.coffee
 SRCS += shaders/RayTraceFrag.coffee
 
 compile:
-	coffee --watch --join RayTracer.js --compile $(SRCS)
+	coffee --watch --join RayTracer.js --bare --compile $(SRCS)

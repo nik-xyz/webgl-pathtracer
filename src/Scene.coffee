@@ -2,6 +2,7 @@ class Scene
     constructor: (@gl) ->
         @texSizeLimit = @gl.getParameter(@gl.MAX_TEXTURE_SIZE)
 
+
     addTriangles: (triangles) ->
         @createTexture(@processTriangles(triangles))
         @triangleAddressEnd = 3 * triangles.length
