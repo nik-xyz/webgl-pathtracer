@@ -7,10 +7,9 @@ class RayTracer
         if gl is null
             throw "Unable to create WebGL2 context"
 
-        @scene = new Scene(gl)
 
-        # Generate random test triangles for testing
-        @scene.addTriangles(
+        # Generate random triangles for testing
+        triangles =
             for i in [0...1000]
                 r = (s = 0.2) -> s * (Math.random() * 2 - 1)
                 o = new Vec3(r(1), r(1), r(1))
@@ -19,14 +18,13 @@ class RayTracer
                     new Vec3(r(), r(), r()).add(o),
                     new Vec3(r(), r(), r()).add(o)
                 )
-        )
+
+        @scene = new Scene(gl, triangles)
+
+        screenVerts = [-1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1]
+        @screenVBO = new Buffer(gl, new Float32Array(screenVerts))
 
         @createShader()
-
-        @screenVBO = new Buffer(gl, new Float32Array([
-            -1, -1, -1, +1, +1, +1,
-            +1, +1, +1, -1, -1, -1
-        ]))
 
         @vao = new VertexArray(gl)
         @vao.setupAttrib(@program.uniforms.vertPos, @screenVBO, 2, gl.FLOAT, 0, 0)
@@ -41,10 +39,14 @@ class RayTracer
         uniforms = [
             "cullDistance",
             "cameraPosition"
+
+            #"octreeBufferSampler",
+            #"octreeBufferShift",
+            #"octreeBufferMask",
+
             "triangleBufferSampler",
             "triangleBufferShift",
-            "triangleBufferMask",
-            "triangleAddressEnd"
+            "triangleBufferMask"
         ]
 
         @program = new ShaderProgram(gl, sources, uniforms, ["vertPos"])
@@ -55,11 +57,17 @@ class RayTracer
 
 
     setupTextureDataBuffers: ->
+        uniforms = @program.uniforms
+
         @scene.triangleDataTex.bind(gl.TEXTURE0)
-        gl.uniform1i(@program.uniforms.triangleBufferSampler, 0)
-        gl.uniform1ui(@program.uniforms.triangleBufferMask,  @scene.triangleDataTex.dataMask)
-        gl.uniform1ui(@program.uniforms.triangleBufferShift, @scene.triangleDataTex.dataShift)
-        gl.uniform1ui(@program.uniforms.triangleAddressEnd, @scene.triangleAddressEnd)
+        gl.uniform1i(uniforms.triangleBufferSampler, 0)
+        gl.uniform1ui(uniforms.triangleBufferMask,  @scene.triangleDataTex.dataMask)
+        gl.uniform1ui(uniforms.triangleBufferShift, @scene.triangleDataTex.dataShift)
+
+        #@scene.octreeDataTex.bind(gl.TEXTURE1)
+        #gl.uniform1i(uniforms.octreeBufferSampler, 1)
+        #gl.uniform1ui(uniforms.octreeBufferMask,  @scene.octreeDataTex.dataMask)
+        #gl.uniform1ui(uniforms.octreeBufferShift, @scene.octreeDataTex.dataShift)
 
 
     render: ->

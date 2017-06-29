@@ -69,7 +69,6 @@ class Buffer
     ARRAY_BUFFER = 34962
     STATIC_DRAW  = 35044
 
-
     constructor: (@gl, data, @type = ARRAY_BUFFER, usage = STATIC_DRAW) ->
         @buffer = @gl.createBuffer()
         @bind()
@@ -97,7 +96,7 @@ class Texture
 
 class DataTexture extends Texture
     constructor: (@gl, type, channels, data) ->
-        if type isnt @gl.FLOAT
+        if type not in [@gl.FLOAT, @gl.UNSIGNED_INT]
             throw "Data type not supported"
 
         if channels not in [1..4]
@@ -106,30 +105,52 @@ class DataTexture extends Texture
         # Must pad the data to be a power-of-two length
         # so that it can be uploaded to a power-of-two texture
         paddedSize = Math.pow(2, Math.ceil(Math.log2(data.length / channels)))
+        arrayType = if (type is @gl.FLOAT) then Float32Array else Uint32Array
+        paddedData = new arrayType(paddedSize * channels)
+        paddedData.set(data)
 
+        # Check data fits inside texture size limits
         sizeLimit = @gl.getParameter(@gl.MAX_TEXTURE_SIZE)
         sizeLimitSq = @texSizeLimit * @texSizeLimit
         if paddedSize > sizeLimitSq
             throw "Required texture size of #{paddedSize} exceeds limit of #{sizeLimitSq}"
 
-        paddedData = new Float32Array(paddedSize * channels)
-        paddedData.set(data)
-
         # Choose width & height so that the texture is large enough to
         # store the data while staying inside the size limits
         width = Math.min(paddedSize, sizeLimit)
-        height = paddedSize / width
-
-        # Choose a format that can store the required number of channels and type
-        internalFormat = [@gl.R32F, @gl.RG32F, @gl.RGB32F, @gl.RGBA32F][channels - 1]
-        format         = [@gl.RED,  @gl.RG,    @gl.RGB,    @gl.RGBA   ][channels - 1]
-
-        super(@gl, width, height, internalFormat, format, type, paddedData)
+        height = if (width is 0) then 0 else (paddedSize / width)
 
         # Calculate address mask and shift values to allow
         # the texture to be accessed with a 1D index
         @dataMask  = width - 1
         @dataShift = Math.log2(width)
+
+        super(@gl, width, height, getFormat(@gl, type, channels)..., type, paddedData)
+
+
+    getFormat = (gl, type, channels) ->
+        if (type is gl.FLOAT)
+            return getFloatFormat(gl, channels)
+        else
+            return getUnsignedIntegerFormat(gl, channels)
+
+
+    getFloatFormat = (gl, channels) ->
+        formats = [gl.RED, gl.RG, gl.RGB, gl.RGBA]
+        internalFormats = [gl.R32F, gl.RG32F, gl.RGB32F, gl.RGBA32F]
+        return [internalFormats[channels - 1], formats[channels - 1]]
+
+
+    getUnsignedIntegerFormat = (gl, channels) ->
+        formats = [
+            gl.RED_INTEGER,
+            gl.RG_INTEGER,
+            gl.RGB_INTEGER,
+            gl.RGBA_INTEGER
+        ]
+        internalFormats = [gl.R32UI, gl.RG32UI, gl.RGB32UI, gl.RGBA32UI]
+        return [internalFormats[channels - 1], formats[channels - 1]]
+
 
 
 class VertexArray

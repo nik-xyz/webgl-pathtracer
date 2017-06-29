@@ -12,7 +12,20 @@ uniform vec3 cameraPosition;
 uniform sampler2D triangleBufferSampler;
 uniform uint triangleBufferMask;
 uniform uint triangleBufferShift;
-uniform uint triangleAddressEnd;
+
+uniform highp usampler2D octreeBufferSampler;
+uniform uint octreeBufferMask;
+uniform uint octreeBufferShift;
+
+
+struct Octree {
+    /* Addresses in triangleBuffer */
+    uint triStartIndex;
+    uint triEndIndex;
+    
+    /* Addresses in octreeBuffer */
+    uint childIndices[8];
+};
 
 
 struct Tri {
@@ -92,7 +105,7 @@ vec4 rayTraceScene(Ray ray) {
     closestHit.distance = cullDistance;
     Tri closestTri;
 
-    for(uint addr = 0u; addr < triangleAddressEnd; addr += 3u) {
+    for(uint addr = 0u; addr < 3000u; addr += 3u) {
         Tri tri = readTri(addr);
 
         HitTestResult htr = hitTest(tri, ray);

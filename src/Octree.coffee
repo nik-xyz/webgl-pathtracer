@@ -37,6 +37,30 @@ class OctreeNode
             @triangles.push(triangle)
 
 
+    encode: (octreeBuffer, triangleBuffer) ->
+        # Push triangle start address
+        octreeBuffer.push(triangleBuffer.length)
+
+        # Push triangles
+        for triangle in @triangles
+            Array.prototype.push.apply(triangleBuffer, triangle.encode())
+
+        # Push triangle end address
+        octreeBuffer.push(triangleBuffer.length)
+
+        # Push null child addresss that will be overwritten with actual values later
+        childrenSegmentAddress = octreeBuffer.length
+        octreeBuffer.push(0) for iter in [0...8]
+
+        # Push children and set address pointers
+        for child, index in @children
+            if child isnt null
+                # Set child address
+                octreeBuffer[childrenSegmentAddress + index] = octreeBuffer.length
+
+                # Push child
+                child.encode(octreeBuffer, triangleBuffer)
+
 
 class Octree
     constructor: (triangles) ->
@@ -47,6 +71,14 @@ class Octree
         center = minBound.add(maxBound).scale(0.5)
         size = maxBound.sub(minBound).reduce(Math.max) + eps
 
-        root = new OctreeNode(center, size)
+        @root = new OctreeNode(center, size)
         for triangle in triangles
-            root.addTriangle(triangle)
+            @root.addTriangle(triangle)
+
+
+    encode: ->
+        octreeBuffer = []
+        triangleBuffer = []
+        @root.encode(octreeBuffer, triangleBuffer)
+
+        return [octreeBuffer, triangleBuffer]

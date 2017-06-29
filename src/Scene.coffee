@@ -1,17 +1,8 @@
 class Scene
-    constructor: (@gl) ->
-
-
-    addTriangles: (triangles) ->
-        @triangleAddressEnd = 3 * triangles.length
+    constructor: (@gl, triangles) ->
         @octree = new Octree(triangles)
-        data = @processTriangles(triangles)
-        @triangleDataTex = new DataTexture(@gl, @gl.FLOAT, 3, data)
+        [octreeBuffer, triangleBuffer] = @octree.encode()
 
-
-    processTriangles: (triangles) ->
-        data = []
-        for triangle in triangles
-            data = data.concat(triangle.encode())
-
-        return data
+        @octreeDataTex   = new DataTexture(@gl, @gl.UNSIGNED_INT, 1, octreeBuffer)
+        @triangleDataTex = new DataTexture(@gl, @gl.FLOAT, 3, triangleBuffer)
+        
