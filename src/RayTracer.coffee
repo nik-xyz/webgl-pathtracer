@@ -8,23 +8,11 @@ class RayTracer
             throw "Unable to create WebGL2 context"
 
 
-        # Generate random triangles for testing
-        triangles =
-            for i in [0...100]
-                r = (s = 0.1) -> s * (Math.random() * 2 - 1)
-                o = new Vec3(r(1), r(1), r(1))
-                new Triangle(
-                    new Vec3(r(), r(), r()).add(o),
-                    new Vec3(r(), r(), r()).add(o),
-                    new Vec3(r(), r(), r()).add(o)
-                )
-
-        @scene = new Scene(gl, triangles)
-
         screenVerts = [-1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1]
         @screenVBO = new Buffer(gl, new Float32Array(screenVerts))
 
         @createShader()
+        @createDataTextures()
 
         @vao = new VertexArray(gl)
         @vao.setupAttrib(@program.uniforms.vertPos, @screenVBO, 2, gl.FLOAT, 0, 0)
@@ -37,15 +25,15 @@ class RayTracer
         ]
 
         uniforms = [
-            "cullDistance",
+            "cullDistance"
             "cameraPosition"
 
-            "octreeBufferSampler",
-            "octreeBufferShift",
-            "octreeBufferMask",
+            "octreeBufferSampler"
+            "octreeBufferShift"
+            "octreeBufferMask"
 
-            "triangleBufferSampler",
-            "triangleBufferShift",
+            "triangleBufferSampler"
+            "triangleBufferShift"
             "triangleBufferMask"
         ]
 
@@ -56,18 +44,35 @@ class RayTracer
         gl.uniform3f(@program.uniforms.cameraPosition, 0, 0, -2)
 
 
-    setupTextureDataBuffers: ->
+    createDataTextures: ->
+        # Generate random triangles for testing
+        triangles =
+            for i in [0...100]
+                r = (s = 0.2) -> s * (Math.random() * 2 - 1)
+                o = new Vec3(r(1), r(1), r(1))
+                new Triangle([0...3].map(-> new Vec3(r(), r(), r()).add(o))...)
+
+        @octree = new Octree(triangles)
+        [octreeBuffer, triangleBuffer] = @octree.encode()
+
+        @octreeDataTex = new DataTexture(gl, gl.UNSIGNED_INT,
+            Octree.OCTREE_BUFFER_CHANNELS, octreeBuffer)
+        @triangleDataTex = new DataTexture(gl, gl.FLOAT,
+            Octree.TRIANGLE_BUFFER_CHANNELS, triangleBuffer)
+
+
+    bindDataTextures: ->
         uniforms = @program.uniforms
 
-        @scene.triangleDataTex.bind(gl.TEXTURE0)
+        @triangleDataTex.bind(gl.TEXTURE0)
         gl.uniform1i(uniforms.triangleBufferSampler, 0)
-        gl.uniform1ui(uniforms.triangleBufferMask,  @scene.triangleDataTex.dataMask)
-        gl.uniform1ui(uniforms.triangleBufferShift, @scene.triangleDataTex.dataShift)
+        gl.uniform1ui(uniforms.triangleBufferMask,  @triangleDataTex.dataMask)
+        gl.uniform1ui(uniforms.triangleBufferShift, @triangleDataTex.dataShift)
 
-        @scene.octreeDataTex.bind(gl.TEXTURE1)
+        @octreeDataTex.bind(gl.TEXTURE1)
         gl.uniform1i(uniforms.octreeBufferSampler, 1)
-        gl.uniform1ui(uniforms.octreeBufferMask,  @scene.octreeDataTex.dataMask)
-        gl.uniform1ui(uniforms.octreeBufferShift, @scene.octreeDataTex.dataShift)
+        gl.uniform1ui(uniforms.octreeBufferMask,  @octreeDataTex.dataMask)
+        gl.uniform1ui(uniforms.octreeBufferShift, @octreeDataTex.dataShift)
 
 
     render: ->
@@ -75,7 +80,7 @@ class RayTracer
         gl.clearColor(1.0, 1.0, 1.0, 1.0)
         gl.clear(gl.COLOR_BUFFER_BIT)
 
-        @setupTextureDataBuffers()
+        @bindDataTextures()
 
         @program.use()
         @vao.bind()

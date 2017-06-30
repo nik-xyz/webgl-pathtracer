@@ -22,7 +22,6 @@ class OctreeNode
                 @mapChildToPosition(index), @size * 0.5, @subdivisionLimit - 1)
 
 
-
     addTriangle: (triangle) ->
         # Find which child nodes the vertices are in
         childIndices = triangle.verts.map(@mapPositionToChild)
@@ -38,16 +37,16 @@ class OctreeNode
             @triangles.push(triangle)
 
 
-    encode: (octreeBuffer, triangleBuffer) ->
+    encode: (octreeBuffer = [], triangleBuffer = []) ->
         # Push triangle start address
-        octreeBuffer.push(triangleBuffer.length / 3)
+        octreeBuffer.push(triangleBuffer.length / Octree.TRIANGLE_BUFFER_CHANNELS)
 
         # Push triangles
         for triangle in @triangles
             Array.prototype.push.apply(triangleBuffer, triangle.encode())
 
         # Push triangle end address
-        octreeBuffer.push(triangleBuffer.length / 3)
+        octreeBuffer.push(triangleBuffer.length / Octree.TRIANGLE_BUFFER_CHANNELS)
 
         # Push padding
         octreeBuffer.push(0, 0)
@@ -60,13 +59,19 @@ class OctreeNode
         for child, index in @children
             if child isnt null
                 # Set child address
-                octreeBuffer[childrenSegmentAddress + index] = octreeBuffer.length / 4
+                octreeBuffer[childrenSegmentAddress + index] =
+                    octreeBuffer.length / Octree.OCTREE_BUFFER_CHANNELS
 
                 # Push child
                 child.encode(octreeBuffer, triangleBuffer)
 
+        return [octreeBuffer, triangleBuffer]
+
 
 class Octree
+    @OCTREE_BUFFER_CHANNELS   = 4
+    @TRIANGLE_BUFFER_CHANNELS = 3
+
     constructor: (triangles) ->
         # Compute bounding box for all triangles
         eps = 0.1
@@ -80,9 +85,4 @@ class Octree
             @root.addTriangle(triangle)
 
 
-    encode: ->
-        octreeBuffer = []
-        triangleBuffer = []
-        @root.encode(octreeBuffer, triangleBuffer)
-
-        return [octreeBuffer, triangleBuffer]
+    encode: -> @root.encode()

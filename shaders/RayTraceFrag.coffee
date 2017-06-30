@@ -131,8 +131,8 @@ HitTestResult hitTest(Tri tri, Ray ray) {
 
 vec4 rayTraceScene(Ray ray) {
     Tri closestTri;
-    HitTestResult closestHit;
-    closestHit.distance = cullDistance;
+    HitTestResult closestHtr;
+    closestHtr.distance = cullDistance;
 
     int stackIndex = 0;
     struct {
@@ -177,8 +177,8 @@ vec4 rayTraceScene(Ray ray) {
             for(uint addr = start; addr < end; addr += triangleStride) {
                 Tri tri = readTri(addr);
                 HitTestResult htr = hitTest(tri, ray);
-                if(htr.hit && htr.distance < closestHit.distance) {
-                    closestHit = htr;
+                if(htr.hit && htr.distance < closestHtr.distance) {
+                    closestHtr = htr;
                     closestTri = tri;
                 }
             }
@@ -191,11 +191,11 @@ vec4 rayTraceScene(Ray ray) {
     #undef stackTop
 
 
-    if(!closestHit.hit) {
+    if(!closestHtr.hit) {
         return vec4(0.0, 0.0, 0.0, 1.0);
     }
 
-    return vec4(closestHit.edge0, closestHit.edge1, 1.0, 1.0);
+    return vec4(closestHtr.edge0, closestHtr.edge1, 1.0, 1.0);
 }
 
 
