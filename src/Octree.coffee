@@ -1,5 +1,5 @@
 class OctreeNode
-    constructor: (@center, @size, @subdivisionLimit = 10) ->
+    constructor: (@center, @size, @subdivisionLimit = 5) ->
         @children = [0...8].map(-> null)
         @triangles = []
 
@@ -13,13 +13,14 @@ class OctreeNode
     # Find the the center of a given child node
     mapChildToPosition: (index) =>
         bits = new Vec3((index >> 2) & 1, (index >> 1) & 1, (index >> 0) & 1)
-        return bits.map((bit) => (bit - 0.5) * @size).add(@center)
+        return bits.map((bit) => (bit - 0.5) * @size * 0.5).add(@center)
 
 
     ensureChildExists: (index) ->
         if @children[index] is null
             @children[index] = new OctreeNode(
                 @mapChildToPosition(index), @size * 0.5, @subdivisionLimit - 1)
+
 
 
     addTriangle: (triangle) ->
@@ -39,14 +40,17 @@ class OctreeNode
 
     encode: (octreeBuffer, triangleBuffer) ->
         # Push triangle start address
-        octreeBuffer.push(triangleBuffer.length)
+        octreeBuffer.push(triangleBuffer.length / 3)
 
         # Push triangles
         for triangle in @triangles
             Array.prototype.push.apply(triangleBuffer, triangle.encode())
 
         # Push triangle end address
-        octreeBuffer.push(triangleBuffer.length)
+        octreeBuffer.push(triangleBuffer.length / 3)
+
+        # Push padding
+        octreeBuffer.push(0, 0)
 
         # Push null child addresss that will be overwritten with actual values later
         childrenSegmentAddress = octreeBuffer.length
@@ -56,7 +60,7 @@ class OctreeNode
         for child, index in @children
             if child isnt null
                 # Set child address
-                octreeBuffer[childrenSegmentAddress + index] = octreeBuffer.length
+                octreeBuffer[childrenSegmentAddress + index] = octreeBuffer.length / 4
 
                 # Push child
                 child.encode(octreeBuffer, triangleBuffer)

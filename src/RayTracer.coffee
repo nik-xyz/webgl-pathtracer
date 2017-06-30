@@ -10,8 +10,8 @@ class RayTracer
 
         # Generate random triangles for testing
         triangles =
-            for i in [0...1000]
-                r = (s = 0.2) -> s * (Math.random() * 2 - 1)
+            for i in [0...100]
+                r = (s = 0.1) -> s * (Math.random() * 2 - 1)
                 o = new Vec3(r(1), r(1), r(1))
                 new Triangle(
                     new Vec3(r(), r(), r()).add(o),
@@ -40,9 +40,9 @@ class RayTracer
             "cullDistance",
             "cameraPosition"
 
-            #"octreeBufferSampler",
-            #"octreeBufferShift",
-            #"octreeBufferMask",
+            "octreeBufferSampler",
+            "octreeBufferShift",
+            "octreeBufferMask",
 
             "triangleBufferSampler",
             "triangleBufferShift",
@@ -64,10 +64,10 @@ class RayTracer
         gl.uniform1ui(uniforms.triangleBufferMask,  @scene.triangleDataTex.dataMask)
         gl.uniform1ui(uniforms.triangleBufferShift, @scene.triangleDataTex.dataShift)
 
-        #@scene.octreeDataTex.bind(gl.TEXTURE1)
-        #gl.uniform1i(uniforms.octreeBufferSampler, 1)
-        #gl.uniform1ui(uniforms.octreeBufferMask,  @scene.octreeDataTex.dataMask)
-        #gl.uniform1ui(uniforms.octreeBufferShift, @scene.octreeDataTex.dataShift)
+        @scene.octreeDataTex.bind(gl.TEXTURE1)
+        gl.uniform1i(uniforms.octreeBufferSampler, 1)
+        gl.uniform1ui(uniforms.octreeBufferMask,  @scene.octreeDataTex.dataMask)
+        gl.uniform1ui(uniforms.octreeBufferShift, @scene.octreeDataTex.dataShift)
 
 
     render: ->
