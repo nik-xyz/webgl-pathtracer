@@ -3,6 +3,32 @@ RayTracer.fragShaderSource = """
 
 precision mediump float;
 
+struct Octree {
+    uint triStartAddress;
+    uint triEndAddress;
+    uint childAddresses[8];
+};
+
+struct Cube {
+    vec3 center;
+    float size;
+};
+
+struct Tri {
+    vec3 vert, edge0, edge1;
+};
+
+struct Ray {
+    vec3 origin, dir, inverseDir;
+};
+
+struct HitTestResult {
+    bool hit;
+    float edge0, edge1;
+    float distance;
+};
+
+
 in  vec2 fragPos;
 out vec4 fragColor;
 
@@ -10,6 +36,7 @@ out vec4 fragColor;
 uniform float cullDistance;
 uniform vec3 cameraPosition;
 
+uniform Cube octreeCube;
 
 uniform sampler2D triangleBufferSampler;
 uniform uint triangleBufferMask;
@@ -19,53 +46,25 @@ uniform highp usampler2D octreeBufferSampler;
 uniform uint octreeBufferMask;
 uniform uint octreeBufferShift;
 
-
 const uint nodeStackSize = 10u;
 const uint triangleStride = 3u;
 const uint octreeRootAddress = 0u;
 
 
-struct Octree {
-    uint triStartAddress;
-    uint triEndAddress;
-    uint childAddresses[8];
-};
-
-
-struct Tri {
-    vec3 vert, edge0, edge1;
-};
-
-
-struct Ray {
-    vec3 origin, dir;
-};
-
-
-struct HitTestResult {
-    bool hit;
-    float edge0, edge1;
-    float distance;
-};
+ivec2 getTexelForAddress(uint address, uint mask, uint shift) {
+    return ivec2(address & mask, address >> shift);
+}
 
 
 vec3 readTriData(uint address) {
-    // Map address to 2D texel
-    ivec2 texelCoord = ivec2(
-        address &  triangleBufferMask,
-        address >> triangleBufferShift
-    );
-    return texelFetch(triangleBufferSampler, texelCoord, 0).rgb;
+    return texelFetch(triangleBufferSampler, getTexelForAddress(
+        address, triangleBufferMask, triangleBufferShift), 0).rgb;
 }
 
 
 uvec4 readOctreeData(uint address) {
-    // Map address to 2D texel
-    ivec2 texelCoord = ivec2(
-        address &  octreeBufferMask,
-        address >> octreeBufferShift
-    );
-    return texelFetch(octreeBufferSampler, texelCoord, 0);
+    return texelFetch(octreeBufferSampler, getTexelForAddress(
+        address, octreeBufferMask, octreeBufferShift), 0);
 }
 
 
@@ -93,7 +92,16 @@ Octree readOctree(uint address) {
 }
 
 
-HitTestResult hitTest(Tri tri, Ray ray) {
+Cube getOctreeChildCube(Cube parentCube, uint index) {
+    vec3 bits = vec3((index >> 2u) & 1u, (index >> 1u) & 1u, (index >> 0u) & 1u);
+    return Cube(
+        (bits - 0.5) * parentCube.size * 0.5 + parentCube.center,
+        parentCube.size * 0.5
+    );
+}
+
+
+HitTestResult hitTestTri(Tri tri, Ray ray) {
     const float eps = 0.000001;
 
     HitTestResult res;
@@ -129,6 +137,24 @@ HitTestResult hitTest(Tri tri, Ray ray) {
 }
 
 
+float vec3Min(vec3 vec) {
+    return min(vec.x, min(vec.y, vec.z));
+}
+
+
+float vec3Max(vec3 vec) {
+    return max(vec.x, max(vec.y, vec.z));
+}
+
+
+bool hitTestCube(Cube cube, Ray ray) {
+    vec3 originToCenter = cube.center - ray.origin;
+    vec3 vert0 = (originToCenter - cube.size) * ray.inverseDir;
+    vec3 vert1 = (originToCenter + cube.size) * ray.inverseDir;
+    return vec3Min(max(vert0, vert1)) >= vec3Max(min(vert0, vert1));
+}
+
+
 vec4 rayTraceScene(Ray ray) {
     Tri closestTri;
     HitTestResult closestHtr;
@@ -136,10 +162,8 @@ vec4 rayTraceScene(Ray ray) {
 
     int stackIndex = 0;
     struct {
-        // The node being processed
         Octree node;
-
-        // How far the node has been processed
+        Cube cube;
         uint execState;
     } stack[nodeStackSize];
 
@@ -147,25 +171,33 @@ vec4 rayTraceScene(Ray ray) {
 
     // Push root node onto stack
     stackTop.node = readOctree(octreeRootAddress);
+    stackTop.cube = octreeCube;
     stackTop.execState = 0u;
 
     // Watchdog counter
-    uint wd = 1000u;
+    uint wd = 10000u;
 
     while(stackIndex >= 0 && wd > 0u) {
         wd--;
 
         // Find child octree nodes to test
         while(stackTop.execState < 8u) {
-            uint childAddress = stackTop.node.childAddresses[stackTop.execState];
+            uint childIndex = stackTop.execState;
+            uint childAddress = stackTop.node.childAddresses[childIndex];
             stackTop.execState++;
 
-            // Push child node onto stack if it is valid
+            // Check that the child exists
             if(childAddress != 0u) {
-                stackIndex++;
-                stackTop.node = readOctree(childAddress);
-                stackTop.execState = 0u;
-                break;
+                Cube childCube = getOctreeChildCube(stackTop.cube, childIndex);
+
+                if(hitTestCube(stackTop.cube, ray)) {
+                    stackIndex++;
+                    stackTop.node = readOctree(childAddress);
+                    stackTop.cube = childCube;
+                    stackTop.execState = 0u;
+
+                    break;
+                }
             }
         }
 
@@ -176,7 +208,7 @@ vec4 rayTraceScene(Ray ray) {
 
             for(uint addr = start; addr < end; addr += triangleStride) {
                 Tri tri = readTri(addr);
-                HitTestResult htr = hitTest(tri, ray);
+                HitTestResult htr = hitTestTri(tri, ray);
                 if(htr.hit && htr.distance < closestHtr.distance) {
                     closestHtr = htr;
                     closestTri = tri;
@@ -201,7 +233,7 @@ vec4 rayTraceScene(Ray ray) {
 
 void main() {
     vec3 dir = normalize(vec3(fragPos.x, fragPos.y, 0.9));
-    Ray ray = Ray(cameraPosition, dir);
+    Ray ray = Ray(cameraPosition, dir, 1.0 / dir);
 
     fragColor = rayTraceScene(ray);
 }

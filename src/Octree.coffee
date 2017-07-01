@@ -1,17 +1,17 @@
 class OctreeNode
-    constructor: (@center, @size, @subdivisionLimit = 5) ->
-        @children = [0...8].map(-> null)
+    constructor: (@center, @size, @subdivisionLimit = 9) ->
+        @children = new Array(8).fill(null)
         @triangles = []
 
 
     # Find the child node that contains the given point
-    mapPositionToChild: (position) =>
+    getContainerNode: (position) =>
         bits = @center.less(position)
         return (bits.x << 2) | (bits.y << 1) | (bits.z << 0)
 
 
     # Find the the center of a given child node
-    mapChildToPosition: (index) =>
+    getNodeCenterPosition: (index) =>
         bits = new Vec3((index >> 2) & 1, (index >> 1) & 1, (index >> 0) & 1)
         return bits.map((bit) => (bit - 0.5) * @size * 0.5).add(@center)
 
@@ -19,15 +19,15 @@ class OctreeNode
     ensureChildExists: (index) ->
         if @children[index] is null
             @children[index] = new OctreeNode(
-                @mapChildToPosition(index), @size * 0.5, @subdivisionLimit - 1)
+                @getNodeCenterPosition(index), @size * 0.5, @subdivisionLimit - 1)
 
 
     addTriangle: (triangle) ->
-        # Find which child nodes the vertices are in
-        childIndices = triangle.verts.map(@mapPositionToChild)
+        # Find the octants that contain the triange's vertices
+        childIndices = triangle.verts.map(@getContainerNode)
 
         # If the vertices are all in the same octant, the triangle can be
-        # added to a child node, otherwise it must be added it to this node
+        # added to a child node, otherwise it must be added to this node
         vertsInSameOctant = childIndices.every((index) -> index == childIndices[0])
 
         if vertsInSameOctant and @subdivisionLimit > 0
@@ -43,7 +43,7 @@ class OctreeNode
 
         # Push triangles
         for triangle in @triangles
-            Array.prototype.push.apply(triangleBuffer, triangle.encode())
+            triangleBuffer.push(triangle.encode()...)
 
         # Push triangle end address
         octreeBuffer.push(triangleBuffer.length / Octree.TRIANGLE_BUFFER_CHANNELS)
@@ -53,7 +53,7 @@ class OctreeNode
 
         # Push null child addresss that will be overwritten with actual values later
         childrenSegmentAddress = octreeBuffer.length
-        octreeBuffer.push(0) for iter in [0...8]
+        octreeBuffer.push(new Array(8).fill(0)...)
 
         # Push children and set address pointers
         for child, index in @children
