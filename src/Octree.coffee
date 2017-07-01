@@ -28,7 +28,7 @@ class OctreeNode
 
         # If the vertices are all in the same octant, the triangle can be
         # added to a child node, otherwise it must be added to this node
-        vertsInSameOctant = childIndices.every((index) -> index == childIndices[0])
+        vertsInSameOctant = childIndices.every((index) -> index is childIndices[0])
 
         if vertsInSameOctant and @subdivisionLimit > 0
             @ensureChildExists(childIndices[0])
@@ -48,22 +48,27 @@ class OctreeNode
         # Push triangle end address
         octreeBuffer.push(triangleBuffer.length / Octree.TRIANGLE_BUFFER_CHANNELS)
 
-        # Push padding
-        octreeBuffer.push(0, 0)
+        if @children.every((child) -> child is null)
+            # Push no-load flag + padding
+            octreeBuffer.push(0, 0)
 
-        # Push null child addresss that will be overwritten with actual values later
-        childrenSegmentAddress = octreeBuffer.length
-        octreeBuffer.push(new Array(8).fill(0)...)
+        else
+            # Push load flag + padding
+            octreeBuffer.push(1, 0)
 
-        # Push children and set address pointers
-        for child, index in @children
-            if child isnt null
-                # Set child address
-                octreeBuffer[childrenSegmentAddress + index] =
-                    octreeBuffer.length / Octree.OCTREE_BUFFER_CHANNELS
+            # Push null child addresss that will be overwritten with actual values later
+            childrenSegmentAddress = octreeBuffer.length
+            octreeBuffer.push(new Array(8).fill(0)...)
 
-                # Push child
-                child.encode(octreeBuffer, triangleBuffer)
+            # Push children and set address pointers
+            for child, index in @children
+                if child isnt null
+                    # Set child address
+                    octreeBuffer[childrenSegmentAddress + index] =
+                        octreeBuffer.length / Octree.OCTREE_BUFFER_CHANNELS
+
+                    # Push child
+                    child.encode(octreeBuffer, triangleBuffer)
 
         return [octreeBuffer, triangleBuffer]
 

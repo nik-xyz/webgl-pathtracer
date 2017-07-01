@@ -51,7 +51,7 @@ class RayTracer
     createDataTextures: ->
         # Generate random triangles for testing
         triangles =
-            for i in [0...1000]
+            for i in [0...10000]
                 r = (s = 0.05) -> s * (Math.random() * 2 - 1)
                 o = new Vec3(r(1), r(1), r(1))
                 new Triangle([0...3].map(-> new Vec3(r(), r(), r()).add(o))...)

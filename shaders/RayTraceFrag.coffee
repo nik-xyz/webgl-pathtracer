@@ -79,14 +79,20 @@ Tri readTri(uint address) {
 
 Octree readOctree(uint address) {
     uvec4 triangleData = readOctreeData(address + 0u);
-    uvec4 octreeData0  = readOctreeData(address + 1u);
-    uvec4 octreeData1  = readOctreeData(address + 2u);
+    uvec4 octreeData0 = uvec4(0u);
+    uvec4 octreeData1 = uvec4(0u);
+
+    // Check load flag
+    if(triangleData[2] != 0u) {
+        octreeData0 = readOctreeData(address + 1u);
+        octreeData1 = readOctreeData(address + 2u);
+    }
 
     return Octree(
         triangleData.x, triangleData.y,
         uint[8](
-            octreeData0.x, octreeData0.y, octreeData0.z, octreeData0.w,
-            octreeData1.x, octreeData1.y, octreeData1.z, octreeData1.w
+            octreeData0[0], octreeData0[1], octreeData0[2], octreeData0[3],
+            octreeData1[0], octreeData1[1], octreeData1[2], octreeData1[3]
         )
     );
 }
