@@ -60,11 +60,8 @@ class RayTracer
         @octree = new Octree(triangles)
         [octreeBuffer, triangleBuffer] = @octree.encode()
 
-        @octreeDataTex = new DataTexture(gl, gl.UNSIGNED_INT,
-            Octree.OCTREE_BUFFER_CHANNELS, octreeBuffer)
-
-        @triangleDataTex = new DataTexture(gl, gl.FLOAT,
-            Octree.TRIANGLE_BUFFER_CHANNELS, triangleBuffer)
+        @octreeDataTex   = new DataTexture(gl, gl.UNSIGNED_INT, octreeBuffer)
+        @triangleDataTex = new DataTexture(gl, gl.FLOAT, triangleBuffer)
 
 
     render: ->

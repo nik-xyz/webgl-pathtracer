@@ -9,7 +9,7 @@ uniform uint octreeBufferMask;
 uniform uint octreeBufferShift;
 
 
-const uint triangleStride = 3u;
+const uint triangleStride = 9u;
 const uint octreeRootAddress = 0u;
 
 
@@ -18,9 +18,9 @@ ivec2 getTexelForAddress(uint address, uint mask, uint shift) {
 }
 
 
-vec3 readTriData(uint address) {
+float readTriData(uint address) {
     return texelFetch(triangleBufferSampler, getTexelForAddress(
-        address, triangleBufferMask, triangleBufferShift), 0).rgb;
+        address, triangleBufferMask, triangleBufferShift), 0).r;
 }
 
 
@@ -32,9 +32,9 @@ uint readOctreeData(uint address) {
 
 Tri readTri(uint address) {
     return Tri(
-        readTriData(address + 0u),
-        readTriData(address + 1u),
-        readTriData(address + 2u)
+        vec3(readTriData(address + 0u), readTriData(address + 1u), readTriData(address + 2u)),
+        vec3(readTriData(address + 3u), readTriData(address + 4u), readTriData(address + 5u)),
+        vec3(readTriData(address + 6u), readTriData(address + 7u), readTriData(address + 8u))
     );
 }
 

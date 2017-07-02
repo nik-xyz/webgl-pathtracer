@@ -95,25 +95,23 @@ class Texture
 
 
 class DataTexture extends Texture
-    constructor: (@gl, type, channels, data) ->
+    constructor: (@gl, type, data) ->
         if type not in [@gl.FLOAT, @gl.UNSIGNED_INT]
             throw "Data type not supported"
 
-        if channels not in [1..4]
-            throw "Invalid number of channels: #{channels}"
-
         # Must pad the data to be a power-of-two length
         # so that it can be uploaded to a power-of-two texture
-        paddedSize = Math.pow(2, Math.ceil(Math.log2(data.length / channels)))
-        arrayType = if (type is @gl.FLOAT) then Float32Array else Uint32Array
-        paddedData = new arrayType(paddedSize * channels)
-        paddedData.set(data)
+        paddedSize = Math.pow(2, Math.ceil(Math.log2(data.length)))
 
         # Check data fits inside texture size limits
         sizeLimit = @gl.getParameter(@gl.MAX_TEXTURE_SIZE)
         sizeLimitSq = @texSizeLimit * @texSizeLimit
         if paddedSize > sizeLimitSq
             throw "Required texture size of #{paddedSize} exceeds limit of #{sizeLimitSq}"
+
+        arrayType = if type is @gl.FLOAT then Float32Array else Uint32Array
+        paddedData = new arrayType(paddedSize)
+        paddedData.set(data)
 
         # Choose width & height so that the texture is large enough to
         # store the data while staying inside the size limits
@@ -125,31 +123,14 @@ class DataTexture extends Texture
         @dataMask  = width - 1
         @dataShift = Math.log2(width)
 
-        super(@gl, width, height, getFormat(@gl, type, channels)..., type, paddedData)
+        super(@gl, width, height, getFormats(@gl, type)..., type, paddedData)
 
 
-    getFormat = (gl, type, channels) ->
-        if (type is gl.FLOAT)
-            return getFloatFormat(gl, channels)
+    getFormats = (gl, type) ->
+        if type is gl.FLOAT
+            return [gl.R32F, gl.RED]
         else
-            return getUnsignedIntegerFormat(gl, channels)
-
-
-    getFloatFormat = (gl, channels) ->
-        formats = [gl.RED, gl.RG, gl.RGB, gl.RGBA]
-        internalFormats = [gl.R32F, gl.RG32F, gl.RGB32F, gl.RGBA32F]
-        return [internalFormats[channels - 1], formats[channels - 1]]
-
-
-    getUnsignedIntegerFormat = (gl, channels) ->
-        formats = [
-            gl.RED_INTEGER,
-            gl.RG_INTEGER,
-            gl.RGB_INTEGER,
-            gl.RGBA_INTEGER
-        ]
-        internalFormats = [gl.R32UI, gl.RG32UI, gl.RGB32UI, gl.RGBA32UI]
-        return [internalFormats[channels - 1], formats[channels - 1]]
+            return [gl.R32UI, gl.RED_INTEGER]
 
 
 

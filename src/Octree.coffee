@@ -39,14 +39,14 @@ class OctreeNode
 
     encode: (octreeBuffer = [], triangleBuffer = []) ->
         # Push triangle start address
-        octreeBuffer.push(triangleBuffer.length / Octree.TRIANGLE_BUFFER_CHANNELS)
+        octreeBuffer.push(triangleBuffer.length)
 
         # Push triangles
         for triangle in @triangles
             triangleBuffer.push(triangle.encode()...)
 
         # Push triangle end address
-        octreeBuffer.push(triangleBuffer.length / Octree.TRIANGLE_BUFFER_CHANNELS)
+        octreeBuffer.push(triangleBuffer.length)
 
         if @children.every((child) -> child is null)
             # Push no-load flag
@@ -64,8 +64,7 @@ class OctreeNode
             for child, index in @children
                 if child isnt null
                     # Set child address
-                    octreeBuffer[childrenSegmentAddress + index] =
-                        octreeBuffer.length / Octree.OCTREE_BUFFER_CHANNELS
+                    octreeBuffer[childrenSegmentAddress + index] = octreeBuffer.length
 
                     # Push child
                     child.encode(octreeBuffer, triangleBuffer)
@@ -74,9 +73,6 @@ class OctreeNode
 
 
 class Octree
-    @OCTREE_BUFFER_CHANNELS   = 1
-    @TRIANGLE_BUFFER_CHANNELS = 3
-
     constructor: (triangles) ->
         # Compute bounding box for all triangles
         eps = 0.1
