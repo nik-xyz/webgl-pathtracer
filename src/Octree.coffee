@@ -49,12 +49,12 @@ class OctreeNode
         octreeBuffer.push(triangleBuffer.length / Octree.TRIANGLE_BUFFER_CHANNELS)
 
         if @children.every((child) -> child is null)
-            # Push no-load flag + padding
-            octreeBuffer.push(0, 0)
+            # Push no-load flag
+            octreeBuffer.push(0)
 
         else
-            # Push load flag + padding
-            octreeBuffer.push(1, 0)
+            # Push load flag
+            octreeBuffer.push(1)
 
             # Push null child addresss that will be overwritten with actual values later
             childrenSegmentAddress = octreeBuffer.length
@@ -74,7 +74,7 @@ class OctreeNode
 
 
 class Octree
-    @OCTREE_BUFFER_CHANNELS   = 4
+    @OCTREE_BUFFER_CHANNELS   = 1
     @TRIANGLE_BUFFER_CHANNELS = 3
 
     constructor: (triangles) ->

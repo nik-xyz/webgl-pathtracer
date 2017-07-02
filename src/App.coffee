@@ -6,7 +6,6 @@ class App
 
         rt.render()
 
-
 window.onload = ->
     app = new App()
     app.run()

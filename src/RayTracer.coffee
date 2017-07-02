@@ -15,17 +15,17 @@ class RayTracer
         screenVerts = [-1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1]
         screenVBO = new Buffer(gl, new Float32Array(screenVerts))
 
-        @createShader()
+        program = createShader()
         @createDataTextures()
 
         vao = new VertexArray(gl)
         vao.setupAttrib(program.uniforms.vertPos, screenVBO, 2, gl.FLOAT, 0, 0)
 
 
-    createShader: ->
+    createShader = ->
         sources = [
-            [gl.VERTEX_SHADER,   RayTracer.vertShaderSource]
-            [gl.FRAGMENT_SHADER, RayTracer.fragShaderSource]
+            [gl.VERTEX_SHADER,   Shader.vertShaderSource]
+            [gl.FRAGMENT_SHADER, Shader.fragShaderSource]
         ]
 
         uniforms = [
@@ -44,14 +44,15 @@ class RayTracer
             "triangleBufferMask"
         ]
 
-        program = new ShaderProgram(gl, sources, uniforms, ["vertPos"])
-        program.use()
+        attribs = ["vertPos"]
+
+        return new ShaderProgram(gl, sources, uniforms, attribs)
 
 
     createDataTextures: ->
         # Generate random triangles for testing
         triangles =
-            for i in [0...10000]
+            for i in [0...100]
                 r = (s = 0.05) -> s * (Math.random() * 2 - 1)
                 o = new Vec3(r(1), r(1), r(1))
                 new Triangle([0...3].map(-> new Vec3(r(), r(), r()).add(o))...)
@@ -66,7 +67,11 @@ class RayTracer
             Octree.TRIANGLE_BUFFER_CHANNELS, triangleBuffer)
 
 
-    bindDataTextures: ->
+    render: ->
+        gl.viewport(0, 0, @canvas.width, @canvas.height)
+
+        program.use()
+
         @triangleDataTex.bind(gl.TEXTURE0)
         gl.uniform1i( program.uniforms["triangleBufferSampler"], 0)
         gl.uniform1ui(program.uniforms["triangleBufferMask"],  @triangleDataTex.dataMask)
@@ -77,14 +82,6 @@ class RayTracer
         gl.uniform1ui(program.uniforms["octreeBufferMask"],  @octreeDataTex.dataMask)
         gl.uniform1ui(program.uniforms["octreeBufferShift"], @octreeDataTex.dataShift)
 
-
-    render: ->
-        gl.viewport(0, 0, @canvas.width, @canvas.height)
-        gl.clearColor(1.0, 1.0, 1.0, 1.0)
-        gl.clear(gl.COLOR_BUFFER_BIT)
-
-        @bindDataTextures()
-
         center = @octree.root.center
         gl.uniform3f(program.uniforms["octreeCube.center"], center.x, center.y, center.z)
         gl.uniform1f(program.uniforms["octreeCube.size"], @octree.root.size)
@@ -92,7 +89,5 @@ class RayTracer
         gl.uniform1f(program.uniforms["cullDistance"], 10000)
         gl.uniform3f(program.uniforms["cameraPosition"], 0, 0, -2)
 
-        program.use()
         vao.bind()
-
         gl.drawArrays(gl.TRIANGLES, 0, 6)
