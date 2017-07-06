@@ -1,5 +1,13 @@
 Shader.hitTestSource = """
-HitTestResult hitTestTri(Tri tri, Ray ray) {
+
+struct HitTestResult {
+    bool hit;
+    float edge0, edge1;
+    float distance;
+};
+
+/* Möller-Trumbore based ray-triangle intersection test */
+HitTestResult hitTestTri(Triangle tri, Ray ray) {
     const float eps = 0.000001;
 
     HitTestResult res;
@@ -24,7 +32,7 @@ HitTestResult hitTestTri(Tri tri, Ray ray) {
 
     res.edge0 = dot(ray.dir, vertToOriginCrossEdge1) * inverseDet;
 
-    if(res.edge0 < 0.0 || res.edge1 + res.edge0 > 1.0 + eps) {
+    if(res.edge0 < 0.0 || res.edge0 + res.edge1 > 1.0 + eps) {
         return res;
     }
 
@@ -35,20 +43,14 @@ HitTestResult hitTestTri(Tri tri, Ray ray) {
 }
 
 
-float vec3Min(vec3 vec) {
-    return min(vec.x, min(vec.y, vec.z));
-}
-
-
-float vec3Max(vec3 vec) {
-    return max(vec.x, max(vec.y, vec.z));
-}
-
-
 bool hitTestCube(Cube cube, Ray ray) {
     vec3 originToCenter = cube.center - ray.origin;
     vec3 vert0 = (originToCenter - cube.size) * ray.inverseDir;
     vec3 vert1 = (originToCenter + cube.size) * ray.inverseDir;
-    return vec3Min(max(vert0, vert1)) >= vec3Max(min(vert0, vert1));
+    vec3 closeVec = min(vert0, vert1);
+    vec3 farVec   = max(vert0, vert1);
+    float close   = max(closeVec.x, max(closeVec.y, closeVec.z));
+    float far     = min(farVec.x,   min(farVec.y,   farVec.z));
+    return close <= far;
 }
 """

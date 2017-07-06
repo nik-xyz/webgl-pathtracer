@@ -1,19 +1,18 @@
-class RayTracer
+class PathTracer
     gl = null
     vao = null
     screenVBO = null
     program = null
 
-
     constructor: ->
         @canvas = document.createElement("canvas")
 
         gl = @canvas.getContext("webgl2")
-        if gl is null
-            throw "Unable to create WebGL2 context"
+        if gl is null then throw "Unable to create WebGL2 context"
 
-        screenVerts = [-1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1]
-        screenVBO = new Buffer(gl, new Float32Array(screenVerts))
+        screenVBO = new Buffer(gl, new Float32Array(
+            [-1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1]
+        ))
 
         program = createShader()
         @createDataTextures()
@@ -79,8 +78,7 @@ class RayTracer
         gl.uniform1ui(program.uniforms["octreeBufferMask"],  @octreeDataTex.dataMask)
         gl.uniform1ui(program.uniforms["octreeBufferShift"], @octreeDataTex.dataShift)
 
-        center = @octree.root.center
-        gl.uniform3f(program.uniforms["octreeCube.center"], center.x, center.y, center.z)
+        gl.uniform3fv(program.uniforms["octreeCube.center"], @octree.root.center.array())
         gl.uniform1f(program.uniforms["octreeCube.size"], @octree.root.size)
 
         gl.uniform1f(program.uniforms["cullDistance"], 10000)

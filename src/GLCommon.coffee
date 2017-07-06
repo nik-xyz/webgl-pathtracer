@@ -34,7 +34,7 @@ class ShaderProgram
 
     checkShaders = (gl, shaders) ->
         for shader in shaders
-            if not gl.getShaderParameter(shader, gl.COMPILE_STATUS)
+            unless gl.getShaderParameter(shader, gl.COMPILE_STATUS)
                 log = gl.getShaderInfoLog(shader)
 
                 for shader in shaders
@@ -96,7 +96,7 @@ class Texture
 
 class DataTexture extends Texture
     constructor: (@gl, type, data) ->
-        if type not in [@gl.FLOAT, @gl.UNSIGNED_INT]
+        unless type in [@gl.FLOAT, @gl.UNSIGNED_INT]
             throw "Data type not supported"
 
         # Must pad the data to be a power-of-two length
@@ -107,30 +107,31 @@ class DataTexture extends Texture
         sizeLimit = @gl.getParameter(@gl.MAX_TEXTURE_SIZE)
         sizeLimitSq = @texSizeLimit * @texSizeLimit
         if paddedSize > sizeLimitSq
-            throw "Required texture size of #{paddedSize} exceeds limit of #{sizeLimitSq}"
+            throw "Required texture size exceeds limit"
 
         arrayType = if type is @gl.FLOAT then Float32Array else Uint32Array
         paddedData = new arrayType(paddedSize)
         paddedData.set(data)
 
-        # Choose width & height so that the texture is large enough to
-        # store the data while staying inside the size limits
+        # Choose width and height so that the texture is large enough
+        # to store the data while staying inside the size limits
         width = Math.min(paddedSize, sizeLimit)
-        height = if (width is 0) then 0 else (paddedSize / width)
+        height = if width is 0 then 0 else (paddedSize / width)
 
         # Calculate address mask and shift values to allow
         # the texture to be accessed with a 1D index
         @dataMask  = width - 1
         @dataShift = Math.log2(width)
 
-        super(@gl, width, height, getFormats(@gl, type)..., type, paddedData)
+        # Find appropriate formats to store the data
+        formats =
+            if type is @gl.FLOAT
+                [@gl.R32F, @gl.RED]
+            else
+                [@gl.R32UI, @gl.RED_INTEGER]
 
-
-    getFormats = (gl, type) ->
-        if type is gl.FLOAT
-            return [gl.R32F, gl.RED]
-        else
-            return [gl.R32UI, gl.RED_INTEGER]
+        # Create texture
+        super(@gl, width, height, formats..., type, paddedData)
 
 
 

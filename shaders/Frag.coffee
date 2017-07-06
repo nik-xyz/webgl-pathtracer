@@ -16,7 +16,7 @@ uniform vec3 cameraPosition;
 
 uniform Cube octreeCube;
 
-const uint nodeStackSize = 10u;
+const uint octreeStackSize = 10u;
 
 
 Cube getOctreeChildCube(Cube parentCube, uint index) {
@@ -29,7 +29,7 @@ Cube getOctreeChildCube(Cube parentCube, uint index) {
 
 
 vec4 rayTraceScene(Ray ray) {
-    Tri closestTri;
+    Triangle closestTri;
     HitTestResult closestHtr;
     closestHtr.distance = cullDistance;
 
@@ -38,7 +38,7 @@ vec4 rayTraceScene(Ray ray) {
         Octree node;
         Cube cube;
         uint execState;
-    } stack[nodeStackSize];
+    } stack[octreeStackSize];
 
     #define stackTop (stack[stackIndex])
 
@@ -76,7 +76,7 @@ vec4 rayTraceScene(Ray ray) {
             uint end   = stackTop.node.triEndAddress;
 
             for(uint addr = start; addr < end; addr += triangleStride) {
-                Tri tri = readTri(addr);
+                Triangle tri = readTri(addr);
                 HitTestResult htr = hitTestTri(tri, ray);
                 if(htr.hit && htr.distance < closestHtr.distance) {
                     closestHtr = htr;

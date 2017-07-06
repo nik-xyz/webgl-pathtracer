@@ -1,10 +1,10 @@
 class App
     run: ->
-        rt = new RayTracer()
-        rt.canvas.width = rt.canvas.height = 1000
-        document.body.appendChild(rt.canvas)
+        pt = new PathTracer()
+        pt.canvas.width = pt.canvas.height = 1000
+        document.body.appendChild(pt.canvas)
 
-        rt.render()
+        pt.render()
 
 window.onload = ->
     app = new App()

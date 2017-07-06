@@ -4,7 +4,7 @@ SRCS += src/GLCommon.coffee
 SRCS += src/Vec3.coffee
 SRCS += src/Triangle.coffee
 SRCS += src/Octree.coffee
-SRCS += src/RayTracer.coffee
+SRCS += src/PathTracer.coffee
 SRCS += shaders/Shader.coffee
 SRCS += shaders/Types.coffee
 SRCS += shaders/HitTest.coffee
@@ -13,4 +13,4 @@ SRCS += shaders/Vert.coffee
 SRCS += shaders/Frag.coffee
 
 compile:
-	coffee --watch --join RayTracer.js --bare --compile $(SRCS)
+	coffee --watch --join PathTracer.js --bare --compile $(SRCS)

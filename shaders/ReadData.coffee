@@ -30,8 +30,8 @@ uint readOctreeData(uint address) {
 }
 
 
-Tri readTri(uint address) {
-    return Tri(
+Triangle readTri(uint address) {
+    return Triangle(
         vec3(readTriData(address + 0u), readTriData(address + 1u), readTriData(address + 2u)),
         vec3(readTriData(address + 3u), readTriData(address + 4u), readTriData(address + 5u)),
         vec3(readTriData(address + 6u), readTriData(address + 7u), readTriData(address + 8u))

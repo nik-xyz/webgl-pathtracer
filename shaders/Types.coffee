@@ -11,17 +11,11 @@ struct Cube {
     float size;
 };
 
-struct Tri {
+struct Triangle {
     vec3 vert, edge0, edge1;
 };
 
 struct Ray {
     vec3 origin, dir, inverseDir;
-};
-
-struct HitTestResult {
-    bool hit;
-    float edge0, edge1;
-    float distance;
 };
 """
