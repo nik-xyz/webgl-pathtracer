@@ -18,10 +18,10 @@ class OctreeNode
     # Find the the center of a given child node
     getNodeCenterPosition: (index) =>
         bits = new Vec3((index >> 2) & 1, (index >> 1) & 1, (index >> 0) & 1)
-        return bits.map((bit) => (bit - 0.5) * @size * 0.5).add(@center)
+        return bits.map((bit) => (bit - 0.5) * @size).add(@center)
 
 
-    ensureChildExists: (index) ->
+    ensureChildExists: (index) =>
         if @children[index] is null
             center = @getNodeCenterPosition(index)
             @children[index] = new OctreeNode(center, @size * 0.5, @limit - 1)
