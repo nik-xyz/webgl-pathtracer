@@ -1,7 +1,7 @@
 
 SRCS  = src/App.coffee
 SRCS += src/GLCommon.coffee
-SRCS += src/Vec3.coffee
+SRCS += src/Vec.coffee
 SRCS += src/Triangle.coffee
 SRCS += src/Octree.coffee
 SRCS += src/PathTracer.coffee
