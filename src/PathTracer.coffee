@@ -49,12 +49,7 @@ class PathTracer
 
 
     createDataTextures: ->
-        # Generate random triangles for testing
-        triangles =
-            for i in [0...100]
-                r = (s = 0.05) -> s * (Math.random() * 2 - 1)
-                o = new Vec3(r(1), r(1), r(1))
-                new Triangle([0...3].map(-> new Vec3(r(), r(), r()).add(o))...)
+        triangles = new TriangleLoader(Models.testModel).triangles
 
         @octree = new Octree(triangles)
         [octreeBuffer, triangleBuffer] = @octree.encode()
