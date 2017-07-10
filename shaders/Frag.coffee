@@ -3,9 +3,10 @@ Shader.fragShaderSource = """
 
 precision mediump float;
 
-""" + Shader.typesSource + """
+""" + Shader.typesSource   + """
+""" + Shader.octreeSource  + """
 """ + Shader.hitTestSource + """
-""" + Shader.readDataSource + """
+""" + Shader.dataTexSource + """
 
 in  vec2 fragPos;
 out vec4 fragColor;
@@ -19,27 +20,29 @@ uniform Cube octreeCube;
 const uint octreeStackSize = 10u;
 
 
-Cube getOctreeChildCube(Cube parentCube, uint index) {
-    vec3 bits = vec3((index >> 2u) & 1u, (index >> 1u) & 1u, (index >> 0u) & 1u);
-    return Cube(
-        (bits - 0.5) * parentCube.size + parentCube.center,
-        parentCube.size * 0.5
-    );
-}
+struct SceneRayTraceResult {
+    bool hit;
+    vec3 pos;
+    vec3 nor;
+    vec2 tex;
+};
 
 
-vec4 rayTraceScene(Ray ray) {
+struct StackElem {
+    Octree node;
+    Cube cube;
+    uint execState;
+};
+
+
+SceneRayTraceResult rayTraceScene(Ray ray) {
     uint closestTriAddress;
     PosTriangle closestTri;
     HitTestResult closestHtr;
     closestHtr.distance = cullDistance;
 
     int stackIndex = 0;
-    struct StackElem {
-        Octree node;
-        Cube cube;
-        uint execState;
-    } stack[octreeStackSize];
+    StackElem stack[octreeStackSize];
 
     #define stackTop (stack[stackIndex])
 
@@ -93,18 +96,28 @@ vec4 rayTraceScene(Ray ray) {
 
     #undef stackTop
 
-
     if(!closestHtr.hit) {
-        return vec4(0.0, 0.0, 0.0, 1.0);
+        SceneRayTraceResult res;
+        res.hit = false;
+        return res;
     }
 
-    AuxTriangle auxData = readTriAuxData(closestTriAddress);
+    AuxTriangle auxTri = readTriAuxData(closestTriAddress);
 
-    return vec4(
-        auxData.vertNor +
-        auxData.edge0Nor * closestHtr.edge0 +
-        auxData.edge1Nor * closestHtr.edge1,
-        1.0
+    return SceneRayTraceResult(
+        true,
+
+        closestTri.vert +
+        closestTri.edge0 * closestHtr.edge0 +
+        closestTri.edge1 * closestHtr.edge1,
+
+        auxTri.vertNor +
+        auxTri.edge0Nor * closestHtr.edge0 +
+        auxTri.edge1Nor * closestHtr.edge1,
+
+        auxTri.vertTex +
+        auxTri.edge0Tex * closestHtr.edge0 +
+        auxTri.edge1Tex * closestHtr.edge1
     );
 }
 
@@ -113,7 +126,9 @@ void main() {
     vec3 dir = normalize(vec3(fragPos.x, fragPos.y, 0.9));
     Ray ray = Ray(cameraPosition, dir, 1.0 / dir);
 
-    fragColor = rayTraceScene(ray);
+    SceneRayTraceResult res = rayTraceScene(ray);
+
+    fragColor = vec4(res.nor, 1.0);
 }
 
 """

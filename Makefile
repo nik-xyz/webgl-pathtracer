@@ -10,7 +10,8 @@ SRCS += src/PathTracer.coffee
 SRCS += shaders/Shader.coffee
 SRCS += shaders/Types.coffee
 SRCS += shaders/HitTest.coffee
-SRCS += shaders/ReadData.coffee
+SRCS += shaders/DataTex.coffee
+SRCS += shaders/Octree.coffee
 SRCS += shaders/Vert.coffee
 SRCS += shaders/Frag.coffee
 

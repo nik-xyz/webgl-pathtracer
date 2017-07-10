@@ -1,10 +1,4 @@
-Shader.typesSource =
-"""
-struct Octree {
-    uint triStartAddress;
-    uint triEndAddress;
-    uint childAddresses[8];
-};
+Shader.typesSource = """
 
 struct Cube {
     vec3 center;
@@ -19,6 +13,8 @@ struct AuxTriangle {
     vec3 vertNor, edge0Nor, edge1Nor;
     vec2 vertTex, edge0Tex, edge1Tex;
 };
+
+const uint triangleStride = 24u;
 
 struct Ray {
     vec3 origin, dir, inverseDir;
