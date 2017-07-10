@@ -3,30 +3,43 @@ class TriangleLoader
     WHITESPACE_REGEX = /[\s]+/g
     VERTEX_REGEX     = /\//g
 
+    DEFAULT_TEXCOORD = new Vec2(0, 0)
+
 
     constructor: (data) ->
-        arrays = parseLines(data)
-        @triangles = createTriangles(arrays...)
+        @triangles = createTriangles(getFaces(parseLines(data)...))
 
 
-    createTriangles = (posArray, norArray, texArray, faceArray) ->
+    createTriangles = (faces) ->
         triangles = []
-        for face in faceArray
-            # TODO: Triangulate face instead
-            if face.length isnt 3 then continue
-
-            verts = []
-            for vert in face
-                # TODO: check range
-                verts.push(new TriangleVertex(
-                    posArray[vert[0] - 1],
-                    norArray[vert[2] - 1],
-                    new Vec2(),
-                ))
-
-            triangles.push(new Triangle(verts...))
+        for face in faces
+            for index in [1...(face.length - 1)]
+                triangles.push(new Triangle(face[0], face[index], face[index + 1]))
 
         return triangles
+
+
+    getFaces = (posArray, norArray, texArray, faceArray) ->
+        for face in faceArray
+            for vertIndices in face
+                new TriangleVertex(
+                    accessArray(posArray, vertIndices[0]),
+                    accessArray(norArray, vertIndices[2]),
+                    accessArray(texArray, vertIndices[1], DEFAULT_TEXCOORD),
+                )
+                # Implicit join
+            # Implicit join & return
+
+
+    accessArray = (array, index, alt) ->
+        unless Number.isSafeInteger(index)
+            if alt? then return alt
+            throw "Invalid list index"
+
+        if index < 1 or index > array.length
+            throw "List index is out of range"
+
+        return array[index - 1]
 
 
     parseLines = (data) ->
@@ -54,7 +67,7 @@ class TriangleLoader
                     faceArray.push(args.map(parseFaceVert))
 
             catch error
-                throw "Error parsing file on line #{lineIndex + 1}:\n#{error}"
+                throw "Error parsing file on line #{lineIndex + 1}: #{error}"
 
         return [posArray, norArray, texArray, faceArray]
 
@@ -79,5 +92,7 @@ class TriangleLoader
         if tokens.length < num then throw "Not enough arguments"
         for index in [0...qty]
             num = Number.parseFloat(tokens[index])
-            if num is NaN then throw "Invalid float"
-            num
+            if num is NaN
+                throw "Invalid float"
+
+            num # Implicit join & return

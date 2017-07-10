@@ -52,7 +52,6 @@ class OctreeNode
         # Push triangle end address
         octreeBuffer.push(triangleBuffer.length)
 
-
         if @children.every((child) -> child is null)
             # Push no-load flag
             octreeBuffer.push(NO_LOAD_FLAG)
