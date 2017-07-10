@@ -1,6 +1,6 @@
-Shader.hitTestSource = """
+Shader.geomHitTestSource = """
 
-struct HitTestResult {
+struct TriangleHitTestResult {
     bool hit;
     float edge0, edge1;
     float distance;
@@ -8,10 +8,10 @@ struct HitTestResult {
 
 
 /* Möller-Trumbore based ray-triangle intersection test */
-HitTestResult hitTestTri(PosTriangle tri, Ray ray) {
+TriangleHitTestResult hitTestTri(TrianglePosData tri, Ray ray) {
     const float eps = 0.000001;
 
-    HitTestResult res;
+    TriangleHitTestResult res;
     res.hit = false;
 
     vec3 rayCrossEdge0 = cross(ray.dir, tri.edge0);

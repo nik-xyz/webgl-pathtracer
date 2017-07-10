@@ -28,11 +28,10 @@ class PathTracer
         ]
 
         uniforms = [
-            "cullDistance"
             "cameraPosition"
 
-            "octreeCube.center"
-            "octreeCube.size"
+            "octreeCubeCenter"
+            "octreeCubeSize"
 
             "octreeBufferSampler"
             "octreeBufferShift"
@@ -73,8 +72,8 @@ class PathTracer
         gl.uniform1ui(program.uniforms["octreeBufferMask"],  @octreeDataTex.dataMask)
         gl.uniform1ui(program.uniforms["octreeBufferShift"], @octreeDataTex.dataShift)
 
-        gl.uniform3fv(program.uniforms["octreeCube.center"], @octree.root.center.array())
-        gl.uniform1f(program.uniforms["octreeCube.size"], @octree.root.size)
+        gl.uniform3fv(program.uniforms["octreeCubeCenter"], @octree.root.center.array())
+        gl.uniform1f(program.uniforms["octreeCubeSize"], @octree.root.size)
 
         gl.uniform1f(program.uniforms["cullDistance"], 10000)
         gl.uniform3f(program.uniforms["cameraPosition"], 0, 0, -2)

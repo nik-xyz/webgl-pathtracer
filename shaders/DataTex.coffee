@@ -4,7 +4,6 @@ uniform sampler2D triangleBufferSampler;
 uniform uint triangleBufferMask;
 uniform uint triangleBufferShift;
 
-
 uniform highp usampler2D octreeBufferSampler;
 uniform uint octreeBufferMask;
 uniform uint octreeBufferShift;
@@ -16,8 +15,11 @@ ivec2 getTexelForAddress(uint address, uint mask, uint shift) {
 
 
 float readTriData(uint address) {
-    return texelFetch(triangleBufferSampler, getTexelForAddress(
-        address, triangleBufferMask, triangleBufferShift), 0).r;
+    return texelFetch(
+        triangleBufferSampler,
+        getTexelForAddress(address, triangleBufferMask, triangleBufferShift),
+        0
+    ).r;
 }
 
 
@@ -39,13 +41,16 @@ vec2 readTriVec2Data(uint address) {
 
 
 uint readOctreeData(uint address) {
-    return texelFetch(octreeBufferSampler, getTexelForAddress(
-        address, octreeBufferMask, octreeBufferShift), 0).r;
+    return texelFetch(
+        octreeBufferSampler,
+        getTexelForAddress(address, octreeBufferMask, octreeBufferShift),
+        0
+    ).r;
 }
 
 
-PosTriangle readTriPosData(uint address) {
-    return PosTriangle(
+TrianglePosData readTriPosData(uint address) {
+    return TrianglePosData(
         readTriVec3Data(address + 0u),
         readTriVec3Data(address + 3u),
         readTriVec3Data(address + 6u)
@@ -53,8 +58,8 @@ PosTriangle readTriPosData(uint address) {
 }
 
 
-AuxTriangle readTriAuxData(uint address) {
-    return AuxTriangle(
+TriangleAuxAttribs readTriAuxData(uint address) {
+    return TriangleAuxAttribs(
         readTriVec3Data(address + 9u),
         readTriVec3Data(address + 12u),
         readTriVec3Data(address + 15u),
@@ -72,8 +77,11 @@ Octree readOctree(uint address) {
 
     // Check load flag
     if(loadFlag == 0u) {
-        return Octree(triStartAddress, triEndAddress,
-            uint[8](0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u));
+        return Octree(
+            triStartAddress,
+            triEndAddress,
+            uint[8](0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u)
+        );
     }
 
     return Octree(

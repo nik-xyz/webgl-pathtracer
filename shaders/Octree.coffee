@@ -1,12 +1,11 @@
 Shader.octreeSource = """
 
-const uint octreeRootAddress = 0u;
-
 struct Octree {
     uint triStartAddress;
     uint triEndAddress;
     uint childAddresses[8];
 };
+
 
 Cube getOctreeChildCube(Cube parentCube, uint index) {
     vec3 bits = vec3((index >> 2u) & 1u, (index >> 1u) & 1u, (index >> 0u) & 1u);
