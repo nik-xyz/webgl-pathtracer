@@ -15,12 +15,16 @@ class TriangleLoader
             # TODO: Triangulate face instead
             if face.length isnt 3 then continue
 
-            positions = []
+            verts = []
             for vert in face
                 # TODO: check range
-                positions.push(posArray[vert[0] - 1])
+                verts.push(new TriangleVertex(
+                    posArray[vert[0] - 1],
+                    norArray[vert[2] - 1],
+                    new Vec2(),
+                ))
 
-            triangles.push(new Triangle(positions...))
+            triangles.push(new Triangle(verts...))
 
         return triangles
 
@@ -58,19 +62,17 @@ class TriangleLoader
     parseFaceVert = (str) ->
         tokens = str.split(VERTEX_REGEX)
         vertAttribs = [
-            [0, true],  # Position
-            [1, false], # Texture Coordinate
-            [2, true]   # Normal
+            [0, false, "position"],
+            [1, true,  "texture coordinate"],
+            [2, false, "normal"]
         ]
 
-        for [tokenIndex, required] in vertAttribs
-            if tokens.length < tokenIndex or tokens[tokenIndex] is ""
-                if required then throw "Required integer not present"
-                NaN
-            else
-                num = Number.parseInt(tokens[tokenIndex])
-                unless Number.isSafeInteger(num) then throw "Invalid integer"
-                num
+        for [tokenIndex, optional, name] in vertAttribs
+            arrayIndex = Number.parseInt(tokens[tokenIndex])
+            unless optional or Number.isSafeInteger(arrayIndex)
+                throw "Vertex #{name} list index is absent or invalid"
+
+            arrayIndex # Implicit join & return
 
 
     parseFloats = (qty, tokens) ->

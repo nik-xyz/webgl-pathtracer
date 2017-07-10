@@ -11,8 +11,13 @@ struct Cube {
     float size;
 };
 
-struct Triangle {
+struct PosTriangle {
     vec3 vert, edge0, edge1;
+};
+
+struct AuxTriangle {
+    vec3 vertNor, edge0Nor, edge1Nor;
+    vec2 vertTex, edge0Tex, edge1Tex;
 };
 
 struct Ray {

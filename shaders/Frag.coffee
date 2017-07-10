@@ -29,7 +29,8 @@ Cube getOctreeChildCube(Cube parentCube, uint index) {
 
 
 vec4 rayTraceScene(Ray ray) {
-    Triangle closestTri;
+    uint closestTriAddress;
+    PosTriangle closestTri;
     HitTestResult closestHtr;
     closestHtr.distance = cullDistance;
 
@@ -76,11 +77,12 @@ vec4 rayTraceScene(Ray ray) {
             uint end   = stackTop.node.triEndAddress;
 
             for(uint addr = start; addr < end; addr += triangleStride) {
-                Triangle tri = readTri(addr);
+                PosTriangle tri = readTriPosData(addr);
                 HitTestResult htr = hitTestTri(tri, ray);
                 if(htr.hit && htr.distance < closestHtr.distance) {
                     closestHtr = htr;
                     closestTri = tri;
+                    closestTriAddress = addr;
                 }
             }
 
@@ -96,7 +98,14 @@ vec4 rayTraceScene(Ray ray) {
         return vec4(0.0, 0.0, 0.0, 1.0);
     }
 
-    return vec4(closestHtr.edge0, closestHtr.edge1, 1.0, 1.0);
+    AuxTriangle auxData = readTriAuxData(closestTriAddress);
+
+    return vec4(
+        auxData.vertNor +
+        auxData.edge0Nor * closestHtr.edge0 +
+        auxData.edge1Nor * closestHtr.edge1,
+        1.0
+    );
 }
 
 

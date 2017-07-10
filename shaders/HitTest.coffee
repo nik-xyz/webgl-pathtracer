@@ -7,7 +7,7 @@ struct HitTestResult {
 };
 
 /* Möller-Trumbore based ray-triangle intersection test */
-HitTestResult hitTestTri(Triangle tri, Ray ray) {
+HitTestResult hitTestTri(PosTriangle tri, Ray ray) {
     const float eps = 0.000001;
 
     HitTestResult res;

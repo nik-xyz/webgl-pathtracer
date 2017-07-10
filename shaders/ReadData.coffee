@@ -9,7 +9,7 @@ uniform uint octreeBufferMask;
 uniform uint octreeBufferShift;
 
 
-const uint triangleStride = 9u;
+const uint triangleStride = 24u;
 const uint octreeRootAddress = 0u;
 
 
@@ -24,17 +24,46 @@ float readTriData(uint address) {
 }
 
 
+vec3 readTriVec3Data(uint address) {
+    return vec3(
+        readTriData(address + 0u),
+        readTriData(address + 1u),
+        readTriData(address + 2u)
+    );
+}
+
+
+vec2 readTriVec2Data(uint address) {
+    return vec2(
+        readTriData(address + 0u),
+        readTriData(address + 1u)
+    );
+}
+
+
 uint readOctreeData(uint address) {
     return texelFetch(octreeBufferSampler, getTexelForAddress(
         address, octreeBufferMask, octreeBufferShift), 0).r;
 }
 
 
-Triangle readTri(uint address) {
-    return Triangle(
-        vec3(readTriData(address + 0u), readTriData(address + 1u), readTriData(address + 2u)),
-        vec3(readTriData(address + 3u), readTriData(address + 4u), readTriData(address + 5u)),
-        vec3(readTriData(address + 6u), readTriData(address + 7u), readTriData(address + 8u))
+PosTriangle readTriPosData(uint address) {
+    return PosTriangle(
+        readTriVec3Data(address + 0u),
+        readTriVec3Data(address + 3u),
+        readTriVec3Data(address + 6u)
+    );
+}
+
+
+AuxTriangle readTriAuxData(uint address) {
+    return AuxTriangle(
+        readTriVec3Data(address + 9u),
+        readTriVec3Data(address + 12u),
+        readTriVec3Data(address + 15u),
+        readTriVec2Data(address + 18u),
+        readTriVec2Data(address + 20u),
+        readTriVec2Data(address + 22u)
     );
 }
 
