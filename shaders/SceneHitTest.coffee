@@ -67,7 +67,8 @@ SceneHitTestResult hitTestScene(Ray ray) {
 
         // Test the current node's triangles
         if(stackTop.execState == 8u) {
-            for(uint addr = stackTop.node.triStartAddress;
+            for(
+                uint addr = stackTop.node.triStartAddress;
                 addr < stackTop.node.triEndAddress;
                 addr += TRIANGLE_STRIDE
             ) {
@@ -95,16 +96,22 @@ SceneHitTestResult hitTestScene(Ray ray) {
     TriangleAuxAttribs closestTriAux = readTriAuxData(closestTriAddress);
 
     return SceneHitTestResult(
+        // Hit
         true,
 
+        // Position
         closestTri.vert +
         closestTri.edge0 * closestHtr.edge0 +
         closestTri.edge1 * closestHtr.edge1,
 
-        closestTriAux.vertNor +
-        closestTriAux.edge0Nor * closestHtr.edge0 +
-        closestTriAux.edge1Nor * closestHtr.edge1,
+        // Normal
+        normalize(
+            closestTriAux.vertNor +
+            closestTriAux.edge0Nor * closestHtr.edge0 +
+            closestTriAux.edge1Nor * closestHtr.edge1
+        ),
 
+        // Texture coordinate
         closestTriAux.vertTex +
         closestTriAux.edge0Tex * closestHtr.edge0 +
         closestTriAux.edge1Tex * closestHtr.edge1

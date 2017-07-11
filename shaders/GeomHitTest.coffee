@@ -25,7 +25,7 @@ TriangleHitTestResult hitTestTri(TrianglePosData tri, Ray ray) {
     vec3 vertToOrigin = ray.origin - tri.vert;
     res.edge1 = dot(vertToOrigin, rayCrossEdge0) * inverseDet;
 
-    if(res.edge1 < 0.0 || res.edge1 > 1.0) {
+    if(res.edge1 < -eps || res.edge1 > 1.0 + eps) {
         return res;
     }
 
@@ -33,7 +33,7 @@ TriangleHitTestResult hitTestTri(TrianglePosData tri, Ray ray) {
 
     res.edge0 = dot(ray.dir, vertToOriginCrossEdge1) * inverseDet;
 
-    if(res.edge0 < 0.0 || res.edge0 + res.edge1 > 1.0 + eps) {
+    if(res.edge0 < -eps || res.edge0 + res.edge1 > 1.0 + eps) {
         return res;
     }
 

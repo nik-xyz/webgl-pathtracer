@@ -26,4 +26,10 @@ struct Cube {
 struct Ray {
     vec3 origin, dir, inverseDir;
 };
+
+
+Ray createRay(vec3 origin, vec3 dir) {
+    // TODO: check div-by-0 behavior in WebGL2 spec
+    return Ray(origin, dir, 1.0 / dir);
+}
 """
