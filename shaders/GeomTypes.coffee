@@ -1,4 +1,4 @@
-Shader.geomTypesSource = """
+ShaderSources.getGeomTypes = -> """
 
 const uint TRIANGLE_STRIDE = 24u;
 
@@ -32,4 +32,6 @@ Ray createRay(vec3 origin, vec3 dir) {
     // TODO: check div-by-0 behavior in WebGL2 spec
     return Ray(origin, dir, 1.0 / dir);
 }
+
+
 """

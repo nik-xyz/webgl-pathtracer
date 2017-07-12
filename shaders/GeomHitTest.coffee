@@ -1,4 +1,4 @@
-Shader.geomHitTestSource = """
+ShaderSources.getGeomHitTest = -> """
 
 struct TriangleHitTestResult {
     bool hit;
@@ -54,4 +54,6 @@ bool hitTestCube(Cube cube, Ray ray) {
     float far     = min(farVec.x,   min(farVec.y,   farVec.z));
     return close <= far;
 }
+
+
 """

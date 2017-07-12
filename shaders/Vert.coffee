@@ -1,4 +1,4 @@
-Shader.vertShaderSource = """
+ShaderSources.getVertShader = -> """
 #version 300 es
 
 in vec2 vertPos;

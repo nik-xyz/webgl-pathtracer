@@ -1,14 +1,5 @@
-Shader.dataTexSource = """
-
-uniform sampler2D triangleBufferSampler;
-uniform uint triangleBufferMask;
-uniform uint triangleBufferShift;
-
-uniform highp usampler2D octreeBufferSampler;
-uniform uint octreeBufferMask;
-uniform uint octreeBufferShift;
-
-
+ShaderSources.getDataTex = ->
+    """
 ivec2 getTexelForAddress(uint address, uint mask, uint shift) {
     return ivec2(address & mask, address >> shift);
 }
@@ -98,5 +89,6 @@ Octree readOctree(uint address) {
         )
     );
 }
+
 
 """

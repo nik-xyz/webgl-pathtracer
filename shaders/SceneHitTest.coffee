@@ -1,6 +1,6 @@
-Shader.sceneHitTestSource = """
+ShaderSources.getSceneHitTest = -> """
 const uint SCENE_OCTREE_ROOT_ADDRESS = 0u;
-const uint OCTREE_STACK_SIZE = 10u;
+const uint OCTREE_STACK_SIZE = #{(Octree.SUBDIVISION_LIMIT + 1).toString()}u;
 const float RAY_CUTOFF_DISTANCE = 100000.0;
 
 
@@ -119,4 +119,6 @@ SceneHitTestResult hitTestScene(Ray ray) {
 }
 
 #undef stackTop
+
+
 """

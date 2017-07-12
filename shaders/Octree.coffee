@@ -1,4 +1,4 @@
-Shader.octreeSource = """
+ShaderSources.getOctree = -> """
 
 struct Octree {
     uint triStartAddress;
@@ -14,4 +14,6 @@ Cube getOctreeChildCube(Cube parentCube, uint index) {
         parentCube.size * 0.5
     );
 }
+
+
 """

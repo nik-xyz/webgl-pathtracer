@@ -9,12 +9,13 @@ SRCS += src/PathTracer.coffee
 
 SRCS += models/TestModel.coffee
 
-SRCS += shaders/Shader.coffee
+SRCS += shaders/ShaderSources.coffee
 SRCS += shaders/Octree.coffee
 SRCS += shaders/DataTex.coffee
 SRCS += shaders/GeomTypes.coffee
 SRCS += shaders/GeomHitTest.coffee
 SRCS += shaders/SceneHitTest.coffee
+SRCS += shaders/Uniforms.coffee
 SRCS += shaders/Vert.coffee
 SRCS += shaders/Frag.coffee
 

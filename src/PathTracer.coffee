@@ -23,8 +23,8 @@ class PathTracer
 
     createShader = ->
         sources = [
-            [gl.VERTEX_SHADER,   Shader.vertShaderSource]
-            [gl.FRAGMENT_SHADER, Shader.fragShaderSource]
+            [gl.VERTEX_SHADER,   ShaderSources.getVertShader()]
+            [gl.FRAGMENT_SHADER, ShaderSources.getFragShader(Octree.SUBDIVISION_LIMIT + 1)]
         ]
 
         uniforms = [

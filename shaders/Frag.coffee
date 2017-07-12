@@ -1,4 +1,4 @@
-Shader.fragShaderSource = """
+ShaderSources.getFragShader = -> """
 #version 300 es
 
 precision mediump float;
@@ -6,17 +6,13 @@ precision mediump float;
 in vec2 fragPos;
 out highp vec4 fragColor;
 
-uniform vec3 cameraPosition;
 
-uniform vec3 octreeCubeCenter;
-uniform float octreeCubeSize;
-
-
-""" + Shader.geomTypesSource    + """
-""" + Shader.octreeSource       + """
-""" + Shader.dataTexSource      + """
-""" + Shader.geomHitTestSource  + """
-""" + Shader.sceneHitTestSource + """
+#{ShaderSources.getUniforms()}
+#{ShaderSources.getGeomTypes()}
+#{ShaderSources.getOctree()}
+#{ShaderSources.getDataTex()}
+#{ShaderSources.getGeomHitTest()}
+#{ShaderSources.getSceneHitTest()}
 
 
 vec4 tracePath(Ray startRay) {
@@ -37,5 +33,6 @@ void main() {
     Ray ray = createRay(cameraPosition, normalize(vec3(fragPos.x, fragPos.y, 0.9)));
     fragColor = tracePath(ray);
 }
+
 
 """

@@ -76,9 +76,9 @@ class OctreeNode
 
 
 class Octree
-    SUBDIVISION_LIMIT = 10
+    @SUBDIVISION_LIMIT = 10
 
-    constructor: (triangles, eps = 0.1, limit = SUBDIVISION_LIMIT) ->
+    constructor: (triangles, eps = 0.1, limit = @SUBDIVISION_LIMIT) ->
         # Compute bounding box for all triangles
         minBound = triangles.map((tri) -> tri.minBound).reduce((a, b) -> a.min(b))
         maxBound = triangles.map((tri) -> tri.maxBound).reduce((a, b) -> a.max(b))
