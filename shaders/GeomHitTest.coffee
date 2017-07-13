@@ -1,5 +1,4 @@
-ShaderSources.getGeomHitTest = -> """
-
+ShaderSources.getGeomHitTestSource = -> """
 struct TriangleHitTestResult {
     bool hit;
     float edge0, edge1;
@@ -38,6 +37,10 @@ TriangleHitTestResult hitTestTri(TrianglePosData tri, Ray ray) {
     }
 
     res.distance = dot(tri.edge0, vertToOriginCrossEdge1) * inverseDet;
+
+    if(res.distance < 0.0) {
+        return res;
+    }
 
     res.hit = true;
     return res;

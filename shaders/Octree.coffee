@@ -1,5 +1,4 @@
-ShaderSources.getOctree = -> """
-
+ShaderSources.getOctreeSource = -> """
 struct Octree {
     uint triStartAddress;
     uint triEndAddress;

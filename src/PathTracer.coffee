@@ -23,8 +23,8 @@ class PathTracer
 
     createShader = ->
         sources = [
-            [gl.VERTEX_SHADER,   ShaderSources.getVertShader()]
-            [gl.FRAGMENT_SHADER, ShaderSources.getFragShader(Octree.SUBDIVISION_LIMIT + 1)]
+            [gl.VERTEX_SHADER,   ShaderSources.getVertShaderSource()]
+            [gl.FRAGMENT_SHADER, ShaderSources.getFragShaderSource()]
         ]
 
         uniforms = [
@@ -76,7 +76,7 @@ class PathTracer
         gl.uniform1f(program.uniforms["octreeCubeSize"], @octree.root.size)
 
         gl.uniform1f(program.uniforms["cullDistance"], 10000)
-        gl.uniform3f(program.uniforms["cameraPosition"], 0, 0, -2)
+        gl.uniform3f(program.uniforms["cameraPosition"], 0, 0, -5)
 
         vao.bind()
         gl.drawArrays(gl.TRIANGLES, 0, 6)

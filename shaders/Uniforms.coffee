@@ -1,4 +1,4 @@
-ShaderSources.getUniforms = -> """
+ShaderSources.getUniformsSource = -> """
 uniform sampler2D triangleBufferSampler;
 uniform uint triangleBufferMask;
 uniform uint triangleBufferShift;

@@ -1,5 +1,4 @@
-ShaderSources.getDataTex = ->
-    """
+ShaderSources.getDataTexSource = -> """
 ivec2 getTexelForAddress(uint address, uint mask, uint shift) {
     return ivec2(address & mask, address >> shift);
 }

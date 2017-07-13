@@ -1,5 +1,4 @@
-ShaderSources.getGeomTypes = -> """
-
+ShaderSources.getGeomTypesSource = -> """
 const uint TRIANGLE_STRIDE = 24u;
 
 

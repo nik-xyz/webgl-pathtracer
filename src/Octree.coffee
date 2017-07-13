@@ -1,7 +1,7 @@
 class OctreeNode
-    NULL_NODE_ADDRESS = 0
-    NO_LOAD_FLAG      = 0
-    LOAD_FLAG         = 1
+    @NULL_NODE_ADDRESS = 0
+    @NO_LOAD_FLAG      = 0
+    @LOAD_FLAG         = 1
 
 
     constructor: (@center, @size, @limit) ->
@@ -54,14 +54,14 @@ class OctreeNode
 
         if @children.every((child) -> child is null)
             # Push no-load flag
-            octreeBuffer.push(NO_LOAD_FLAG)
+            octreeBuffer.push(@NO_LOAD_FLAG)
         else
             # Push load flag
-            octreeBuffer.push(LOAD_FLAG)
+            octreeBuffer.push(@LOAD_FLAG)
 
             # Push null child addresss that will be overwritten with actual values later
             childrenSegmentBaseAddress = octreeBuffer.length
-            octreeBuffer.push(new Array(8).fill(NULL_NODE_ADDRESS)...)
+            octreeBuffer.push(new Array(8).fill(@NULL_NODE_ADDRESS)...)
 
             # Push children and set address pointers
             for child, index in @children
