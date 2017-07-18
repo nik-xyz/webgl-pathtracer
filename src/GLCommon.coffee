@@ -51,7 +51,7 @@ class ShaderProgram
                 throw "Failed to locate uniform #{name}"
 
             uniforms[name] = location
-        return uniforms
+        uniforms
 
 
     getAttribs = (gl, program, attribNames) ->
@@ -62,7 +62,7 @@ class ShaderProgram
                 throw "Failed to locate attrib #{name}"
 
             attribs[name] = location
-        return attribs
+        attribs
 
 
 class Buffer
@@ -134,7 +134,6 @@ class DataTexture extends Texture
         super(@gl, width, height, formats..., type, paddedData)
 
 
-
 class VertexArray
     constructor: (@gl) ->
         @vao = @gl.createVertexArray()
@@ -149,3 +148,15 @@ class VertexArray
 
     bind: ->
         @gl.bindVertexArray(@vao)
+
+
+class TexFramebuffer
+    constructor: (@gl, @resolution) ->
+        @buf = @gl.createFramebuffer()
+        @gl.bindFramebuffer(@gl.FRAMEBUFFER, @buf)
+
+        @tex = new Texture(@gl, @resolution.x, @resolution.y, @gl.RGBA,
+            @gl.RGBA, @gl.UNSIGNED_BYTE, null)
+
+        @gl.framebufferTexture2D(@gl.FRAMEBUFFER, @gl.COLOR_ATTACHMENT0,
+            @gl.TEXTURE_2D, @tex.tex, 0);

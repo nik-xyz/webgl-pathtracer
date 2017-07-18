@@ -12,4 +12,6 @@ uniform vec3 cameraPosition;
 uniform vec3 octreeCubeCenter;
 uniform float octreeCubeSize;
 
+uniform uint rngSeed;
+uniform float compositeAlpha;
 """

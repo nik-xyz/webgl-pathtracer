@@ -3,11 +3,17 @@ class PathTracer
     vao = null
     screenVBO = null
     program = null
+    framebuffer = null
 
     constructor: ->
         @canvas = document.createElement("canvas")
 
-        gl = @canvas.getContext("webgl2")
+        attribs = {
+            antialias: false
+            depth: false
+            stencil: false
+        }
+        gl = @canvas.getContext("webgl2", attribs)
         if gl is null then throw "Unable to create WebGL2 context"
 
         screenVBO = new Buffer(gl, new Float32Array(
@@ -15,10 +21,19 @@ class PathTracer
         ))
 
         program = createShader()
-        @createDataTextures()
+        @createScene()
 
         vao = new VertexArray(gl)
         vao.setupAttrib(program.uniforms.vertPos, screenVBO, 2, gl.FLOAT, 0, 0)
+
+        @rngSeed = 0
+        @sampleCounter = 0
+
+
+    setResolution: (@resolution) ->
+        [@canvas.width, @canvas.height] = @resolution.array()
+
+        framebuffer = new TexFramebuffer(gl, @resolution)
 
 
     createShader = ->
@@ -40,6 +55,9 @@ class PathTracer
             "triangleBufferSampler"
             "triangleBufferShift"
             "triangleBufferMask"
+
+            "rngSeed"
+            "compositeAlpha"
         ]
 
         attribs = ["vertPos"]
@@ -47,7 +65,7 @@ class PathTracer
         return new ShaderProgram(gl, sources, uniforms, attribs)
 
 
-    createDataTextures: ->
+    createScene: ->
         triangles = new TriangleLoader(Models.testModel).triangles
 
         @octree = new Octree(triangles)
@@ -57,10 +75,14 @@ class PathTracer
         @triangleDataTex = new DataTexture(gl, gl.FLOAT, triangleBuffer)
 
 
-    render: ->
-        gl.viewport(0, 0, @canvas.width, @canvas.height)
+    renderImage: ->
+        gl.viewport(0, 0, @resolution.x, @resolution.y)
 
         program.use()
+        vao.bind()
+
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, framebuffer.buf)
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, framebuffer.buf)
 
         @triangleDataTex.bind(gl.TEXTURE0)
         gl.uniform1i( program.uniforms["triangleBufferSampler"], 0)
@@ -78,5 +100,24 @@ class PathTracer
         gl.uniform1f(program.uniforms["cullDistance"], 10000)
         gl.uniform3f(program.uniforms["cameraPosition"], 0, 0, -5)
 
-        vao.bind()
+        gl.uniform1ui(program.uniforms["rngSeed"], @rngSeed)
+        gl.uniform1f(program.uniforms["compositeAlpha"], 1 / (@sampleCounter + 1))
+
+        @rngSeed++
+        @sampleCounter++
+
+        gl.enable(gl.BLEND)
+        gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE)
+
+        gl.depthMask(false)
         gl.drawArrays(gl.TRIANGLES, 0, 6)
+        gl.finish()
+
+
+    displayImage: ->
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, framebuffer.buf)
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null)
+        gl.clearColor(0, 0, 0, 0)
+        gl.clear(gl.COLOR_BUFFER_BIT)
+        bounds = [0, 0, @resolution.x, @resolution.y]
+        gl.blitFramebuffer(bounds..., bounds..., gl.COLOR_BUFFER_BIT, gl.NEAREST)

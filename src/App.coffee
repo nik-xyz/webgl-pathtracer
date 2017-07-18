@@ -1,10 +1,20 @@
 class App
     run: ->
         pt = new PathTracer()
-        pt.canvas.width = pt.canvas.height = 1000
-        document.body.appendChild(pt.canvas)
+        pt.setResolution(new Vec2(512, 512))
 
-        pt.render()
+        render = ->
+            pt.renderImage()
+            pt.displayImage()
+
+        button = document.createElement("input")
+        button.value = "Render!"
+        button.type = "button"
+        button.addEventListener("click", render)
+
+        document.body.appendChild(button)
+        document.body.appendChild(document.createElement("br"))
+        document.body.appendChild(pt.canvas)
 
 window.onload = ->
     app = new App()
