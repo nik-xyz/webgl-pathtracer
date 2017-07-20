@@ -44,6 +44,7 @@ class PathTracer
 
         uniforms = [
             "cameraPosition"
+            "subPixelJitter"
 
             "octreeCubeCenter"
             "octreeCubeSize"
@@ -98,7 +99,10 @@ class PathTracer
         gl.uniform1f(program.uniforms["octreeCubeSize"], @octree.root.size)
 
         gl.uniform1f(program.uniforms["cullDistance"], 10000)
-        gl.uniform3f(program.uniforms["cameraPosition"], 0, 0, -5)
+        gl.uniform3f(program.uniforms["cameraPosition"], 0, 3, -3)
+
+        jitter = new Vec2().map(-> Math.random() * 2 - 1).div(@resolution)
+        gl.uniform2fv(program.uniforms["subPixelJitter"], jitter.array())
 
         gl.uniform1ui(program.uniforms["rngSeed"], @rngSeed)
         gl.uniform1f(program.uniforms["compositeAlpha"], 1 / (@sampleCounter + 1))

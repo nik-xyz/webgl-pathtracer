@@ -8,10 +8,12 @@ uniform uint octreeBufferMask;
 uniform uint octreeBufferShift;
 
 uniform vec3 cameraPosition;
+uniform vec2 subPixelJitter;
 
 uniform vec3 octreeCubeCenter;
 uniform float octreeCubeSize;
 
 uniform uint rngSeed;
-uniform float compositeAlpha;
+uniform highp float compositeAlpha;
+
 """

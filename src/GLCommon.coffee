@@ -1,5 +1,7 @@
 class ShaderProgram
-    constructor: (@gl, shaderData, uniformNames = [], attribNames = []) ->
+    constructor: (@gl, shaderData, uniformNames = [], attribNames = [],
+        uniformsReqired = false
+    ) ->
         shaders = createShaders(@gl, shaderData)
         checkShaders(@gl, shaders)
 
@@ -14,7 +16,7 @@ class ShaderProgram
             @gl.detachShader(@program, shader)
             @gl.deleteShader(shader)
 
-        @uniforms = getUniforms(@gl, @program, uniformNames)
+        @uniforms = getUniforms(@gl, @program, uniformNames, uniformsReqired)
         @attribs  = getAttribs(@gl, @program, attribNames)
 
 
@@ -43,12 +45,16 @@ class ShaderProgram
                 throw "Shader compilation failed:\n#{log}"
 
 
-    getUniforms = (gl, program, uniformNames) ->
+    getUniforms = (gl, program, uniformNames, required) ->
         uniforms = {}
         for name in uniformNames
             location = gl.getUniformLocation(program, name)
             if location is null
-                throw "Failed to locate uniform #{name}"
+                message = "Failed to locate uniform #{name}"
+                if required
+                    throw message
+                else
+                    console.error(message)
 
             uniforms[name] = location
         uniforms
@@ -152,11 +158,21 @@ class VertexArray
 
 class TexFramebuffer
     constructor: (@gl, @resolution) ->
+
+        floatExt = @gl.getExtension("EXT_color_buffer_float")
+        internalFormat = if floatExt then @gl.RGBA32F else @gl.RGBA8
+
         @buf = @gl.createFramebuffer()
         @gl.bindFramebuffer(@gl.FRAMEBUFFER, @buf)
 
-        @tex = new Texture(@gl, @resolution.x, @resolution.y, @gl.RGBA,
-            @gl.RGBA, @gl.UNSIGNED_BYTE, null)
+        @rb = @gl.createRenderbuffer()
+        @gl.bindRenderbuffer(@gl.RENDERBUFFER, @rb)
 
-        @gl.framebufferTexture2D(@gl.FRAMEBUFFER, @gl.COLOR_ATTACHMENT0,
-            @gl.TEXTURE_2D, @tex.tex, 0);
+        @gl.renderbufferStorage(@gl.RENDERBUFFER, internalFormat,
+            @resolution.x, @resolution.y);
+
+        @gl.framebufferRenderbuffer(@gl.FRAMEBUFFER, @gl.COLOR_ATTACHMENT0,
+            @gl.RENDERBUFFER, @rb);
+
+        @gl.bindRenderbuffer(@gl.RENDERBUFFER, null)
+        @gl.bindFramebuffer(@gl.FRAMEBUFFER, null)

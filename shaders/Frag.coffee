@@ -3,7 +3,7 @@ ShaderSources.getFragShaderSource = -> """
 
 precision mediump float;
 
-in vec2 fragPos;
+in  highp vec2 fragPos;
 out highp vec4 fragColor;
 
 // Include other shaders
@@ -19,7 +19,14 @@ out highp vec4 fragColor;
 void main() {
     uint rngState = rngSeed;
 
-    Ray ray = createRay(cameraPosition, normalize(vec3(fragPos.x+random(rngState)/512., fragPos.y+random(rngState)/512., 0.8)));
+    mat3 cameraMat = mat3(
+        1.0, 0.0, 0.0,
+        0.0, 0.707, 0.707,
+        0.0, -0.707, 0.707
+    );
+
+    vec3 projected = cameraMat * vec3(fragPos + subPixelJitter, 1.5);
+    Ray ray = createRay(cameraPosition, normalize(projected));
 
     fragColor = vec4(tracePath(ray, rngState), compositeAlpha);
 }
