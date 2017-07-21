@@ -4,6 +4,15 @@ ivec2 getTexelForAddress(uint address, uint mask, uint shift) {
 }
 
 
+float readRandomData(uint address) {
+    return texelFetch(
+        randomBufferSampler,
+        getTexelForAddress(address, randomBufferMask, randomBufferShift),
+        0
+    ).r;
+}
+
+
 float readTriData(uint address) {
     return texelFetch(
         triangleBufferSampler,

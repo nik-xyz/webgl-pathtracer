@@ -1,12 +1,23 @@
 ShaderSources.getRandomSource = -> """
-float random(inout uint rngState) {
-    vec3 seed = vec3(fragPos, float(rngState++));
+uint calculateCantorPairing(uvec2 pair) {
+    uint sum = pair.x + pair.y;
+    return (sum * (sum + 1u)) / 2u + pair.y;
+}
 
-    // Poor but somewhat useable RNG
-    float x = sin(seed.x * 1000.0) + 2.0;
-    float y = sin(seed.y * 1000.0 * x) + 2.0;
-    float z = sin(seed.z * 1000.0 * x * y);
-    return fract(x + y + z);
+
+float random(inout uint rngState) {
+    uvec2 coord = uvec2(gl_FragCoord);
+
+    // Combine the coordinates and seed using Cantor's pairing
+    // function, which helps avoid patterns in the end result.
+    uint addr = calculateCantorPairing(coord);
+    addr = calculateCantorPairing(uvec2(addr, coord.x * coord.y));
+    addr = calculateCantorPairing(uvec2(addr, rngState));
+    addr = addr & ((1u << 12u) - 1u);
+
+    rngState += 1u;
+
+    return readRandomData(addr);
 }
 
 

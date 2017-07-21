@@ -26,7 +26,6 @@ class PathTracer
         vao = new VertexArray(gl)
         vao.setupAttrib(program.uniforms.vertPos, screenVBO, 2, gl.FLOAT, 0, 0)
 
-        @rngSeed = 0
         @sampleCounter = 0
 
 
@@ -57,7 +56,10 @@ class PathTracer
             "triangleBufferShift"
             "triangleBufferMask"
 
-            "rngSeed"
+            "randomBufferSampler"
+            "randomBufferShift"
+            "randomBufferMask"
+
             "compositeAlpha"
         ]
 
@@ -76,7 +78,19 @@ class PathTracer
         @triangleDataTex = new DataTexture(gl, gl.FLOAT, triangleBuffer)
 
 
+    createRandomData: ->
+        randomDataLen = 1 << 12
+        randomData = [0...randomDataLen].map(Math.random)
+        if @randomDataTex?
+            gl.deleteTexture(@randomDataTex.tex)
+
+        @randomDataTex = new DataTexture(gl, gl.FLOAT, randomData)
+
+
+
     renderImage: ->
+        @createRandomData()
+
         gl.viewport(0, 0, @resolution.x, @resolution.y)
 
         program.use()
@@ -86,28 +100,32 @@ class PathTracer
         gl.bindFramebuffer(gl.READ_FRAMEBUFFER, framebuffer.buf)
 
         @triangleDataTex.bind(gl.TEXTURE0)
+        @octreeDataTex.bind(gl.TEXTURE1)
+        @randomDataTex.bind(gl.TEXTURE2)
+
         gl.uniform1i( program.uniforms["triangleBufferSampler"], 0)
         gl.uniform1ui(program.uniforms["triangleBufferMask"],  @triangleDataTex.dataMask)
         gl.uniform1ui(program.uniforms["triangleBufferShift"], @triangleDataTex.dataShift)
 
-        @octreeDataTex.bind(gl.TEXTURE1)
         gl.uniform1i( program.uniforms["octreeBufferSampler"], 1)
         gl.uniform1ui(program.uniforms["octreeBufferMask"],  @octreeDataTex.dataMask)
         gl.uniform1ui(program.uniforms["octreeBufferShift"], @octreeDataTex.dataShift)
+
+        gl.uniform1i( program.uniforms["randomBufferSampler"], 2)
+        gl.uniform1ui(program.uniforms["randomBufferMask"],  @randomDataTex.dataMask)
+        gl.uniform1ui(program.uniforms["randomBufferShift"], @randomDataTex.dataShift)
 
         gl.uniform3fv(program.uniforms["octreeCubeCenter"], @octree.root.center.array())
         gl.uniform1f(program.uniforms["octreeCubeSize"], @octree.root.size)
 
         gl.uniform1f(program.uniforms["cullDistance"], 10000)
         gl.uniform3f(program.uniforms["cameraPosition"], 0, 3, -3)
+        gl.uniform2uiv(program.uniforms["resolution"], @resolution.array())
 
         jitter = new Vec2().map(-> Math.random() * 2 - 1).div(@resolution)
         gl.uniform2fv(program.uniforms["subPixelJitter"], jitter.array())
-
-        gl.uniform1ui(program.uniforms["rngSeed"], @rngSeed)
         gl.uniform1f(program.uniforms["compositeAlpha"], 1 / (@sampleCounter + 1))
 
-        @rngSeed++
         @sampleCounter++
 
         gl.enable(gl.BLEND)

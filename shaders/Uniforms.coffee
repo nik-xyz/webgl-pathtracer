@@ -7,6 +7,10 @@ uniform highp usampler2D octreeBufferSampler;
 uniform uint octreeBufferMask;
 uniform uint octreeBufferShift;
 
+uniform sampler2D randomBufferSampler;
+uniform uint randomBufferMask;
+uniform uint randomBufferShift;
+
 uniform vec3 cameraPosition;
 uniform vec2 subPixelJitter;
 

@@ -3,7 +3,7 @@ class App
         pt = new PathTracer()
         pt.setResolution(new Vec2(512, 512))
 
-        render = ->
+        window.render = ->
             pt.renderImage()
             pt.displayImage()
 

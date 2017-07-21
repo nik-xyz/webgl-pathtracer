@@ -17,12 +17,12 @@ out highp vec4 fragColor;
 #{ShaderSources.getPathTraceSource()}
 
 void main() {
-    uint rngState = rngSeed;
+    uint rngState = 0u;
 
     mat3 cameraMat = mat3(
-        1.0, 0.0, 0.0,
-        0.0, 0.707, 0.707,
-        0.0, -0.707, 0.707
+        1.000,  0.000,  0.000,
+        0.000,  0.707,  0.707,
+        0.000, -0.707,  0.707
     );
 
     vec3 projected = cameraMat * vec3(fragPos + subPixelJitter, 1.5);
