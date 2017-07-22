@@ -100,6 +100,10 @@ class Texture
         @gl.bindTexture(@gl.TEXTURE_2D, @tex)
 
 
+    destroy: ->
+        @gl.deleteTexture(@tex)
+
+
 class DataTexture extends Texture
     constructor: (@gl, type, data) ->
         unless type in [@gl.FLOAT, @gl.UNSIGNED_INT]
@@ -116,8 +120,12 @@ class DataTexture extends Texture
             throw "Required texture size exceeds limit"
 
         arrayType = if type is @gl.FLOAT then Float32Array else Uint32Array
-        paddedData = new arrayType(paddedSize)
-        paddedData.set(data)
+
+        # Avoid copying if the original array meets the necessary requirements
+        unless (data instanceof arrayType) and (data.length is paddedSize)
+            paddedData = new arrayType(paddedSize)
+            paddedData.set(data)
+            data = paddedData
 
         # Choose width and height so that the texture is large enough
         # to store the data while staying inside the size limits
@@ -137,7 +145,7 @@ class DataTexture extends Texture
                 [@gl.R32UI, @gl.RED_INTEGER]
 
         # Create texture
-        super(@gl, width, height, formats..., type, paddedData)
+        super(@gl, width, height, formats..., type, data)
 
 
 class VertexArray
@@ -145,7 +153,7 @@ class VertexArray
         @vao = @gl.createVertexArray()
 
 
-    setupAttrib: (location, buffer, size, type, stride, offset) ->
+    setupAttrib: (location, buffer, size, type, stride = 0, offset = 0) ->
         @bind()
         buffer.bind()
         @gl.enableVertexAttribArray(location)
@@ -158,7 +166,6 @@ class VertexArray
 
 class TexFramebuffer
     constructor: (@gl, @resolution) ->
-
         floatExt = @gl.getExtension("EXT_color_buffer_float")
         internalFormat = if floatExt then @gl.RGBA32F else @gl.RGBA8
 
@@ -176,3 +183,8 @@ class TexFramebuffer
 
         @gl.bindRenderbuffer(@gl.RENDERBUFFER, null)
         @gl.bindFramebuffer(@gl.FRAMEBUFFER, null)
+
+
+    destroy: ->
+        @gl.destroyFramebuffer(@buf)
+        @gl.destroyRenderbuffer(@rb)

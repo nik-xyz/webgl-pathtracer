@@ -5,6 +5,8 @@ SRCS += src/Vec.coffee
 SRCS += src/Triangle.coffee
 SRCS += src/Octree.coffee
 SRCS += src/TriangleLoader.coffee
+SRCS += src/RandomGen.coffee
+SRCS += src/Scene.coffee
 SRCS += src/PathTracer.coffee
 
 SRCS += models/TestModel.coffee

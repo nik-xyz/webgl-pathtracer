@@ -1,145 +1,112 @@
 class PathTracer
-    gl = null
-    vao = null
-    screenVBO = null
-    program = null
-    framebuffer = null
-
     constructor: ->
-        @canvas = document.createElement("canvas")
+        @createContext()
+        @createShader()
+        @createVertexData()
+        @reset()
 
-        attribs = {
+        @scene = new Scene(@gl)
+        @randomGen = new RandomGen(@gl)
+
+
+    createContext: ->
+        # Disable features that intefere with pixel transfer operations
+        # or are not needed
+        attribs =
             antialias: false
-            depth: false
-            stencil: false
-        }
-        gl = @canvas.getContext("webgl2", attribs)
-        if gl is null then throw "Unable to create WebGL2 context"
+            depth:     false
+            stencil:   false
+            alpha:     false
 
-        screenVBO = new Buffer(gl, new Float32Array(
+        @gl = document.createElement("canvas")?.getContext("webgl2", attribs)
+        unless @gl?
+            throw "Unable to create WebGl2 context"
+
+        @gl.depthMask(false)
+        @gl.clearColor(0, 0, 0, 0)
+
+
+    createShader: ->
+        sources = [
+            [@gl.VERTEX_SHADER,   ShaderSources.getVertShaderSource()]
+            [@gl.FRAGMENT_SHADER, ShaderSources.getFragShaderSource()]
+        ]
+        @program = new ShaderProgram(@gl, sources,
+                ShaderSources.uniformNames, ["vertPos"])
+
+
+    createVertexData: ->
+        @vbo = new Buffer(@gl, new Float32Array(
             [-1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1]
         ))
-
-        program = createShader()
-        @createScene()
-
-        vao = new VertexArray(gl)
-        vao.setupAttrib(program.uniforms.vertPos, screenVBO, 2, gl.FLOAT, 0, 0)
-
-        @sampleCounter = 0
+        @vao = new VertexArray(@gl)
+        @vao.setupAttrib(@program.uniforms["vertPos"], @vbo, 2, @gl.FLOAT)
 
 
-    setResolution: (@resolution) ->
-        [@canvas.width, @canvas.height] = @resolution.array()
-
-        framebuffer = new TexFramebuffer(gl, @resolution)
+    reset: -> @sampleCounter = 0
 
 
-    createShader = ->
-        sources = [
-            [gl.VERTEX_SHADER,   ShaderSources.getVertShaderSource()]
-            [gl.FRAGMENT_SHADER, ShaderSources.getFragShaderSource()]
-        ]
-
-        uniforms = [
-            "cameraPosition"
-            "subPixelJitter"
-
-            "octreeCubeCenter"
-            "octreeCubeSize"
-
-            "octreeBufferSampler"
-            "octreeBufferShift"
-            "octreeBufferMask"
-
-            "triangleBufferSampler"
-            "triangleBufferShift"
-            "triangleBufferMask"
-
-            "randomBufferSampler"
-            "randomBufferShift"
-            "randomBufferMask"
-
-            "compositeAlpha"
-        ]
-
-        attribs = ["vertPos"]
-
-        return new ShaderProgram(gl, sources, uniforms, attribs)
+    getCanvas: -> @gl.canvas
 
 
-    createScene: ->
-        triangles = new TriangleLoader(Models.testModel).triangles
+    setResolution: (@frameRes) ->
+        @frameBounds = [0, 0, @frameRes.x, @frameRes.y]
+        [@gl.canvas.width, @gl.canvas.height] = @frameRes.array()
+        @gl.viewport(@frameBounds...)
 
-        @octree = new Octree(triangles)
-        [octreeBuffer, triangleBuffer] = @octree.encode()
+        if @frame? then @frame.destroy()
+        @frame = new TexFramebuffer(@gl, @frameRes)
 
-        @octreeDataTex   = new DataTexture(gl, gl.UNSIGNED_INT, octreeBuffer)
-        @triangleDataTex = new DataTexture(gl, gl.FLOAT, triangleBuffer)
+        @reset()
 
 
-    createRandomData: ->
-        randomDataLen = 1 << 12
-        randomData = [0...randomDataLen].map(Math.random)
-        if @randomDataTex?
-            gl.deleteTexture(@randomDataTex.tex)
+    setJitter: ->
+        jitter = new Vec2()
+            .map(Math.random)
+            .scale(2)
+            .sub(new Vec2(1, 1))
+            .div(@frameRes)
+            .array()
 
-        @randomDataTex = new DataTexture(gl, gl.FLOAT, randomData)
+        @gl.uniform2fv(@program.uniforms["subPixelJitter"], jitter)
 
+
+    setAlpha: ->
+        runningAverageAlpha = 1 / (@sampleCounter + 1)
+        @gl.uniform1f(@program.uniforms["compositeAlpha"], runningAverageAlpha)
 
 
     renderImage: ->
-        @createRandomData()
+        @program.use()
 
-        gl.viewport(0, 0, @resolution.x, @resolution.y)
+        @randomGen.createRandomData()
+        @randomGen.uploadData(@program)
+        @scene.uploadData(@program)
 
-        program.use()
-        vao.bind()
-
-        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, framebuffer.buf)
-        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, framebuffer.buf)
-
-        @triangleDataTex.bind(gl.TEXTURE0)
-        @octreeDataTex.bind(gl.TEXTURE1)
-        @randomDataTex.bind(gl.TEXTURE2)
-
-        gl.uniform1i( program.uniforms["triangleBufferSampler"], 0)
-        gl.uniform1ui(program.uniforms["triangleBufferMask"],  @triangleDataTex.dataMask)
-        gl.uniform1ui(program.uniforms["triangleBufferShift"], @triangleDataTex.dataShift)
-
-        gl.uniform1i( program.uniforms["octreeBufferSampler"], 1)
-        gl.uniform1ui(program.uniforms["octreeBufferMask"],  @octreeDataTex.dataMask)
-        gl.uniform1ui(program.uniforms["octreeBufferShift"], @octreeDataTex.dataShift)
-
-        gl.uniform1i( program.uniforms["randomBufferSampler"], 2)
-        gl.uniform1ui(program.uniforms["randomBufferMask"],  @randomDataTex.dataMask)
-        gl.uniform1ui(program.uniforms["randomBufferShift"], @randomDataTex.dataShift)
-
-        gl.uniform3fv(program.uniforms["octreeCubeCenter"], @octree.root.center.array())
-        gl.uniform1f(program.uniforms["octreeCubeSize"], @octree.root.size)
-
-        gl.uniform1f(program.uniforms["cullDistance"], 10000)
-        gl.uniform3f(program.uniforms["cameraPosition"], 0, 3, -3)
-        gl.uniform2uiv(program.uniforms["resolution"], @resolution.array())
-
-        jitter = new Vec2().map(-> Math.random() * 2 - 1).div(@resolution)
-        gl.uniform2fv(program.uniforms["subPixelJitter"], jitter.array())
-        gl.uniform1f(program.uniforms["compositeAlpha"], 1 / (@sampleCounter + 1))
+        @setJitter()
+        @setAlpha()
 
         @sampleCounter++
 
-        gl.enable(gl.BLEND)
-        gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE)
+        # Render to output framebugger
+        @gl.bindFramebuffer(@gl.DRAW_FRAMEBUFFER, @frame.buf)
+        @gl.bindFramebuffer(@gl.READ_FRAMEBUFFER, @frame.buf)
 
-        gl.depthMask(false)
-        gl.drawArrays(gl.TRIANGLES, 0, 6)
-        gl.finish()
+        # Composite samples with additive blending
+        @gl.enable(@gl.BLEND)
+        @gl.blendFuncSeparate(@gl.SRC_ALPHA, @gl.ONE_MINUS_SRC_ALPHA, @gl.ONE, @gl.ONE)
+
+        # Render
+        @vao.bind()
+        @gl.drawArrays(@gl.TRIANGLES, 0, 6)
+        @gl.finish()
 
 
     displayImage: ->
-        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, framebuffer.buf)
-        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null)
-        gl.clearColor(0, 0, 0, 0)
-        gl.clear(gl.COLOR_BUFFER_BIT)
-        bounds = [0, 0, @resolution.x, @resolution.y]
-        gl.blitFramebuffer(bounds..., bounds..., gl.COLOR_BUFFER_BIT, gl.NEAREST)
+        @gl.bindFramebuffer(@gl.READ_FRAMEBUFFER, @frame.buf)
+        @gl.bindFramebuffer(@gl.DRAW_FRAMEBUFFER, null)
+
+        @gl.clear(@gl.COLOR_BUFFER_BIT)
+
+        @gl.blitFramebuffer(@frameBounds..., @frameBounds...,
+            @gl.COLOR_BUFFER_BIT, @gl.NEAREST)

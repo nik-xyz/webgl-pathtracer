@@ -14,7 +14,7 @@ class App
 
         document.body.appendChild(button)
         document.body.appendChild(document.createElement("br"))
-        document.body.appendChild(pt.canvas)
+        document.body.appendChild(pt.getCanvas())
 
 window.onload = ->
     app = new App()

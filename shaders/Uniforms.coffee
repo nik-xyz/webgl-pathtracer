@@ -11,13 +11,35 @@ uniform sampler2D randomBufferSampler;
 uniform uint randomBufferMask;
 uniform uint randomBufferShift;
 
-uniform vec3 cameraPosition;
-uniform vec2 subPixelJitter;
-
 uniform vec3 octreeCubeCenter;
 uniform float octreeCubeSize;
 
-uniform uint rngSeed;
+uniform vec3 cameraPosition;
+uniform vec2 subPixelJitter;
 uniform highp float compositeAlpha;
 
+
+
 """
+
+ShaderSources.uniformNames = [
+    "triangleBufferSampler"
+    "triangleBufferShift"
+    "triangleBufferMask"
+
+    "octreeBufferSampler"
+    "octreeBufferShift"
+    "octreeBufferMask"
+
+    "randomBufferSampler"
+    "randomBufferShift"
+    "randomBufferMask"
+
+    "octreeCubeCenter"
+    "octreeCubeSize"
+
+    "cameraPosition"
+
+    "subPixelJitter"
+    "compositeAlpha"
+]
