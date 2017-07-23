@@ -134,8 +134,7 @@ class DataTexture extends Texture
 
         # Calculate address mask and shift values to allow
         # the texture to be accessed with a 1D index
-        @dataMask  = width - 1
-        @dataShift = Math.log2(width)
+        @dataMaskAndShift = [width - 1, Math.log2(width)]
 
         # Find appropriate formats to store the data
         formats =

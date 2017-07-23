@@ -17,6 +17,6 @@ class RandomGen
     uploadData: (program) ->
         @randomDataTex.bind(@gl.TEXTURE2)
 
-        @gl.uniform1i( program.uniforms["randomBufferSampler"], 2)
-        @gl.uniform1ui(program.uniforms["randomBufferMask"],  @randomDataTex.dataMask)
-        @gl.uniform1ui(program.uniforms["randomBufferShift"], @randomDataTex.dataShift)
+        @gl.uniform1i(program.uniforms["randomBufferSampler"], 2)
+        @gl.uniform2uiv(program.uniforms["randomBufferAddrData"],
+            @randomDataTex.dataMaskAndShift)

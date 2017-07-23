@@ -59,7 +59,8 @@ class OctreeNode
             # Push load flag
             octreeBuffer.push(@LOAD_FLAG)
 
-            # Push null child addresss that will be overwritten with actual values later
+            # Push null child addresss that will be overwritten
+            # with actual values later
             childrenSegmentBaseAddress = octreeBuffer.length
             octreeBuffer.push(new Array(8).fill(@NULL_NODE_ADDRESS)...)
 
@@ -67,7 +68,8 @@ class OctreeNode
             for child, index in @children
                 if child isnt null
                     # Set child address
-                    octreeBuffer[childrenSegmentBaseAddress + index] = octreeBuffer.length
+                    octreeBuffer[childrenSegmentBaseAddress + index] =
+                        octreeBuffer.length
 
                     # Push child
                     child.encode(octreeBuffer, triangleBuffer)
@@ -78,16 +80,16 @@ class OctreeNode
 class Octree
     @SUBDIVISION_LIMIT = 10
 
-    constructor: (triangles, eps = 0.1, limit = @SUBDIVISION_LIMIT) ->
+    constructor: (tris, eps = 0.1, limit = @SUBDIVISION_LIMIT) ->
         # Compute bounding box for all triangles
-        minBound = triangles.map((tri) -> tri.minBound).reduce((a, b) -> a.min(b))
-        maxBound = triangles.map((tri) -> tri.maxBound).reduce((a, b) -> a.max(b))
+        minBound = tris.map((tri) -> tri.minBound).reduce((a, b) -> a.min(b))
+        maxBound = tris.map((tri) -> tri.maxBound).reduce((a, b) -> a.max(b))
         center = minBound.add(maxBound).scale(0.5)
         size = maxBound.sub(minBound).reduce(Math.max) + eps
 
         @root = new OctreeNode(center, size, limit)
 
-        for triangle in triangles
+        for triangle in tris
             @root.addTriangle(triangle)
 
 

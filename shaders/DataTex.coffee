@@ -1,13 +1,13 @@
 ShaderSources.getDataTexSource = -> """
-ivec2 getTexelForAddress(uint address, uint mask, uint shift) {
-    return ivec2(address & mask, address >> shift);
+ivec2 getTexelForAddress(uint address, uvec2 maskAndShift) {
+    return ivec2(address & maskAndShift.x, address >> maskAndShift.y);
 }
 
 
 float readRandomData(uint address) {
     return texelFetch(
         randomBufferSampler,
-        getTexelForAddress(address, randomBufferMask, randomBufferShift),
+        getTexelForAddress(address, randomBufferAddrData),
         0
     ).r;
 }
@@ -16,7 +16,7 @@ float readRandomData(uint address) {
 float readTriData(uint address) {
     return texelFetch(
         triangleBufferSampler,
-        getTexelForAddress(address, triangleBufferMask, triangleBufferShift),
+        getTexelForAddress(address, triangleBufferAddrData),
         0
     ).r;
 }
@@ -42,7 +42,7 @@ vec2 readTriVec2Data(uint address) {
 uint readOctreeData(uint address) {
     return texelFetch(
         octreeBufferSampler,
-        getTexelForAddress(address, octreeBufferMask, octreeBufferShift),
+        getTexelForAddress(address, octreeBufferAddrData),
         0
     ).r;
 }

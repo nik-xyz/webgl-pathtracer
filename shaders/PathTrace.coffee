@@ -15,6 +15,7 @@ vec3 scatter(vec3 incident, vec3 normal, inout uint rngState) {
     }
     else {
         // Calculate lambertian distribution
+        // FIXME
         return normalize(normal + unitSphereRandom(rngState));
     }
 }
@@ -25,7 +26,7 @@ vec3 tracePath(Ray ray, inout uint rngState) {
     vec3 incomingLight = vec3(0.0);
 
     // How much of the incoming light from the current ray will be transported
-    // back to the original ray's origin along the path that has been traced so far
+    // to the original ray's origin along the path that has been traced so far
     vec3 transportCoeff = vec3(1.0);
 
     for(uint bounce = 0u; bounce < BOUNCES; bounce++) {

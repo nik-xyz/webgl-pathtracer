@@ -1,15 +1,12 @@
 ShaderSources.getUniformsSource = -> """
 uniform sampler2D triangleBufferSampler;
-uniform uint triangleBufferMask;
-uniform uint triangleBufferShift;
+uniform uvec2 triangleBufferAddrData;
 
 uniform highp usampler2D octreeBufferSampler;
-uniform uint octreeBufferMask;
-uniform uint octreeBufferShift;
+uniform uvec2 octreeBufferAddrData;
 
 uniform sampler2D randomBufferSampler;
-uniform uint randomBufferMask;
-uniform uint randomBufferShift;
+uniform uvec2 randomBufferAddrData;
 
 uniform vec3 octreeCubeCenter;
 uniform float octreeCubeSize;
@@ -19,21 +16,17 @@ uniform vec2 subPixelJitter;
 uniform highp float compositeAlpha;
 
 
-
 """
 
 ShaderSources.uniformNames = [
     "triangleBufferSampler"
-    "triangleBufferShift"
-    "triangleBufferMask"
+    "triangleBufferAddrData"
 
     "octreeBufferSampler"
-    "octreeBufferShift"
-    "octreeBufferMask"
+    "octreeBufferAddrData"
 
     "randomBufferSampler"
-    "randomBufferShift"
-    "randomBufferMask"
+    "randomBufferAddrData"
 
     "octreeCubeCenter"
     "octreeCubeSize"

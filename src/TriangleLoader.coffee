@@ -13,10 +13,12 @@ class TriangleLoader
     createTriangles = (faces) ->
         triangles = []
         for face in faces
+            # Triangulate the face
             for index in [1...(face.length - 1)]
-                triangles.push(new Triangle(face[0], face[index], face[index + 1]))
+                tri = new Triangle(face[0], face[index], face[index + 1])
+                triangles.push(tri)
 
-        return triangles
+        triangles
 
 
     getFaces = (posArray, norArray, texArray, faceArray) ->
@@ -27,8 +29,6 @@ class TriangleLoader
                     accessArray(norArray, vertIndices[2]),
                     accessArray(texArray, vertIndices[1], DEFAULT_TEXCOORD),
                 )
-                # Implicit join
-            # Implicit join & return
 
 
     accessArray = (array, index, alt) ->
@@ -85,7 +85,7 @@ class TriangleLoader
             unless optional or Number.isSafeInteger(arrayIndex)
                 throw "Vertex #{name} list index is absent or invalid"
 
-            arrayIndex # Implicit join & return
+            arrayIndex
 
 
     parseFloats = (qty, tokens) ->
@@ -95,4 +95,4 @@ class TriangleLoader
             if num is NaN
                 throw "Invalid float"
 
-            num # Implicit join & return
+            num

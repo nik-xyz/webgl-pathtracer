@@ -2,10 +2,13 @@ class Scene
     constructor: (@gl) ->
         triangles = new TriangleLoader(Models.testModel).triangles
 
-        @octree = new Octree(triangles)
-        [octreeBuffer, triangleBuffer] = @octree.encode()
+        octree = new Octree(triangles)
 
-        @octreeDataTex   = new DataTexture(@gl, @gl.UNSIGNED_INT, octreeBuffer)
+        @octreeCenter = octree.root.center
+        @octreeSize   = octree.root.size
+
+        [octreeBuffer, triangleBuffer] = octree.encode()
+        @octreeDataTex = new DataTexture(@gl, @gl.UNSIGNED_INT, octreeBuffer)
         @triangleDataTex = new DataTexture(@gl, @gl.FLOAT, triangleBuffer)
 
         @cameraPosition = new Vec3(0, 3, -3)
@@ -17,15 +20,15 @@ class Scene
 
         uniforms = program.uniforms
 
-        @gl.uniform1i( uniforms["triangleBufferSampler"], 0)
-        @gl.uniform1ui(uniforms["triangleBufferMask"],  @triangleDataTex.dataMask)
-        @gl.uniform1ui(uniforms["triangleBufferShift"], @triangleDataTex.dataShift)
+        @gl.uniform1i(uniforms["triangleBufferSampler"], 0)
+        @gl.uniform2uiv(uniforms["triangleBufferAddrData"],
+            @triangleDataTex.dataMaskAndShift)
 
-        @gl.uniform1i( uniforms["octreeBufferSampler"], 1)
-        @gl.uniform1ui(uniforms["octreeBufferMask"],  @octreeDataTex.dataMask)
-        @gl.uniform1ui(uniforms["octreeBufferShift"], @octreeDataTex.dataShift)
+        @gl.uniform1i(uniforms["octreeBufferSampler"], 1)
+        @gl.uniform2uiv(uniforms["octreeBufferAddrData"],
+            @octreeDataTex.dataMaskAndShift)
 
-        @gl.uniform3fv(uniforms["octreeCubeCenter"], @octree.root.center.array())
-        @gl.uniform1f( uniforms["octreeCubeSize"],   @octree.root.size)
+        @gl.uniform3fv(uniforms["octreeCubeCenter"], @octreeCenter.array())
+        @gl.uniform1f(uniforms["octreeCubeSize"], @octreeSize)
 
         @gl.uniform3fv(uniforms["cameraPosition"], @cameraPosition.array())

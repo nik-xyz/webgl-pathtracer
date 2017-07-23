@@ -94,7 +94,8 @@ class PathTracer
 
         # Composite samples with additive blending
         @gl.enable(@gl.BLEND)
-        @gl.blendFuncSeparate(@gl.SRC_ALPHA, @gl.ONE_MINUS_SRC_ALPHA, @gl.ONE, @gl.ONE)
+        @gl.blendFuncSeparate(@gl.SRC_ALPHA, @gl.ONE_MINUS_SRC_ALPHA,
+            @gl.ONE, @gl.ONE)
 
         # Render
         @vao.bind()

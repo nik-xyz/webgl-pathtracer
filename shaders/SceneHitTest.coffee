@@ -59,7 +59,8 @@ SceneHitTestResult hitTestScene(Ray ray) {
 
                 if(hitTestCube(stackTop.cube, ray)) {
                     stackIndex++;
-                    stackTop = StackElem(readOctree(childAddress), childCube, 0u);
+                    stackTop = StackElem(readOctree(childAddress),
+                        childCube, 0u);
 
                     break;
                 }
