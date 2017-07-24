@@ -10,7 +10,7 @@ class TriangleVertex
 
 
 class Triangle
-    constructor: (vert0, vert1, vert2) ->
+    constructor: (vert0, vert1, vert2, @materialId) ->
         @minBound = vert0.pos.min(vert1.pos).min(vert2.pos)
         @maxBound = vert0.pos.max(vert1.pos).max(vert2.pos)
 
@@ -26,4 +26,4 @@ class Triangle
         norData = verts.map((v) -> v.nor.array()).reduce((a, b) -> a.concat(b))
         texData = verts.map((v) -> v.tex.array()).reduce((a, b) -> a.concat(b))
 
-        return posData.concat(norData).concat(texData)
+        return posData.concat(norData).concat(texData).concat(@materialId)

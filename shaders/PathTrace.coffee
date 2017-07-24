@@ -1,24 +1,7 @@
 ShaderSources.getPathTraceSource = -> """
-// Ray bounce limit
-const uint BOUNCES = 5u;
+const uint BOUNCE_LIMIT = 5u;
 
 const float RAY_SURFACE_OFFSET = 0.001;
-
-
-// Defines the scattering function for the surface
-vec3 scatter(vec3 incident, vec3 normal, inout uint rngState) {
-    float specularity = 0.2;
-
-    if(random(rngState) < specularity) {
-        // Specular reflection
-        return reflect(incident, normal);
-    }
-    else {
-        // Calculate lambertian distribution
-        // FIXME
-        return normalize(normal + unitSphereRandom(rngState));
-    }
-}
 
 
 vec3 tracePath(Ray ray, inout uint rngState) {
@@ -29,27 +12,38 @@ vec3 tracePath(Ray ray, inout uint rngState) {
     // to the original ray's origin along the path that has been traced so far
     vec3 transportCoeff = vec3(1.0);
 
-    for(uint bounce = 0u; bounce < BOUNCES; bounce++) {
+    for(uint bounce = 0u; bounce < BOUNCE_LIMIT; bounce++) {
         SceneHitTestResult htr = hitTestScene(ray);
 
         if(htr.hit) {
-            // TODO: get emissivity from material
-            vec3 emittedLight = vec3(0.0);
+            // TODO: load material from buffer instead of selecting between
+            // hard-coded options
+            Material material;
+            if(htr.materialIndex == 0u) {
+                material = Material(
+                    vec3(0.0), 0.1, vec3(1.0), vec3(0.0, 0.0, 1.0));
+            }
+            else if(htr.materialIndex == 1u) {
+                material = Material(
+                    vec3(0.0), 0.0, vec3(1.0), vec3(1.0, 0.0, 0.0));
+            }
+            else {
+                material = Material(
+                    vec3(0.0), 0.2, vec3(1.0), vec3(1.0, 1.0, 1.0));
+            }
+
+            // Use scattering function to determine the new ray's direction
+            ScatterResult sr = scatterMaterial(
+                ray.dir, htr.nor, material, rngState);
+
+            ray = createRay(htr.pos + sr.dir * RAY_SURFACE_OFFSET, sr.dir);
 
             // Accumulate emission from surface
-            incomingLight += transportCoeff * emittedLight;
-
-            // TODO: Get reflectivity / transmissivity from material
-            // TODO: Use Different coeffs for different scattering functions
-            vec3 materialTransportCoeff = vec3(htr.tex.y, htr.tex.y, 1.0);
+            incomingLight += transportCoeff * material.emissivity;
 
             // Calculate the new overall transport coefficient using
             // with the current material's transport coefficient
-            transportCoeff *= materialTransportCoeff;
-
-            // Use scattering function to determine the new ray's direction
-            vec3 dir = scatter(ray.dir, htr.nor, rngState);
-            ray = createRay(htr.pos + dir * RAY_SURFACE_OFFSET, dir);
+            transportCoeff *= sr.transportCoeff;
         }
         else {
             // TODO: sample background enviroment map instead

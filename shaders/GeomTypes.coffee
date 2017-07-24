@@ -1,5 +1,5 @@
 ShaderSources.getGeomTypesSource = -> """
-const uint TRIANGLE_STRIDE = 24u;
+const uint TRIANGLE_STRIDE = 25u;
 
 
 // Triangle position data. Only positions are needed for ray-triangle hit tests.
@@ -13,6 +13,7 @@ struct TrianglePosData {
 struct TriangleAuxAttribs {
     vec3 vertNor, edge0Nor, edge1Nor;
     vec2 vertTex, edge0Tex, edge1Tex;
+    uint materialIndex;
 };
 
 

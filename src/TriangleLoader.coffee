@@ -6,18 +6,18 @@ class TriangleLoader
     DEFAULT_TEXCOORD = new Vec2(0, 0)
 
 
-    constructor: (data) ->
-        @triangles = createTriangles(getFaces(parseLines(data)...))
+    constructor: (data, materialId) ->
+        @triangles = createTriangles(getFaces(parseLines(data)...), materialId)
 
 
-    createTriangles = (faces) ->
+    createTriangles = (faces, materialId) ->
         triangles = []
         for face in faces
             # Triangulate the face
             for index in [1...(face.length - 1)]
-                tri = new Triangle(face[0], face[index], face[index + 1])
+                tri = new Triangle(
+                    face[0], face[index], face[index + 1], materialId)
                 triangles.push(tri)
-
         triangles
 
 

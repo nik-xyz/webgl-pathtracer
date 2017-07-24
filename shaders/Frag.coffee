@@ -14,6 +14,7 @@ out highp vec4 fragColor;
 #{ShaderSources.getGeomHitTestSource()}
 #{ShaderSources.getSceneHitTestSource()}
 #{ShaderSources.getRandomSource()}
+#{ShaderSources.getMaterialSource()}
 #{ShaderSources.getPathTraceSource()}
 
 void main() {

@@ -64,7 +64,8 @@ TriangleAuxAttribs readTriAuxData(uint address) {
         readTriVec3Data(address + 15u),
         readTriVec2Data(address + 18u),
         readTriVec2Data(address + 20u),
-        readTriVec2Data(address + 22u)
+        readTriVec2Data(address + 22u),
+        uint(round(readTriData(address + 24u)))
     );
 }
 

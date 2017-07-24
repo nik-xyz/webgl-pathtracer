@@ -16,6 +16,7 @@ SRCS += shaders/DataTex.coffee
 SRCS += shaders/Frag.coffee
 SRCS += shaders/GeomHitTest.coffee
 SRCS += shaders/GeomTypes.coffee
+SRCS += shaders/Material.coffee
 SRCS += shaders/Octree.coffee
 SRCS += shaders/PathTrace.coffee
 SRCS += shaders/Random.coffee

@@ -1,11 +1,14 @@
 class Scene
     constructor: (@gl) ->
-        triangles = new TriangleLoader(Models.testModel).triangles
+        trianglesSphere = new TriangleLoader(Models.testModelSphere, 0).triangles
+        trianglesCube = new TriangleLoader(Models.testModelCube, 1).triangles
+        trianglesPlane = new TriangleLoader(Models.testModelPlane, 2).triangles
+        triangles = trianglesSphere.concat(trianglesCube).concat(trianglesPlane)
 
         octree = new Octree(triangles)
 
         @octreeCenter = octree.root.center
-        @octreeSize   = octree.root.size
+        @octreeSize = octree.root.size
 
         [octreeBuffer, triangleBuffer] = octree.encode()
         @octreeDataTex = new DataTexture(@gl, @gl.UNSIGNED_INT, octreeBuffer)

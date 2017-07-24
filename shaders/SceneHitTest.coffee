@@ -9,6 +9,7 @@ struct SceneHitTestResult {
     vec3 pos;
     vec3 nor;
     vec2 tex;
+    uint materialIndex;
 };
 
 
@@ -116,7 +117,10 @@ SceneHitTestResult hitTestScene(Ray ray) {
         // Texture coordinate
         closestTriAux.vertTex +
         closestTriAux.edge0Tex * closestHtr.edge0 +
-        closestTriAux.edge1Tex * closestHtr.edge1
+        closestTriAux.edge1Tex * closestHtr.edge1,
+
+        // Material index
+        closestTriAux.materialIndex
     );
 }
 
