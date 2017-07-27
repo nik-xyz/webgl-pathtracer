@@ -13,30 +13,17 @@ vec3 tracePath(Ray ray, inout uint rngState) {
     vec3 transportCoeff = vec3(1.0);
 
     for(uint bounce = 0u; bounce < BOUNCE_LIMIT; bounce++) {
-        SceneHitTestResult htr = hitTestScene(ray);
+        SceneHitTestResult shtr = hitTestScene(ray);
 
-        if(htr.hit) {
-            // TODO: load material from buffer instead of selecting between
-            // hard-coded options
-            Material material;
-            if(htr.materialIndex == 0u) {
-                material = Material(
-                    vec3(0.0), 0.1, vec3(1.0), vec3(0.0, 0.0, 1.0));
-            }
-            else if(htr.materialIndex == 1u) {
-                material = Material(
-                    vec3(0.0), 0.0, vec3(1.0), vec3(1.0, 0.0, 0.0));
-            }
-            else {
-                material = Material(
-                    vec3(0.0), 0.2, vec3(1.0), vec3(1.0, 1.0, 1.0));
-            }
+        if(shtr.hit) {
+            // Load material from buffer
+            Material material = readMaterial(shtr.materialIndex);
 
             // Use scattering function to determine the new ray's direction
             ScatterResult sr = scatterMaterial(
-                ray.dir, htr.nor, material, rngState);
+                ray.dir, shtr.nor, material, rngState);
 
-            ray = createRay(htr.pos + sr.dir * RAY_SURFACE_OFFSET, sr.dir);
+            ray = createRay(shtr.pos + sr.dir * RAY_SURFACE_OFFSET, sr.dir);
 
             // Accumulate emission from surface
             incomingLight += transportCoeff * material.emissivity;

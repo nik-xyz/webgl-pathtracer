@@ -3,7 +3,7 @@ const uint TRIANGLE_STRIDE = 25u;
 
 
 // Triangle position data. Only positions are needed for ray-triangle hit tests.
-struct TrianglePosData {
+struct TrianglePositions {
     vec3 vert, edge0, edge1;
 };
 

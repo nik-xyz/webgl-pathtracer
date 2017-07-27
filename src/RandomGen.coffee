@@ -14,9 +14,9 @@ class RandomGen
         @randomDataTex = new DataTexture(@gl, @gl.FLOAT, @randomData)
 
 
-    uploadData: (program) ->
-        @randomDataTex.bind(@gl.TEXTURE2)
+    bind: (program) ->
+        @randomDataTex.bind(@gl.TEXTURE3)
 
-        @gl.uniform1i(program.uniforms["randomBufferSampler"], 2)
+        @gl.uniform1i(program.uniforms["randomBufferSampler"], 3)
         @gl.uniform2uiv(program.uniforms["randomBufferAddrData"],
             @randomDataTex.dataMaskAndShift)

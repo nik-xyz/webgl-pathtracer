@@ -30,10 +30,10 @@ struct StackElem {
 SceneHitTestResult hitTestScene(Ray ray) {
     // Store the closest triangle intersected so far
     uint closestTriAddress;
-    TrianglePosData closestTri;
-    TriangleHitTestResult closestHtr;
-    closestHtr.hit = false;
-    closestHtr.distance = RAY_CUTOFF_DISTANCE;
+    TrianglePositions closestTri;
+    TriangleHitTestResult closestThtr;
+    closestThtr.hit = false;
+    closestThtr.distance = RAY_CUTOFF_DISTANCE;
 
     // Octree traversal stack
     int stackIndex = 0;
@@ -54,7 +54,7 @@ SceneHitTestResult hitTestScene(Ray ray) {
             uint childAddress = stackTop.node.childAddresses[childIndex];
             stackTop.execState++;
 
-            // Check that the child exists
+            // Push the child pnto the stack if it exists
             if(childAddress != 0u) {
                 Cube childCube = getOctreeChildCube(stackTop.cube, childIndex);
 
@@ -75,11 +75,11 @@ SceneHitTestResult hitTestScene(Ray ray) {
                 addr < stackTop.node.triEndAddress;
                 addr += TRIANGLE_STRIDE
             ) {
-                TrianglePosData tri = readTriPosData(addr);
-                TriangleHitTestResult htr = hitTestTri(tri, ray);
+                TrianglePositions tri = readTrianglePositions(addr);
+                TriangleHitTestResult thtr = hitTestTriangle(tri, ray);
 
-                if(htr.hit && htr.distance < closestHtr.distance) {
-                    closestHtr = htr;
+                if(thtr.hit && thtr.distance < closestThtr.distance) {
+                    closestThtr = thtr;
                     closestTri = tri;
                     closestTriAddress = addr;
                 }
@@ -90,13 +90,13 @@ SceneHitTestResult hitTestScene(Ray ray) {
         }
     }
 
-    if(!closestHtr.hit) {
+    if(!closestThtr.hit) {
         SceneHitTestResult res;
         res.hit = false;
         return res;
     }
 
-    TriangleAuxAttribs closestTriAux = readTriAuxData(closestTriAddress);
+    TriangleAuxAttribs closestTriAux = readTriangleAuxAttribs(closestTriAddress);
 
     return SceneHitTestResult(
         // Hit
@@ -104,20 +104,20 @@ SceneHitTestResult hitTestScene(Ray ray) {
 
         // Position
         closestTri.vert +
-        closestTri.edge0 * closestHtr.edge0 +
-        closestTri.edge1 * closestHtr.edge1,
+        closestTri.edge0 * closestThtr.edge0 +
+        closestTri.edge1 * closestThtr.edge1,
 
         // Normal
         normalize(
             closestTriAux.vertNor +
-            closestTriAux.edge0Nor * closestHtr.edge0 +
-            closestTriAux.edge1Nor * closestHtr.edge1
+            closestTriAux.edge0Nor * closestThtr.edge0 +
+            closestTriAux.edge1Nor * closestThtr.edge1
         ),
 
         // Texture coordinate
         closestTriAux.vertTex +
-        closestTriAux.edge0Tex * closestHtr.edge0 +
-        closestTriAux.edge1Tex * closestHtr.edge1,
+        closestTriAux.edge0Tex * closestThtr.edge0 +
+        closestTriAux.edge1Tex * closestThtr.edge1,
 
         // Material index
         closestTriAux.materialIndex

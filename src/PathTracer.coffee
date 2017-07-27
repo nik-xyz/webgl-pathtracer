@@ -19,8 +19,7 @@ class PathTracer
             alpha:     false
 
         @gl = document.createElement("canvas")?.getContext("webgl2", attribs)
-        unless @gl?
-            throw "Unable to create WebGl2 context"
+        unless @gl then throw "Unable to create WebGl2 context"
 
         @gl.depthMask(false)
         @gl.clearColor(0, 0, 0, 0)
@@ -80,8 +79,8 @@ class PathTracer
         @program.use()
 
         @randomGen.createRandomData()
-        @randomGen.uploadData(@program)
-        @scene.uploadData(@program)
+        @randomGen.bind(@program)
+        @scene.bind(@program)
 
         @setJitter()
         @setAlpha()

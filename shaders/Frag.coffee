@@ -10,11 +10,12 @@ out highp vec4 fragColor;
 #{ShaderSources.getUniformsSource()}
 #{ShaderSources.getGeomTypesSource()}
 #{ShaderSources.getOctreeSource()}
+#{ShaderSources.getMaterialSource()}
 #{ShaderSources.getDataTexSource()}
+#{ShaderSources.getRandomSource()}
 #{ShaderSources.getGeomHitTestSource()}
 #{ShaderSources.getSceneHitTestSource()}
-#{ShaderSources.getRandomSource()}
-#{ShaderSources.getMaterialSource()}
+#{ShaderSources.getScatterSource()}
 #{ShaderSources.getPathTraceSource()}
 
 void main() {

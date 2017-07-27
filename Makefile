@@ -6,6 +6,7 @@ SRCS += src/Triangle.coffee
 SRCS += src/Octree.coffee
 SRCS += src/TriangleLoader.coffee
 SRCS += src/RandomGen.coffee
+SRCS += src/Material.coffee
 SRCS += src/Scene.coffee
 SRCS += src/PathTracer.coffee
 
@@ -20,6 +21,7 @@ SRCS += shaders/Material.coffee
 SRCS += shaders/Octree.coffee
 SRCS += shaders/PathTrace.coffee
 SRCS += shaders/Random.coffee
+SRCS += shaders/Scatter.coffee
 SRCS += shaders/SceneHitTest.coffee
 SRCS += shaders/Uniforms.coffee
 SRCS += shaders/Vert.coffee

@@ -12,7 +12,7 @@ float random(inout uint rngState) {
     uvec2 coord = uvec2(gl_FragCoord);
 
     // Combine the coordinates and seed using Cantor's pairing
-    // function, which helps avoid patterns in the end result.
+    // function, which avoids noticeable patterns in the end result.
     uint addr = calculateCantorPairing(coord);
     addr = calculateCantorPairing(uvec2(addr, coord.x * coord.y));
     addr = calculateCantorPairing(uvec2(addr, rngState));
@@ -20,7 +20,7 @@ float random(inout uint rngState) {
 
     rngState += 1u;
 
-    return readRandomData(addr);
+    return readRandomFloat(addr);
 }
 
 

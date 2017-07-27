@@ -106,8 +106,16 @@ class Texture
 
 class DataTexture extends Texture
     constructor: (@gl, type, data) ->
-        unless type in [@gl.FLOAT, @gl.UNSIGNED_INT]
-            throw "Data type not supported"
+        # Find the appropriate typed arrays and image formats for the data
+        [arrayType, internalFormat, format] =
+            if type is @gl.FLOAT
+                [Float32Array, @gl.R32F, @gl.RED]
+
+            else if type is @gl.UNSIGNED_INT
+                [Uint32Array, @gl.R32UI, @gl.RED_INTEGER]
+
+            else
+                throw "Data type not supported"
 
         # Must pad the data to be a power-of-two length
         # so that it can be uploaded to a power-of-two texture
@@ -119,8 +127,6 @@ class DataTexture extends Texture
         if paddedSize > sizeLimitSq
             throw "Required texture size exceeds limit"
 
-        arrayType = if type is @gl.FLOAT then Float32Array else Uint32Array
-
         # Avoid copying if the original array meets the necessary requirements
         unless (data instanceof arrayType) and (data.length is paddedSize)
             paddedData = new arrayType(paddedSize)
@@ -130,21 +136,14 @@ class DataTexture extends Texture
         # Choose width and height so that the texture is large enough
         # to store the data while staying inside the size limits
         width = Math.min(paddedSize, sizeLimit)
-        height = if width is 0 then 0 else (paddedSize / width)
+        height = paddedSize / Math.max(width, 1)
 
         # Calculate address mask and shift values to allow
         # the texture to be accessed with a 1D index
         @dataMaskAndShift = [width - 1, Math.log2(width)]
 
-        # Find appropriate formats to store the data
-        formats =
-            if type is @gl.FLOAT
-                [@gl.R32F, @gl.RED]
-            else
-                [@gl.R32UI, @gl.RED_INTEGER]
-
         # Create texture
-        super(@gl, width, height, formats..., type, data)
+        super(@gl, width, height, internalFormat, format, type, data)
 
 
 class VertexArray
