@@ -42,10 +42,12 @@ class PathTracer
         @vao.setupAttrib(@program.uniforms["vertPos"], @vbo, 2, @gl.FLOAT)
 
 
-    reset: -> @sampleCounter = 0
+    reset: ->
+        @sampleCounter = 0
 
 
-    getCanvas: -> @gl.canvas
+    getCanvas: ->
+        @gl.canvas
 
 
     setResolution: (@frameRes) ->

@@ -1,30 +1,54 @@
 class Scene
     constructor: (@gl) ->
-        @materials = []
-        @triangles = []
+        @models = []
 
-        # TODO: don't do this in the constructor
+        # TODO: Don't do this here. Any of it
         @setCameraPosition(new Vec3(0, 3, -3))
-        @addModel(Models.testModelSphere,
-            new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0, 1)))
-        @addModel(Models.testModelCube,
-            new Material(new Vec3(), 0.0, new Vec3(1, 1, 1), new Vec3(1, 0, 0)))
-        @addModel(Models.testModelPlane,
-            new Material(new Vec3(), 0.1, new Vec3(1, 1, 1), new Vec3(1, 1, 1)))
-        @finalizeSceneData()
+
+        red   = new Material(new Vec3(), 0.0, new Vec3(1, 1, 1), new Vec3(1, 0, 0))
+        green = new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0.7, 0.2))
+        blue  = new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0, 1))
+        white = new Material(new Vec3(), 0.1, new Vec3(1, 1, 1), new Vec3(1, 1, 1))
+        yellow = new Material(new Vec3(2, 1.2, 0.0), 0.1, new Vec3(1, 1, 1), new Vec3(1, 0.6, 0.0))
+
+        sphere = new Model(Models.testModelSphere)
+        cube   = new Model(Models.testModelCube)
+        cube2  = new Model(Models.testModelCube)
+        cube3  = new Model(Models.testModelCube)
+        plane  = new Model(Models.testModelPlane)
+
+        plane.setPosition(new Vec3(0, -1.5, 0))
+        cube.setPosition(new Vec3(1.5, -1, -0.8))
+        cube2.setPosition(new Vec3(-1.5, -1, 0.8))
+        cube3.setPosition(new Vec3(-1.5, -1, -1.3))
+        cube3.setSize(new Vec3(0.4, 0.4, 0.4))
+
+        @addModel(sphere, green)
+        @addModel(cube,   red)
+        @addModel(cube2,  blue)
+        @addModel(cube3,  yellow)
+        @addModel(plane,  white)
+
+        @uploadSceneData()
 
 
     addModel: (model, material) ->
-        materialIndex = @materials.length
-        @materials.push(material.encode()...)
-        @triangles.push(new TriangleLoader(model, materialIndex).triangles...)
+        @models.push([model, material])
 
 
     setCameraPosition: (@cameraPosition) ->
 
 
-    finalizeSceneData: () ->
-        octree = new Octree(@triangles)
+    uploadSceneData: () ->
+        triangles = []
+        materialData = []
+        materialCounter = 0
+
+        for [model, material] in @models
+            triangles.push(model.getTriangles(materialData.length)...)
+            materialData.push(material.encode()...)
+
+        octree = new Octree(triangles)
         @octreeCenter = octree.root.center
         @octreeSize = octree.root.size
 
@@ -36,7 +60,7 @@ class Scene
 
         @octreeDataTex   = new DataTexture(@gl, @gl.UNSIGNED_INT, octreeBuffer)
         @triangleDataTex = new DataTexture(@gl, @gl.FLOAT, triangleBuffer)
-        @materialDataTex = new DataTexture(@gl, @gl.FLOAT, @materials)
+        @materialDataTex = new DataTexture(@gl, @gl.FLOAT, materialData)
 
 
 

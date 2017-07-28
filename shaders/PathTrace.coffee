@@ -34,7 +34,7 @@ vec3 tracePath(Ray ray, inout uint rngState) {
         }
         else {
             // TODO: sample background enviroment map instead
-            vec3 backgroundLight = vec3(ray.dir.yyy + 0.3);
+            vec3 backgroundLight = vec3(ray.dir.yyy);
 
             incomingLight += transportCoeff * backgroundLight;
             break;

@@ -1,4 +1,4 @@
-class TriangleLoader
+class Model
     NEWLINE_REGEX    = /[\r\n]+/g
     WHITESPACE_REGEX = /[\s]+/g
     VERTEX_REGEX     = /\//g
@@ -6,28 +6,39 @@ class TriangleLoader
     DEFAULT_TEXCOORD = new Vec2(0, 0)
 
 
-    constructor: (data, materialId) ->
-        @triangles = createTriangles(getFaces(parseLines(data)...), materialId)
+    constructor: (data) ->
+        @parseLines(data)
+        @setPosition(new Vec3(0, 0, 0))
+        @setSize(new Vec3(1, 1, 1))
 
 
-    createTriangles = (faces, materialId) ->
+    setSize:          (@modelSize) ->
+    setPosition:      (@modelPos) ->
+
+
+    getTriangles: (materialIndex) ->
         triangles = []
-        for face in faces
+
+        for face in @getFaces()
             # Triangulate the face
-            for index in [1...(face.length - 1)]
+            for index in [1..(face.length - 2)]
                 tri = new Triangle(
-                    face[0], face[index], face[index + 1], materialId)
+                    face[0], face[index], face[index + 1], materialIndex)
                 triangles.push(tri)
         triangles
 
 
-    getFaces = (posArray, norArray, texArray, faceArray) ->
-        for face in faceArray
+    getFaces: ->
+        for face in @faceArray
             for vertIndices in face
+                pos = accessArray(@posArray, vertIndices[0])
+                    .mul(@modelSize)
+                    .add(@modelPos)
+
                 new TriangleVertex(
-                    accessArray(posArray, vertIndices[0]),
-                    accessArray(norArray, vertIndices[2]),
-                    accessArray(texArray, vertIndices[1], DEFAULT_TEXCOORD),
+                    pos,
+                    accessArray(@norArray, vertIndices[2]),
+                    accessArray(@texArray, vertIndices[1], DEFAULT_TEXCOORD),
                 )
 
 
@@ -36,14 +47,17 @@ class TriangleLoader
             if alt? then return alt
             throw "Invalid list index"
 
-        if index < 1 or index > array.length
+        unless 1 <= index <= array.length
             throw "List index is out of range"
 
         return array[index - 1]
 
 
-    parseLines = (data) ->
-        [posArray, norArray, texArray, faceArray] = [[], [], [], []]
+    parseLines: (data) ->
+        @posArray  = []
+        @norArray  = []
+        @texArray  = []
+        @faceArray = []
 
         for line, lineIndex in data.split(NEWLINE_REGEX)
             try
@@ -55,21 +69,19 @@ class TriangleLoader
                 args = tokens.slice(1)
 
                 if command is "v"
-                    posArray.push(new Vec3(parseFloats(3, args)...))
+                    @posArray.push(new Vec3(parseFloats(3, args)...))
 
                 else if command is "vn"
-                    norArray.push(new Vec3(parseFloats(3, args)...))
+                    @norArray.push(new Vec3(parseFloats(3, args)...))
 
                 else if command is "vt"
-                    texArray.push(new Vec2(parseFloats(2, args)...))
+                    @texArray.push(new Vec2(parseFloats(2, args)...))
 
                 else if command is "f"
-                    faceArray.push(args.map(parseFaceVert))
+                    @faceArray.push(args.map(parseFaceVert))
 
             catch error
                 throw "Error parsing file on line #{lineIndex + 1}: #{error}"
-
-        return [posArray, norArray, texArray, faceArray]
 
 
     parseFaceVert = (str) ->
