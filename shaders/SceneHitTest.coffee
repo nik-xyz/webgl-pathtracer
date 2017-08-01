@@ -1,6 +1,6 @@
 ShaderSources.getSceneHitTestSource = -> """
-const uint SCENE_OCTREE_ROOT_ADDRESS = 0u;
-const uint OCTREE_STACK_SIZE = #{(Octree.SUBDIVISION_LIMIT + 1).toString()}u;
+const uint SCENE_KDTREE_ROOT_ADDRESS = 0u;
+const uint KDTREE_STACK_SIZE = #{(KDTree.SUBDIVISION_LIMIT + 1).toString()}u;
 const float RAY_CUTOFF_DISTANCE = 100000.0;
 
 
@@ -14,8 +14,7 @@ struct SceneHitTestResult {
 
 
 struct StackElem {
-    Octree node;
-    Cube cube;
+    KDTree node;
     uint execState;
 };
 
@@ -35,41 +34,40 @@ SceneHitTestResult hitTestScene(Ray ray) {
     closestThtr.hit = false;
     closestThtr.distance = RAY_CUTOFF_DISTANCE;
 
-    // Octree traversal stack
+    // KDTree traversal stack
     int stackIndex = 0;
-    StackElem stack[OCTREE_STACK_SIZE];
+    StackElem stack[KDTREE_STACK_SIZE];
 
     // Push root node onto stack
     stackTop = StackElem(
-        readOctree(SCENE_OCTREE_ROOT_ADDRESS),
-        Cube(octreeCubeCenter, octreeCubeSize),
+        readKDTree(SCENE_KDTREE_ROOT_ADDRESS),
         0u
     );
 
-    // Traverse octree
+    // Traverse tree
     while(stackIndex >= 0) {
-        // Find child octree nodes to test
-        while(stackTop.execState < 8u) {
+        // Find child tree nodes to test
+        while(stackTop.execState < 2u) {
+
+            // TODO: pick the closest side first
             uint childIndex = stackTop.execState;
+
             uint childAddress = stackTop.node.childAddresses[childIndex];
             stackTop.execState++;
 
-            // Push the child pnto the stack if it exists
+            // Push the child onto the stack if it exists
             if(childAddress != 0u) {
-                Cube childCube = getOctreeChildCube(stackTop.cube, childIndex);
+                // TODO: check whether ray intersects plane first
 
-                if(hitTestCube(stackTop.cube, ray)) {
-                    stackIndex++;
-                    stackTop = StackElem(readOctree(childAddress),
-                        childCube, 0u);
+                stackIndex++;
+                stackTop = StackElem(readKDTree(childAddress), 0u);
 
-                    break;
-                }
+                break;
             }
         }
 
         // Test the current node's triangles
-        if(stackTop.execState == 8u) {
+        if(stackTop.execState == 2u) {
             for(
                 uint addr = stackTop.node.triStartAddress;
                 addr < stackTop.node.triEndAddress;

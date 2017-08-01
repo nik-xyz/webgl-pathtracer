@@ -19,6 +19,10 @@ class Triangle
         @edge1 = vert2.sub(vert0)
 
 
+    center: ->
+        @vert.pos.add(@edge0.pos.scale(1 / 3)).add(@edge1.pos.scale(1 / 3))
+
+
     encode: ->
         verts = [@vert, @edge0, @edge1]
 

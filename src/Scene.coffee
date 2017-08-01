@@ -5,10 +5,10 @@ class Scene
         # TODO: Don't do this here. Any of it
         @setCameraPosition(new Vec3(0, 3, -3))
 
-        red   = new Material(new Vec3(), 0.0, new Vec3(1, 1, 1), new Vec3(1, 0, 0))
-        green = new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0.7, 0.2))
-        blue  = new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0, 1))
-        white = new Material(new Vec3(), 0.1, new Vec3(1, 1, 1), new Vec3(1, 1, 1))
+        red   = new Material(new Vec3(), 0.0, new Vec3(1, 1, 1), new Vec3(0.5, 0, 0))
+        green = new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0.35, 0.1))
+        blue  = new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0, 0.5))
+        white = new Material(new Vec3(), 0.1, new Vec3(1, 1, 1), new Vec3(0.5, 0.5, 0.5))
         yellow = new Material(new Vec3(2, 1.2, 0.0), 0.1, new Vec3(1, 1, 1), new Vec3(1, 0.6, 0.0))
 
         sphere = new Model(Models.testModelSphere)
@@ -48,17 +48,14 @@ class Scene
             triangles.push(model.getTriangles(materialData.length)...)
             materialData.push(material.encode()...)
 
-        octree = new Octree(triangles)
-        @octreeCenter = octree.root.center
-        @octreeSize = octree.root.size
+        tree = new KDTree(triangles)
+        [treeBuffer, triangleBuffer] = tree.encode()
 
-        [octreeBuffer, triangleBuffer] = octree.encode()
-
-        if @octreeDataTex?   then @octreeDataTex.destroy()
+        if @treeDataTex?     then @treeDataTex.destroy()
         if @triangleDataTex? then @triangleDataTex.destroy()
         if @materialDataTex? then @materialDataTex.destroy()
 
-        @octreeDataTex   = new DataTexture(@gl, @gl.UNSIGNED_INT, octreeBuffer)
+        @treeDataTex     = new DataTexture(@gl, @gl.UNSIGNED_INT, treeBuffer)
         @triangleDataTex = new DataTexture(@gl, @gl.FLOAT, triangleBuffer)
         @materialDataTex = new DataTexture(@gl, @gl.FLOAT, materialData)
 
@@ -66,7 +63,7 @@ class Scene
 
     bind: (program) ->
         @triangleDataTex.bind(@gl.TEXTURE0)
-        @octreeDataTex.bind(@gl.TEXTURE1)
+        @treeDataTex.bind(@gl.TEXTURE1)
         @materialDataTex.bind(@gl.TEXTURE2)
 
         uniforms = program.uniforms
@@ -75,15 +72,12 @@ class Scene
         @gl.uniform2uiv(uniforms["triangleBufferAddrData"],
             @triangleDataTex.dataMaskAndShift)
 
-        @gl.uniform1i(uniforms["octreeBufferSampler"], 1)
-        @gl.uniform2uiv(uniforms["octreeBufferAddrData"],
-            @octreeDataTex.dataMaskAndShift)
+        @gl.uniform1i(uniforms["treeBufferSampler"], 1)
+        @gl.uniform2uiv(uniforms["treeBufferAddrData"],
+            @treeDataTex.dataMaskAndShift)
 
         @gl.uniform1i(uniforms["materialBufferSampler"], 2)
         @gl.uniform2uiv(uniforms["materialBufferAddrData"],
             @materialDataTex.dataMaskAndShift)
-
-        @gl.uniform3fv(uniforms["octreeCubeCenter"], @octreeCenter.array())
-        @gl.uniform1f(uniforms["octreeCubeSize"], @octreeSize)
 
         @gl.uniform3fv(uniforms["cameraPosition"], @cameraPosition.array())

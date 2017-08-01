@@ -89,7 +89,7 @@ class PathTracer
 
         @sampleCounter++
 
-        # Render to output framebugger
+        # Render to output framebuffer
         @gl.bindFramebuffer(@gl.DRAW_FRAMEBUFFER, @frame.buf)
         @gl.bindFramebuffer(@gl.READ_FRAMEBUFFER, @frame.buf)
 

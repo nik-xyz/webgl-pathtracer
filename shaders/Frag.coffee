@@ -9,7 +9,7 @@ out highp vec4 fragColor;
 // Include other shaders
 #{ShaderSources.getUniformsSource()}
 #{ShaderSources.getGeomTypesSource()}
-#{ShaderSources.getOctreeSource()}
+#{ShaderSources.getKDTreeSource()}
 #{ShaderSources.getMaterialSource()}
 #{ShaderSources.getDataTexSource()}
 #{ShaderSources.getRandomSource()}

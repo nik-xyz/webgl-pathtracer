@@ -55,42 +55,27 @@ TriangleAuxAttribs readTriangleAuxAttribs(uint address) {
 
 
 
-// ---- Octree ----
-uint readOctreeUint(uint address) {
+// ---- KDTree ----
+uint readKDTreeUint(uint address) {
     return texelFetch(
-        octreeBufferSampler,
-        getTexelForAddress(address, octreeBufferAddrData),
+        treeBufferSampler,
+        getTexelForAddress(address, treeBufferAddrData),
         0
     ).r;
 }
 
 
-Octree readOctree(uint address) {
-    uint triStartAddress = readOctreeUint(address + 0u);
-    uint triEndAddress   = readOctreeUint(address + 1u);
-    uint loadFlag        = readOctreeUint(address + 2u);
-
-    // Check load flag
-    if(loadFlag == 0u) {
-        return Octree(
-            triStartAddress,
-            triEndAddress,
-            uint[8](0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u)
-        );
-    }
-
-    return Octree(
-        triStartAddress, triEndAddress,
-        uint[8](
-            readOctreeUint(address + 3u),
-            readOctreeUint(address + 4u),
-            readOctreeUint(address + 5u),
-            readOctreeUint(address + 6u),
-            readOctreeUint(address + 7u),
-            readOctreeUint(address + 8u),
-            readOctreeUint(address + 9u),
-            readOctreeUint(address + 10u)
-        )
+KDTree readKDTree(uint address) {
+    return KDTree(
+        readKDTreeUint(address + 0u),
+        readKDTreeUint(address + 1u),
+        uint[2](
+            readKDTreeUint(address + 2u),
+            readKDTreeUint(address + 3u)
+        ),
+        // TODO: replace with actual values
+        0u,
+        0.0
     );
 }
 
