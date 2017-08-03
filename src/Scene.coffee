@@ -18,7 +18,7 @@ class Scene
         plane  = new Model(Models.testModelPlane)
 
         plane.setPosition(new Vec3(0, -1.5, 0))
-        cube.setPosition(new Vec3(1.5, -1, -0.8))
+        cube.setPosition(new Vec3(1.5, -0.5, -0.8))
         cube2.setPosition(new Vec3(-1.5, -1, 0.8))
         cube3.setPosition(new Vec3(-1.5, -1, -1.3))
         cube3.setSize(new Vec3(0.4, 0.4, 0.4))
