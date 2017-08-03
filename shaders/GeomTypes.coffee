@@ -17,9 +17,8 @@ struct TriangleAuxAttribs {
 };
 
 
-struct Cube {
-    vec3 center;
-    float size;
+struct Box {
+    vec3 minBound, maxBound;
 };
 
 

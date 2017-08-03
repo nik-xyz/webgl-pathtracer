@@ -8,8 +8,8 @@ class Scene
         red   = new Material(new Vec3(), 0.0, new Vec3(1, 1, 1), new Vec3(0.5, 0, 0))
         green = new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0.35, 0.1))
         blue  = new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0, 0.5))
-        white = new Material(new Vec3(), 0.1, new Vec3(1, 1, 1), new Vec3(0.5, 0.5, 0.5))
-        yellow = new Material(new Vec3(2, 1.2, 0.0), 0.1, new Vec3(1, 1, 1), new Vec3(1, 0.6, 0.0))
+        white = new Material(new Vec3(), 0.1, new Vec3(0.2, 0.2, 0.2), new Vec3(0.5, 0.5, 0.5))
+        yellow = new Material(new Vec3(5, 4, 0.0), 0.1, new Vec3(1, 1, 1), new Vec3(1, 0.6, 0.0))
 
         sphere = new Model(Models.testModelSphere)
         cube   = new Model(Models.testModelCube)
@@ -48,15 +48,14 @@ class Scene
             triangles.push(model.getTriangles(materialData.length)...)
             materialData.push(material.encode()...)
 
-        tree = new KDTree(triangles)
-        [treeBuffer, triangleBuffer] = tree.encode()
+        [treeUintBuffer, treeFloatBuffer] = new KDTree(triangles).encode()
 
         if @treeDataTex?     then @treeDataTex.destroy()
         if @triangleDataTex? then @triangleDataTex.destroy()
         if @materialDataTex? then @materialDataTex.destroy()
 
-        @treeDataTex     = new DataTexture(@gl, @gl.UNSIGNED_INT, treeBuffer)
-        @triangleDataTex = new DataTexture(@gl, @gl.FLOAT, triangleBuffer)
+        @treeDataTex     = new DataTexture(@gl, @gl.UNSIGNED_INT, treeUintBuffer)
+        @triangleDataTex = new DataTexture(@gl, @gl.FLOAT, treeFloatBuffer)
         @materialDataTex = new DataTexture(@gl, @gl.FLOAT, materialData)
 
 
@@ -68,12 +67,12 @@ class Scene
 
         uniforms = program.uniforms
 
-        @gl.uniform1i(uniforms["triangleBufferSampler"], 0)
-        @gl.uniform2uiv(uniforms["triangleBufferAddrData"],
+        @gl.uniform1i(uniforms["treeFloatBufferSampler"], 0)
+        @gl.uniform2uiv(uniforms["treeFloatBufferAddrData"],
             @triangleDataTex.dataMaskAndShift)
 
-        @gl.uniform1i(uniforms["treeBufferSampler"], 1)
-        @gl.uniform2uiv(uniforms["treeBufferAddrData"],
+        @gl.uniform1i(uniforms["treeUintBufferSampler"], 1)
+        @gl.uniform2uiv(uniforms["treeUintBufferAddrData"],
             @treeDataTex.dataMaskAndShift)
 
         @gl.uniform1i(uniforms["materialBufferSampler"], 2)

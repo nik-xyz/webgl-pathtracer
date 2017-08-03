@@ -15,7 +15,7 @@ struct SceneHitTestResult {
 
 struct StackElem {
     KDTree node;
-    uint execState;
+    uint processingState;
 };
 
 
@@ -46,19 +46,47 @@ SceneHitTestResult hitTestScene(Ray ray) {
 
     // Traverse tree
     while(stackIndex >= 0) {
+        // Discard the node if the ray will not intercept any part of it
+        if(stackTop.processingState == 0u) {
+            if(!hitTestBox(stackTop.node.box, ray)) {
+                stackIndex--;
+            }
+        }
+
         // Find child tree nodes to test
-        while(stackTop.execState < 2u) {
+        while(stackTop.processingState < 2u) {
+            float rayOriginAlongAxis = dot(ray.origin, stackTop.node.splitAxis);
+            bool originLessThanPlane = rayOriginAlongAxis < stackTop.node.splitPoint;
+            uint closestChildIndex = originLessThanPlane ? 0u : 1u;
 
-            // TODO: pick the closest side first
-            uint childIndex = stackTop.execState;
+            uint childAddress;
+            if(stackTop.processingState == 0u) {
+                // Check closest child first
+                childAddress = stackTop.node.childAddresses[closestChildIndex];
+            }
+            else {
+                // Determine whether the ray will cross the plane
+                float rayDirAlongAxis = dot(ray.dir, stackTop.node.splitAxis);
+                bool goingToMissPlane =
+                    ((rayDirAlongAxis < 0.0) == originLessThanPlane);
 
-            uint childAddress = stackTop.node.childAddresses[childIndex];
-            stackTop.execState++;
+                // If the ray has already hit something on the near side of the
+                // plane or is not going to cross the plane, we do not need to
+                // test anything on the other side
+                if(closestThtr.hit || goingToMissPlane) {
+                    childAddress = 0u;
+                }
+                else {
+                    // Test other side
+                    uint otherSideIndex = 1u - closestChildIndex;
+                    childAddress = stackTop.node.childAddresses[otherSideIndex];
+                }
+            }
+
+            stackTop.processingState++;
 
             // Push the child onto the stack if it exists
             if(childAddress != 0u) {
-                // TODO: check whether ray intersects plane first
-
                 stackIndex++;
                 stackTop = StackElem(readKDTree(childAddress), 0u);
 
@@ -67,7 +95,7 @@ SceneHitTestResult hitTestScene(Ray ray) {
         }
 
         // Test the current node's triangles
-        if(stackTop.execState == 2u) {
+        if(stackTop.processingState == 2u) {
             for(
                 uint addr = stackTop.node.triStartAddress;
                 addr < stackTop.node.triEndAddress;

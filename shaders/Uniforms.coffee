@@ -1,9 +1,9 @@
 ShaderSources.getUniformsSource = -> """
-uniform sampler2D triangleBufferSampler;
-uniform uvec2 triangleBufferAddrData;
+uniform sampler2D treeFloatBufferSampler;
+uniform uvec2 treeFloatBufferAddrData;
 
-uniform highp usampler2D treeBufferSampler;
-uniform uvec2 treeBufferAddrData;
+uniform highp usampler2D treeUintBufferSampler;
+uniform uvec2 treeUintBufferAddrData;
 
 uniform sampler2D materialBufferSampler;
 uniform uvec2 materialBufferAddrData;
@@ -19,11 +19,11 @@ uniform highp float compositeAlpha;
 """
 
 ShaderSources.uniformNames = [
-    "triangleBufferSampler"
-    "triangleBufferAddrData"
+    "treeFloatBufferSampler"
+    "treeFloatBufferAddrData"
 
-    "treeBufferSampler"
-    "treeBufferAddrData"
+    "treeUintBufferSampler"
+    "treeUintBufferAddrData"
 
     "materialBufferSampler"
     "materialBufferAddrData"

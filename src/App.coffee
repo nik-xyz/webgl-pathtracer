@@ -1,7 +1,7 @@
 class App
     run: ->
         pt = new PathTracer()
-        pt.setResolution(new Vec2(512, 512))
+        pt.setResolution(new Vec2(1920, 1080))
 
         window.render = ->
             pt.renderImage()
@@ -15,6 +15,7 @@ class App
         document.body.appendChild(button)
         document.body.appendChild(document.createElement("br"))
         document.body.appendChild(pt.getCanvas())
+
 
 window.onload = ->
     app = new App()

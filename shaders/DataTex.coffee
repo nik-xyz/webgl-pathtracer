@@ -8,8 +8,8 @@ ivec2 getTexelForAddress(uint address, uvec2 maskAndShift) {
 // ---- Triangle ----
 float readTriangleFloat(uint address) {
     return texelFetch(
-        triangleBufferSampler,
-        getTexelForAddress(address, triangleBufferAddrData),
+        treeFloatBufferSampler,
+        getTexelForAddress(address, treeFloatBufferAddrData),
         0
     ).r;
 }
@@ -58,24 +58,35 @@ TriangleAuxAttribs readTriangleAuxAttribs(uint address) {
 // ---- KDTree ----
 uint readKDTreeUint(uint address) {
     return texelFetch(
-        treeBufferSampler,
-        getTexelForAddress(address, treeBufferAddrData),
+        treeUintBufferSampler,
+        getTexelForAddress(address, treeUintBufferAddrData),
         0
     ).r;
 }
 
 
 KDTree readKDTree(uint address) {
+    uint triangleStart = readKDTreeUint(address + 0u);
+    uint triangleEnd   = readKDTreeUint(address + 1u);
+    uint splitAxis     = readKDTreeUint(address + 2u);
+    vec3 splitAxisVec  =
+        (splitAxis == 0u) ? vec3(1.0, 0.0, 0.0) :
+        (splitAxis == 1u) ? vec3(0.0, 1.0, 0.0) :
+                            vec3(0.0, 0.0, 1.0);
+
     return KDTree(
-        readKDTreeUint(address + 0u),
-        readKDTreeUint(address + 1u),
+        triangleStart,
+        triangleEnd,
         uint[2](
-            readKDTreeUint(address + 2u),
-            readKDTreeUint(address + 3u)
+            readKDTreeUint(address + 3u),
+            readKDTreeUint(address + 4u)
         ),
-        // TODO: replace with actual values
-        0u,
-        0.0
+        splitAxisVec,
+        readTriangleFloat(triangleEnd),
+        Box(
+            readTriangleVec3(triangleEnd + 1u),
+            readTriangleVec3(triangleEnd + 4u)
+        )
     );
 }
 

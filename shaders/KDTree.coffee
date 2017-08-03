@@ -3,8 +3,9 @@ struct KDTree {
     uint triStartAddress;
     uint triEndAddress;
     uint childAddresses[2];
-    uint splitAxis;
+    vec3 splitAxis;
     float splitPoint;
+    Box box;
 };
 
 

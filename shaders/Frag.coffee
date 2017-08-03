@@ -22,9 +22,9 @@ void main() {
     uint rngState = 0u;
 
     mat3 cameraMat = mat3(
-        1.000,  0.000,  0.000,
-        0.000,  0.707,  0.707,
-        0.000, -0.707,  0.707
+        1.000 * 1920.0 / 1080.0,  0.000,  0.000,
+        0.000,                    0.707,  0.707,
+        0.000,                   -0.707,  0.707
     );
 
     vec3 projected = cameraMat * vec3(fragPos + subPixelJitter, 1.5);

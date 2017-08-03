@@ -6,8 +6,12 @@ class KDTree
     constructor: (@triangles, @limit = SUBDIVISION_LIMIT) ->
         @lowerChild = null
         @upperChild = null
+
         @selectSplitAxis()
         @selectSplitPoint()
+
+        @minBound = @triangles.map((tri) -> tri.minBound).reduce((a, b) -> a.min(b))
+        @maxBound = @triangles.map((tri) -> tri.maxBound).reduce((a, b) -> a.max(b))
 
         if @limit > 0
             @addTrianglesToChildren()
@@ -30,10 +34,16 @@ class KDTree
                 newTriangles.push(triangle)
 
         @triangles = newTriangles
-        if lowerChildTriangles.length > 0
+
+        if lowerChildTriangles.length > 10
             @lowerChild = new KDTree(lowerChildTriangles, @limit - 1)
-        if upperChildTriangles.length > 0
+        else
+            @triangles.push(lowerChildTriangles...)
+
+        if upperChildTriangles.length > 10
             @upperChild = new KDTree(upperChildTriangles, @limit - 1)
+        else
+            @triangles.push(upperChildTriangles...)
 
 
     selectSplitAxis: () ->
@@ -49,28 +59,38 @@ class KDTree
         @splitPoint = points[Math.floor(points.length / 2)]
 
 
-    encode: (treeBuffer = [], triangleBuffer = []) ->
-        # Push triangle start address
-        treeBuffer.push(triangleBuffer.length)
+    encode: (treeUintBuffer = [], treeFloatBuffer = []) ->
+        # Push triangles start address
+        treeUintBuffer.push(treeFloatBuffer.length)
 
         # Push triangles
         for triangle in @triangles
-            triangleBuffer.push(triangle.encode()...)
+            treeFloatBuffer.push(triangle.encode()...)
 
-        # Push triangle end address
-        treeBuffer.push(triangleBuffer.length)
+        # Push triangle end address, which is also the start address for
+        # the split / bounds data
+        treeUintBuffer.push(treeFloatBuffer.length)
+
+        # Push split point
+        treeFloatBuffer.push(@splitPoint)
+
+        # Push bounds
+        treeFloatBuffer.push(@minBound.array()..., @maxBound.array()...)
+
+        # Push split axis
+        treeUintBuffer.push(@splitAxis)
 
         # Push null child addresss that will be replaced with real values later
-        childrenBaseAddress = treeBuffer.length
-        treeBuffer.push(@NULL_NODE_ADDRESS, @NULL_NODE_ADDRESS)
+        childrenBaseAddress = treeUintBuffer.length
+        treeUintBuffer.push(@NULL_NODE_ADDRESS, @NULL_NODE_ADDRESS)
 
         # Push children and set address pointers
         for child, index in [@lowerChild, @upperChild]
             if child isnt null
                 # Set child address
-                treeBuffer[childrenBaseAddress + index] = treeBuffer.length
+                treeUintBuffer[childrenBaseAddress + index] = treeUintBuffer.length
 
                 # Push child
-                child.encode(treeBuffer, triangleBuffer)
+                child.encode(treeUintBuffer, treeFloatBuffer)
 
-        return [treeBuffer, triangleBuffer]
+        return [treeUintBuffer, treeFloatBuffer]

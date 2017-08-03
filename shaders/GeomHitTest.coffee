@@ -47,10 +47,9 @@ TriangleHitTestResult hitTestTriangle(TrianglePositions tri, Ray ray) {
 }
 
 
-bool hitTestCube(Cube cube, Ray ray) {
-    vec3 originToCenter = cube.center - ray.origin;
-    vec3 vert0 = (originToCenter - cube.size) * ray.inverseDir;
-    vec3 vert1 = (originToCenter + cube.size) * ray.inverseDir;
+bool hitTestBox(Box box, Ray ray) {
+    vec3 vert0 = (box.minBound - ray.origin) * ray.inverseDir;
+    vec3 vert1 = (box.maxBound - ray.origin) * ray.inverseDir;
     vec3 closeVec = min(vert0, vert1);
     vec3 farVec   = max(vert0, vert1);
     float close   = max(closeVec.x, max(closeVec.y, closeVec.z));

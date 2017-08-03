@@ -34,9 +34,10 @@ vec3 tracePath(Ray ray, inout uint rngState) {
         }
         else {
             // TODO: sample background enviroment map instead
+            // For now, fake a square light
             vec3 backgroundLight = vec3(
-                max(abs(ray.dir.x), abs(ray.dir.z)) < 0.6 && ray.dir.y > 0.0 ?
-                    2.0 : 0.0
+                max(abs(ray.dir.x), abs(ray.dir.z)) < 0.4 && ray.dir.y > 0.0 ?
+                    5.0 : 0.0
             );
 
             incomingLight += transportCoeff * backgroundLight;
