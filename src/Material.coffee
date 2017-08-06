@@ -1,4 +1,8 @@
 class Material
+    # TODO: extend the material definition to include:
+    # - flags to indicate whether diffuse and specular textures are to be used
+    # - diffuse texture coords
+    # - specular texture coords
     constructor: (
         @emissivity,
         @specularity,
@@ -7,9 +11,10 @@ class Material
     ) ->
 
 
-    encode: -> [
-            @emissivity.array()
-            [@specularity]
-            @specularReflectivity.array()
-            @diffuseReflectivity.array()
-        ].reduce((a, b) -> a.concat(b))
+    encode: ->
+        encoded = []
+        encoded.push(@emissivity.array()...)
+        encoded.push(@specularity)
+        encoded.push(@specularReflectivity.array()...)
+        encoded.push(@diffuseReflectivity.array()...)
+        encoded

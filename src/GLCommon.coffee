@@ -72,10 +72,11 @@ class ShaderProgram
 
 
 class Buffer
-    ARRAY_BUFFER = 34962
-    STATIC_DRAW  = 35044
-
-    constructor: (@gl, data, @type = ARRAY_BUFFER, usage = STATIC_DRAW) ->
+    constructor: (
+        @gl, data,
+        @type = WebGL2RenderingContext.ARRAY_BUFFER,
+        usage = WebGL2RenderingContext.STATIC_DRAW
+    ) ->
         @buffer = @gl.createBuffer()
         @bind()
         @gl.bufferData(@type, data, usage, 0)
@@ -86,13 +87,16 @@ class Buffer
 
 
 class Texture
-    constructor: (@gl, @width, @height, internalFormat, format, type, data) ->
+    constructor: (
+        @gl, @size, internalFormat, format, type, data,
+        filter = WebGL2RenderingContext.NEAREST
+    ) ->
         @tex = @gl.createTexture()
         @gl.bindTexture(@gl.TEXTURE_2D, @tex)
-        @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST)
-        @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
+        @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, filter)
+        @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, filter)
         @gl.texImage2D(@gl.TEXTURE_2D, 0, internalFormat,
-            @width, @height, 0, format, type, data)
+            @size.x, @size.y, 0, format, type, data)
 
 
     bind: (unit) ->
@@ -110,10 +114,8 @@ class DataTexture extends Texture
         [arrayType, internalFormat, format] =
             if type is @gl.FLOAT
                 [Float32Array, @gl.R32F, @gl.RED]
-
             else if type is @gl.UNSIGNED_INT
                 [Uint32Array, @gl.R32UI, @gl.RED_INTEGER]
-
             else
                 throw "Data type not supported"
 
@@ -143,7 +145,7 @@ class DataTexture extends Texture
         @dataMaskAndShift = [width - 1, Math.log2(width)]
 
         # Create texture
-        super(@gl, width, height, internalFormat, format, type, data)
+        super(@gl, new Vec2(width, height), internalFormat, format, type, data)
 
 
 class VertexArray

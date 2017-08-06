@@ -29,6 +29,12 @@ class Scene
         @addModel(cube3,  yellow)
         @addModel(plane,  white)
 
+        image = new Image()
+        image.src = testImage
+        image.onload = =>
+            @testTex = new Texture(@gl, new Vec2(512, 256), @gl.RGBA8, @gl.RGBA,
+                @gl.UNSIGNED_BYTE, image, @gl.LINEAR)
+
         @uploadSceneData()
 
 
@@ -59,7 +65,6 @@ class Scene
         @materialDataTex = new DataTexture(@gl, @gl.FLOAT, materialData)
 
 
-
     bind: (program) ->
         @triangleDataTex.bind(@gl.TEXTURE0)
         @treeDataTex.bind(@gl.TEXTURE1)
@@ -78,5 +83,8 @@ class Scene
         @gl.uniform1i(uniforms["materialBufferSampler"], 2)
         @gl.uniform2uiv(uniforms["materialBufferAddrData"],
             @materialDataTex.dataMaskAndShift)
+
+        @testTex.bind(@gl.TEXTURE4)
+        @gl.uniform1i(uniforms["testImageSampler"], 4)
 
         @gl.uniform3fv(uniforms["cameraPosition"], @cameraPosition.array())

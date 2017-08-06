@@ -11,6 +11,8 @@ uniform uvec2 materialBufferAddrData;
 uniform sampler2D randomBufferSampler;
 uniform uvec2 randomBufferAddrData;
 
+uniform sampler2D testImageSampler;
+
 uniform vec3 cameraPosition;
 uniform vec2 subPixelJitter;
 uniform highp float compositeAlpha;
@@ -30,6 +32,8 @@ ShaderSources.uniformNames = [
 
     "randomBufferSampler"
     "randomBufferAddrData"
+
+    "testImageSampler"
 
     "cameraPosition"
 

@@ -19,6 +19,12 @@ vec3 tracePath(Ray ray, inout uint rngState) {
             // Load material from buffer
             Material material = readMaterial(shtr.materialIndex);
 
+            // TODO: do this better
+            if(shtr.materialIndex == 0u) {
+                material.diffuseReflectivity = texture(testImageSampler,
+                    -shtr.tex).rgb;
+            }
+
             // Use scattering function to determine the new ray's direction
             ScatterResult sr = scatterMaterial(
                 ray.dir, shtr.nor, material, rngState);

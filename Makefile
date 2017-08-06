@@ -28,3 +28,6 @@ SRCS += shaders/Vert.coffee
 
 compile:
 	coffee --watch --join PathTracer.js --bare --compile $(SRCS)
+
+images:
+	python3 imageencode.py
