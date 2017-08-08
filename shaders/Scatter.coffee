@@ -33,11 +33,11 @@ ScatterResult scatterMaterial(
 
     if(random(rngState) < material.specularity) {
         res.dir = reflect(incident, normal);
-        res.transportCoeff = material.specularReflectivity;
+        res.transportCoeff = material.specularMultiplier;
     }
     else {
         res.dir = scatterLambertian(normal, rngState);
-        res.transportCoeff = material.diffuseReflectivity;
+        res.transportCoeff = material.diffuseMultiplier;
     }
 
     return res;

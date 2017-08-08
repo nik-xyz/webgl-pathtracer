@@ -1,10 +1,13 @@
 ShaderSources.getMaterialSource = -> """
 struct Material {
-    vec3 emissivity;
-
     float specularity;
-    vec3 specularReflectivity;
-    vec3 diffuseReflectivity;
+    vec3 diffuseMultiplier;
+    vec3 specularMultiplier;
+    vec3 emissionMultiplier;
+
+    float diffuseTexArrayIndex;
+    float specularTexArrayIndex;
+    float emissionTexArrayIndex;
 };
 
 

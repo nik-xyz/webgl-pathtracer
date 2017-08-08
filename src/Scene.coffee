@@ -5,11 +5,32 @@ class Scene
         # TODO: Don't do this here. Any of it
         @setCameraPosition(new Vec3(0, 3, -3))
 
-        red   = new Material(new Vec3(), 0.0, new Vec3(1, 1, 1), new Vec3(0.5, 0, 0))
-        green = new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0.35, 0.1))
-        blue  = new Material(new Vec3(), 0.2, new Vec3(1, 1, 1), new Vec3(0, 0, 0.5))
-        white = new Material(new Vec3(), 0.1, new Vec3(0.2, 0.2, 0.2), new Vec3(0.5, 0.5, 0.5))
-        yellow = new Material(new Vec3(5, 4, 0.0), 0.1, new Vec3(1, 1, 1), new Vec3(1, 0.6, 0.0))
+        red   = new Material()
+        green = new Material()
+        blue  = new Material()
+        white = new Material()
+        yellow = new Material()
+
+        yellow.setEmissionMultiplier(new Vec3(5, 4, 0.0))
+        white.setSpecularMultiplier(new Vec3(0.2, 0.2, 0.2))
+
+        red.setSpecularity(0.0)
+        green.setSpecularity(0.2)
+        blue.setSpecularity(0.2)
+        white.setSpecularity(0.1)
+        yellow.setSpecularity(0.1)
+
+        red.setDiffuseMultiplier(new Vec3(0.5, 0, 0))
+        green.setDiffuseMultiplier(new Vec3(1))
+        blue.setDiffuseMultiplier(new Vec3(0, 0, 0.5))
+        white.setDiffuseMultiplier(new Vec3(0.5, 0.5, 0.5))
+        yellow.setDiffuseMultiplier(new Vec3(1, 0.6, 0.0))
+
+        image0 = new Image()
+        green.setDiffuseTexture(image0)
+
+        image1 = new Image()
+        white.setDiffuseTexture(image1)
 
         sphere = new Model(Models.testModelSphere)
         cube   = new Model(Models.testModelCube)
@@ -29,13 +50,14 @@ class Scene
         @addModel(cube3,  yellow)
         @addModel(plane,  white)
 
-        image = new Image()
-        image.src = testImage
-        image.onload = =>
-            @testTex = new Texture(@gl, new Vec2(512, 256), @gl.RGBA8, @gl.RGBA,
-                @gl.UNSIGNED_BYTE, image, @gl.LINEAR)
+        loaded = 0
+        image0.onload = image1.onload = =>
+            loaded++
+            if loaded is 2
+                @uploadSceneData()
 
-        @uploadSceneData()
+        image0.src = testImage0
+        image1.src = testImage1
 
 
     addModel: (model, material) ->
@@ -50,9 +72,13 @@ class Scene
         materialData = []
         materialCounter = 0
 
+        images = []
+
         for [model, material] in @models
             triangles.push(model.getTriangles(materialData.length)...)
-            materialData.push(material.encode()...)
+            materialData.push(material.encode(images)...)
+
+        @uploadImages(images)
 
         [treeUintBuffer, treeFloatBuffer] = new KDTree(triangles).encode()
 
@@ -63,6 +89,16 @@ class Scene
         @treeDataTex     = new DataTexture(@gl, @gl.UNSIGNED_INT, treeUintBuffer)
         @triangleDataTex = new DataTexture(@gl, @gl.FLOAT, treeFloatBuffer)
         @materialDataTex = new DataTexture(@gl, @gl.FLOAT, materialData)
+
+
+    uploadImages: (images) ->
+        size = new Vec2(0)
+
+        for image in images
+            size = size.max(new Vec2(image.width, image.height))
+
+        @materialTexArray = new ArrayTexture(@gl, size, images.length,
+            @gl.RGBA8, @gl.RGBA, @gl.UNSIGNED_BYTE, images, @gl.LINEAR)
 
 
     bind: (program) ->
@@ -84,7 +120,7 @@ class Scene
         @gl.uniform2uiv(uniforms["materialBufferAddrData"],
             @materialDataTex.dataMaskAndShift)
 
-        @testTex.bind(@gl.TEXTURE4)
-        @gl.uniform1i(uniforms["testImageSampler"], 4)
+        @materialTexArray.bind(@gl.TEXTURE4)
+        @gl.uniform1i(uniforms["materialTexArraySampler"], 4)
 
         @gl.uniform3fv(uniforms["cameraPosition"], @cameraPosition.array())

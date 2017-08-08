@@ -13,7 +13,7 @@ class Vec
 
 
 class Vec2 extends Vec
-    constructor: (@x = 0, @y = 0) ->
+    constructor: (@x = 0, @y = @x) ->
 
     map:     (fn)        -> new Vec2(fn(@x), fn(@y))
     combine: (other, fn) -> new Vec2(fn(@x, other.x), fn(@y, other.y))
@@ -22,7 +22,7 @@ class Vec2 extends Vec
 
 
 class Vec3 extends Vec
-    constructor: (@x = 0, @y = 0, @z = 0) ->
+    constructor: (@x = 0, @y = @x, @z = @x) ->
 
     map:     (fn)        -> new Vec3(fn(@x), fn(@y), fn(@z))
     combine: (other, fn) -> new Vec3(fn(@x, other.x), fn(@y, other.y),

@@ -19,10 +19,24 @@ vec3 tracePath(Ray ray, inout uint rngState) {
             // Load material from buffer
             Material material = readMaterial(shtr.materialIndex);
 
-            // TODO: do this better
-            if(shtr.materialIndex == 0u) {
-                material.diffuseReflectivity = texture(testImageSampler,
-                    -shtr.tex).rgb;
+            // TODO: Move texture lookups sperate method
+
+            // Load diffuse texture if there is one
+            if(material.diffuseTexArrayIndex > -0.5) {
+                material.diffuseMultiplier *= texture(materialTexArraySampler,
+                    vec3(-shtr.tex, material.diffuseTexArrayIndex)).rgb;
+            }
+
+            // Load specular texture if there is one
+            if(material.specularTexArrayIndex > -0.5) {
+                material.specularMultiplier *= texture(materialTexArraySampler,
+                    vec3(shtr.tex, material.specularTexArrayIndex)).rgb;
+            }
+
+            // Load emission texture if there is one
+            if(material.emissionTexArrayIndex > -0.5) {
+                material.emissionMultiplier *= texture(materialTexArraySampler,
+                    vec3(shtr.tex, material.emissionTexArrayIndex)).rgb;
             }
 
             // Use scattering function to determine the new ray's direction
@@ -32,7 +46,7 @@ vec3 tracePath(Ray ray, inout uint rngState) {
             ray = createRay(shtr.pos + sr.dir * RAY_SURFACE_OFFSET, sr.dir);
 
             // Accumulate emission from surface
-            incomingLight += transportCoeff * material.emissivity;
+            incomingLight += transportCoeff * material.emissionMultiplier;
 
             // Calculate the new overall transport coefficient using
             // with the current material's transport coefficient

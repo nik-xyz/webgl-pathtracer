@@ -56,7 +56,7 @@ class PathTracer
         @gl.viewport(@frameBounds...)
 
         if @frame? then @frame.destroy()
-        @frame = new TexFramebuffer(@gl, @frameRes)
+        @frame = new Framebuffer(@gl, @frameRes)
 
         @reset()
 

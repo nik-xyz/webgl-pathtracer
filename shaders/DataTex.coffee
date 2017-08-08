@@ -113,10 +113,13 @@ vec3 readMaterialVec3(uint address) {
 
 Material readMaterial(uint address) {
     return Material(
-        readMaterialVec3( address + 0u),
-        readMaterialFloat(address + 3u),
+        readMaterialFloat(address + 0u),
+        readMaterialVec3( address + 1u),
         readMaterialVec3( address + 4u),
-        readMaterialVec3( address + 7u)
+        readMaterialVec3( address + 7u),
+        readMaterialFloat(address + 10u),
+        readMaterialFloat(address + 11u),
+        readMaterialFloat(address + 12u)
     );
 }
 

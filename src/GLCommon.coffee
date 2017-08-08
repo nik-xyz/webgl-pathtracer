@@ -108,6 +108,34 @@ class Texture
         @gl.deleteTexture(@tex)
 
 
+class ArrayTexture
+    constructor: (
+        @gl, @size, @layers, internalFormat, format, type, images,
+        filter = WebGL2RenderingContext.LINEAR
+    ) ->
+        @tex = @gl.createTexture()
+        @gl.bindTexture(@gl.TEXTURE_2D_ARRAY, @tex)
+        @gl.texParameteri(@gl.TEXTURE_2D_ARRAY, @gl.TEXTURE_MIN_FILTER, filter)
+        @gl.texParameteri(@gl.TEXTURE_2D_ARRAY, @gl.TEXTURE_MAG_FILTER, filter)
+        @gl.texStorage3D(@gl.TEXTURE_2D_ARRAY, 1, internalFormat,
+            @size.x, @size.y, images.length)
+
+        for image, index in images
+            @gl.texSubImage3D(
+                @gl.TEXTURE_2D_ARRAY, 0,
+                0, 0, index, image.width, image.height, 1,
+                format, type, image
+            )
+
+    bind: (unit) ->
+        @gl.activeTexture(unit)
+        @gl.bindTexture(@gl.TEXTURE_2D_ARRAY, @tex)
+
+
+    destroy: ->
+        @gl.deleteTexture(@tex)
+
+
 class DataTexture extends Texture
     constructor: (@gl, type, data) ->
         # Find the appropriate typed arrays and image formats for the data
@@ -164,7 +192,7 @@ class VertexArray
         @gl.bindVertexArray(@vao)
 
 
-class TexFramebuffer
+class Framebuffer
     constructor: (@gl, @resolution) ->
         floatExt = @gl.getExtension("EXT_color_buffer_float")
         internalFormat = if floatExt then @gl.RGBA32F else @gl.RGBA8

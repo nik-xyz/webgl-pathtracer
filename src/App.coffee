@@ -1,7 +1,7 @@
 class App
     run: ->
         pt = new PathTracer()
-        pt.setResolution(new Vec2(1920, 1080))
+        pt.setResolution(new Vec2(512, 512))
 
         window.render = ->
             pt.renderImage()

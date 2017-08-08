@@ -12,8 +12,8 @@ class Model
         @setSize(new Vec3(1, 1, 1))
 
 
-    setSize:          (@modelSize) ->
-    setPosition:      (@modelPos) ->
+    setSize: (@modelSize) ->
+    setPosition: (@modelPos) ->
 
 
     getTriangles: (materialIndex) ->
