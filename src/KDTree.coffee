@@ -1,6 +1,7 @@
 class KDTree
     @NULL_NODE_ADDRESS = 0
     SUBDIVISION_LIMIT = @SUBDIVISION_LIMIT = 10
+    MIN_BUCKET_SIZE = 10
 
 
     constructor: (@triangles, @limit = SUBDIVISION_LIMIT) ->
@@ -35,12 +36,12 @@ class KDTree
 
         @triangles = newTriangles
 
-        if lowerChildTriangles.length > 10
+        if lowerChildTriangles.length > MIN_BUCKET_SIZE
             @lowerChild = new KDTree(lowerChildTriangles, @limit - 1)
         else
             @triangles.push(lowerChildTriangles...)
 
-        if upperChildTriangles.length > 10
+        if upperChildTriangles.length > MIN_BUCKET_SIZE
             @upperChild = new KDTree(upperChildTriangles, @limit - 1)
         else
             @triangles.push(upperChildTriangles...)

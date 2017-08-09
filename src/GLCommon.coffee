@@ -111,12 +111,15 @@ class Texture
 class ArrayTexture
     constructor: (
         @gl, @size, @layers, internalFormat, format, type, images,
-        filter = WebGL2RenderingContext.LINEAR
+        filter = WebGL2RenderingContext.LINEAR,
+        wrap = WebGL2RenderingContext.REPEAT
     ) ->
         @tex = @gl.createTexture()
         @gl.bindTexture(@gl.TEXTURE_2D_ARRAY, @tex)
         @gl.texParameteri(@gl.TEXTURE_2D_ARRAY, @gl.TEXTURE_MIN_FILTER, filter)
         @gl.texParameteri(@gl.TEXTURE_2D_ARRAY, @gl.TEXTURE_MAG_FILTER, filter)
+        @gl.texParameteri(@gl.TEXTURE_2D_ARRAY, @gl.TEXTURE_WRAP_S, wrap)
+        @gl.texParameteri(@gl.TEXTURE_2D_ARRAY, @gl.TEXTURE_WRAP_T, wrap)
         @gl.texStorage3D(@gl.TEXTURE_2D_ARRAY, 1, internalFormat,
             @size.x, @size.y, images.length)
 

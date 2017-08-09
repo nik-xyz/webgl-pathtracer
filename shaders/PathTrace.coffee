@@ -21,22 +21,29 @@ vec3 tracePath(Ray ray, inout uint rngState) {
 
             // TODO: Move texture lookups sperate method
 
+            vec2 texSize = vec2(textureSize(materialTexArraySampler, 0).xy);
+
             // Load diffuse texture if there is one
-            if(material.diffuseTexArrayIndex > -0.5) {
-                material.diffuseMultiplier *= texture(materialTexArraySampler,
-                    vec3(-shtr.tex, material.diffuseTexArrayIndex)).rgb;
+            if(material.diffuseTexData.x > -0.5) {
+                // TODO: check texture orientation. The plane and ball seem to be
+                // in conflict
+                vec3 tex = vec3((vec2(1.0) - shtr.tex) * material.diffuseTexData.yz /
+                    texSize.xy, material.diffuseTexData.x);
+                material.diffuseMultiplier *= texture(materialTexArraySampler, tex).rgb;
             }
 
             // Load specular texture if there is one
-            if(material.specularTexArrayIndex > -0.5) {
-                material.specularMultiplier *= texture(materialTexArraySampler,
-                    vec3(shtr.tex, material.specularTexArrayIndex)).rgb;
+            if(material.specularTexData.x > -0.5) {
+                vec3 tex = vec3(shtr.tex * material.specularTexData.yz /
+                    texSize.xy, material.specularTexData.x);
+                material.diffuseMultiplier *= texture(materialTexArraySampler, tex).rgb;
             }
 
             // Load emission texture if there is one
-            if(material.emissionTexArrayIndex > -0.5) {
-                material.emissionMultiplier *= texture(materialTexArraySampler,
-                    vec3(shtr.tex, material.emissionTexArrayIndex)).rgb;
+            if(material.emissionTexData.x > -0.5) {
+                vec3 tex = vec3(shtr.tex * material.emissionTexData.yz /
+                    texSize.xy, material.emissionTexData.x);
+                material.diffuseMultiplier *= texture(materialTexArraySampler, tex).rgb;
             }
 
             // Use scattering function to determine the new ray's direction

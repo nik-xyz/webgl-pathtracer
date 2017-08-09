@@ -117,9 +117,9 @@ Material readMaterial(uint address) {
         readMaterialVec3( address + 1u),
         readMaterialVec3( address + 4u),
         readMaterialVec3( address + 7u),
-        readMaterialFloat(address + 10u),
-        readMaterialFloat(address + 11u),
-        readMaterialFloat(address + 12u)
+        readMaterialVec3( address + 10u),
+        readMaterialVec3( address + 13u),
+        readMaterialVec3( address + 16u)
     );
 }
 

@@ -5,9 +5,9 @@ struct Material {
     vec3 specularMultiplier;
     vec3 emissionMultiplier;
 
-    float diffuseTexArrayIndex;
-    float specularTexArrayIndex;
-    float emissionTexArrayIndex;
+    vec3 diffuseTexData;
+    vec3 specularTexData;
+    vec3 emissionTexData;
 };
 
 

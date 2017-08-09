@@ -15,28 +15,28 @@ class Material
         @setEmissionTexture(null)
 
 
-    setSpecularity:        (@specularity) ->
+    setSpecularity:        (@specularity)        ->
     setDiffuseMultiplier:  (@diffuseMultiplier)  ->
     setSpecularMultiplier: (@specularMultiplier) ->
     setEmissionMultiplier: (@emissionMultiplier) ->
-    setDiffuseTexture:     (@diffuseImage)  ->
-    setSpecularTexture:    (@specularImage) ->
-    setEmissionTexture:    (@emissionImage) ->
+    setDiffuseTexture:     (@diffuseImage)       ->
+    setSpecularTexture:    (@specularImage)      ->
+    setEmissionTexture:    (@emissionImage)      ->
 
 
     encode: (images) ->
         pushImageIfExists = (image) ->
-            unless image then return -1
+            unless image then return [-1, 0, 0]
             index = images.length
             images.push(image)
-            index
+            [index, image.width, image.height]
 
         encoded = []
         encoded.push(@specularity)
         encoded.push(@diffuseMultiplier.array()...)
         encoded.push(@specularMultiplier.array()...)
         encoded.push(@emissionMultiplier.array()...)
-        encoded.push(pushImageIfExists(@diffuseImage))
-        encoded.push(pushImageIfExists(@specularImage))
-        encoded.push(pushImageIfExists(@emissionImage))
+        encoded.push(pushImageIfExists(@diffuseImage)...)
+        encoded.push(pushImageIfExists(@specularImage)...)
+        encoded.push(pushImageIfExists(@emissionImage)...)
         encoded
