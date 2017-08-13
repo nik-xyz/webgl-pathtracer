@@ -5,15 +5,29 @@ class Model
 
     DEFAULT_TEXCOORD = new Vec2(0, 0)
 
-
-    constructor: (data) ->
-        @parseLines(data)
-        @setPosition(new Vec3(0, 0, 0))
-        @setSize(new Vec3(1, 1, 1))
+    DEFAULT_POSITION = new Vec3(0)
+    DEFAULT_SIZE     = new Vec3(1)
 
 
-    setSize: (@modelSize) ->
-    setPosition: (@modelPos) ->
+    constructor: (@data, @position = DEFAULT_POSITION, @size = DEFAULT_SIZE) ->
+        @parseLines()
+
+
+    toJSONEncodableObj: ->
+        obj = {}
+        obj.data     = @data
+        obj.position = @position.array()
+        obj.size     = @size.array()
+        obj
+
+
+    @fromJSONEncodableObj: (obj) ->
+        unless obj.data? and obj.position? and obj.size?
+            throw "Invalid JSON!"
+
+        # TODO: validate data fully
+
+        new Model(obj.data, new Vec3(obj.position...), new Vec3(obj.size...))
 
 
     getTriangles: (materialIndex) ->
@@ -32,13 +46,13 @@ class Model
         for face in @faceArray
             for vertIndices in face
                 pos = accessArray(@posArray, vertIndices[0])
-                    .mul(@modelSize)
-                    .add(@modelPos)
+                    .mul(@size)
+                    .add(@position)
 
                 new TriangleVertex(
-                    pos,
-                    accessArray(@norArray, vertIndices[2]),
-                    accessArray(@texArray, vertIndices[1], DEFAULT_TEXCOORD),
+                    pos
+                    accessArray(@norArray, vertIndices[2])
+                    accessArray(@texArray, vertIndices[1], DEFAULT_TEXCOORD)
                 )
 
 
@@ -53,13 +67,13 @@ class Model
         return array[index - 1]
 
 
-    parseLines: (data) ->
+    parseLines: () ->
         @posArray  = []
         @norArray  = []
         @texArray  = []
         @faceArray = []
 
-        for line, lineIndex in data.split(NEWLINE_REGEX)
+        for line, lineIndex in @data.split(NEWLINE_REGEX)
             try
                 tokens = line.trim().split(WHITESPACE_REGEX)
 

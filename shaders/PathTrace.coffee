@@ -20,7 +20,7 @@ vec3 tracePath(Ray ray, inout uint rngState) {
             Material material = readMaterial(shtr.materialIndex);
 
             // TODO: Move texture lookups sperate method
-
+/*
             vec2 texSize = vec2(textureSize(materialTexArraySampler, 0).xy);
 
             // Load diffuse texture if there is one
@@ -45,7 +45,7 @@ vec3 tracePath(Ray ray, inout uint rngState) {
                     texSize.xy, material.emissionTexData.x);
                 material.diffuseMultiplier *= texture(materialTexArraySampler, tex).rgb;
             }
-
+*/
             // Use scattering function to determine the new ray's direction
             ScatterResult sr = scatterMaterial(
                 ray.dir, shtr.nor, material, rngState);

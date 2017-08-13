@@ -2,6 +2,8 @@ class Scene
     constructor: (@gl) ->
         @models = []
 
+
+    setupTestScene: ->
         # TODO: Don't do this here. Any of it
         @setCameraPosition(new Vec3(0, 3, -3))
 
@@ -26,11 +28,11 @@ class Scene
         white.setDiffuseMultiplier(new Vec3(0.5, 0.5, 0.5))
         yellow.setDiffuseMultiplier(new Vec3(1, 0.6, 0.0))
 
-        image0 = new Image()
-        green.setDiffuseTexture(image0)
+        #image0 = new Image()
+        #green.setDiffuseTexture(image0)
 
-        image1 = new Image()
-        white.setDiffuseTexture(image1)
+        #image1 = new Image()
+        #white.setDiffuseTexture(image1)
 
         sphere = new Model(Models.testModelSphere)
         cube   = new Model(Models.testModelCube)
@@ -38,11 +40,11 @@ class Scene
         cube3  = new Model(Models.testModelCube)
         plane  = new Model(Models.testModelPlane)
 
-        plane.setPosition(new Vec3(0, -1.5, 0))
-        cube.setPosition(new Vec3(1.5, -0.5, -0.8))
-        cube2.setPosition(new Vec3(-1.5, -1, 0.8))
-        cube3.setPosition(new Vec3(-1.5, -1, -1.3))
-        cube3.setSize(new Vec3(0.4, 0.4, 0.4))
+        plane.position = new Vec3(0, -1.5, 0)
+        cube.position  = new Vec3(1.5, -0.5, -0.8)
+        cube2.position = new Vec3(-1.5, -1, 0.8)
+        cube3.position = new Vec3(-1.5, -1, -1.3)
+        cube3.size     = new Vec3(0.4, 0.4, 0.4)
 
         @addModel(sphere, green)
         @addModel(cube,   red)
@@ -50,20 +52,59 @@ class Scene
         @addModel(cube3,  yellow)
         @addModel(plane,  white)
 
-        loaded = 0
-        image0.onload = image1.onload = =>
-            loaded++
-            if loaded is 2
-                @uploadSceneData()
+        #loaded = 0
+        #image0.onload = image1.onload = =>
+        #    loaded++
+        #    if loaded is 2
+        #        @uploadSceneData()
 
-        image0.src = testImage0
-        image1.src = testImage1
+        #image0.src = testImage0
+        #image1.src = testImage1
+
+
+    toJSONEncodableObj: () ->
+        sceneObj = {}
+
+        sceneObj.cameraPosition = @cameraPosition.array()
+
+        sceneObj.models = []
+
+        for [model, material] in @models
+            modelObj = {}
+            modelObj.model    = model.toJSONEncodableObj()
+            modelObj.material = material.toJSONEncodableObj()
+
+            sceneObj.models.push(modelObj)
+
+        sceneObj
+
+
+    @fromJSONEncodableObj: (gl, obj) ->
+        unless obj.cameraPosition? and obj.models?
+            throw "Invalid JSON!"
+
+        # TODO: validate data fully
+
+        scene = new Scene(gl)
+        scene.cameraPosition = new Vec3(obj.cameraPosition...)
+
+        for modelObj in obj.models
+            unless modelObj.model? and modelObj.material?
+                throw "Invalid JSON!"
+
+            model    = Model.fromJSONEncodableObj(modelObj.model)
+            material = Material.fromJSONEncodableObj(modelObj.material)
+
+            scene.addModel(model, material)
+        scene
 
 
     addModel: (model, material) ->
         @models.push([model, material])
 
 
+    # TODO: move this somewhere else because storing the camera position
+    # doesn't fit the role of the scene class
     setCameraPosition: (@cameraPosition) ->
 
 
@@ -78,7 +119,7 @@ class Scene
             triangles.push(model.getTriangles(materialData.length)...)
             materialData.push(material.encode(images)...)
 
-        @uploadImages(images)
+        #@uploadImages(images)
 
         [treeUintBuffer, treeFloatBuffer] = new KDTree(triangles).encode()
 
@@ -120,7 +161,7 @@ class Scene
         @gl.uniform2uiv(uniforms["materialBufferAddrData"],
             @materialDataTex.dataMaskAndShift)
 
-        @materialTexArray.bind(@gl.TEXTURE4)
-        @gl.uniform1i(uniforms["materialTexArraySampler"], 4)
+        #@materialTexArray.bind(@gl.TEXTURE4)
+        #@gl.uniform1i(uniforms["materialTexArraySampler"], 4)
 
         @gl.uniform3fv(uniforms["cameraPosition"], @cameraPosition.array())

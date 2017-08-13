@@ -25,7 +25,6 @@ class Vec3 extends Vec
     constructor: (@x = 0, @y = @x, @z = @x) ->
 
     map:     (fn)        -> new Vec3(fn(@x), fn(@y), fn(@z))
-    combine: (other, fn) -> new Vec3(fn(@x, other.x), fn(@y, other.y),
-                                fn(@z, other.z))
+    combine: (other, fn) -> new Vec3(fn(@x, other.x), fn(@y, other.y), fn(@z, other.z))
     reduce:  (fn)        -> fn(fn(@x, @y), @z)
     array:               -> [@x, @y, @z]

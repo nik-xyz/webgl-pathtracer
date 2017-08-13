@@ -24,6 +24,32 @@ class Material
     setEmissionTexture:    (@emissionImage)      ->
 
 
+    toJSONEncodableObj: ->
+        obj = {}
+        obj.specularity        = @specularity
+        obj.diffuseMultiplier  = @diffuseMultiplier.array()
+        obj.specularMultiplier = @specularMultiplier.array()
+        obj.emissionMultiplier = @emissionMultiplier.array()
+        obj
+
+
+    @fromJSONEncodableObj: (obj) ->
+        unless obj.specularity? and
+               obj.diffuseMultiplier? and
+               obj.specularMultiplier? and
+               obj.emissionMultiplier?
+            throw "Invalid JSON!"
+
+        # TODO: validate data fully
+
+        material = new Material()
+        material.setSpecularity(obj.specularity)
+        material.setDiffuseMultiplier(new Vec3(obj.diffuseMultiplier...))
+        material.setSpecularMultiplier(new Vec3(obj.specularMultiplier...))
+        material.setEmissionMultiplier(new Vec3(obj.emissionMultiplier...))
+        material
+
+
     encode: (images) ->
         pushImageIfExists = (image) ->
             unless image then return [-1, 0, 0]
