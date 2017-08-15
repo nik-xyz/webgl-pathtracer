@@ -65,7 +65,8 @@ class Material
             unless image then return [-1, 0, 0]
             index = images.length
             images.push(image)
-            [index, image.width, image.height]
+            # TODO: find proper resolution
+            [index, 200, 200]#image.width, image.height]
 
         encoded = []
         encoded.push(@specularity)

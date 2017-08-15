@@ -4,7 +4,6 @@ class Scene
 
 
     setupTestScene: ->
-        # TODO: Don't do this here. Any of it
         @setCameraPosition(new Vec3(0, 3, -3))
 
         red   = new Material()
@@ -120,8 +119,26 @@ class Scene
         @materialDataTex = new DataTexture(@gl, @gl.FLOAT, materialData)
 
 
-    uploadImages: (images) ->
-        console.log(images)
+    uploadImages: (imageSrcs) ->
+        # TODO: restructure
+
+        loaded = 0
+        images = new Array(imageSrcs.length)
+        size = new Vec2(0)
+
+        for src, index in imageSrcs
+            do (index) =>
+                image = new Image()
+                image.onload = =>
+                    images[index] = image
+                    size = size.max(new Vec2(image.width, image.height))
+                    loaded++
+                    if loaded is images.length
+                        @materialTexArray = new ArrayTexture(
+                            @gl, size, images.length, @gl.RGBA8, @gl.RGBA,
+                            @gl.UNSIGNED_BYTE, images, @gl.LINEAR)
+                image.src = src
+
 
 
     bind: (program) ->
@@ -143,7 +160,8 @@ class Scene
         @gl.uniform2uiv(uniforms["materialBufferAddrData"],
             @materialDataTex.dataMaskAndShift)
 
-        #@materialTexArray.bind(@gl.TEXTURE4)
-        #@gl.uniform1i(uniforms["materialTexArraySampler"], 4)
+        # TODO: check that the materialTexArray exists and handle appropriately
+        @materialTexArray.bind(@gl.TEXTURE4)
+        @gl.uniform1i(uniforms["materialTexArraySampler"], 4)
 
         @gl.uniform3fv(uniforms["cameraPosition"], @cameraPosition.array())
