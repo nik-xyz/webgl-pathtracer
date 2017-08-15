@@ -14,10 +14,10 @@ class Model
 
 
     toJSONEncodableObj: ->
-        obj = {}
-        obj.data     = @data
-        obj.position = @position.array()
-        obj.size     = @size.array()
+        obj =
+            data:     @data
+            position: @position.array()
+            size:     @size.array()
         obj
 
 

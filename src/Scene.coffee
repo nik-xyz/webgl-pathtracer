@@ -28,11 +28,8 @@ class Scene
         white.setDiffuseMultiplier(new Vec3(0.5, 0.5, 0.5))
         yellow.setDiffuseMultiplier(new Vec3(1, 0.6, 0.0))
 
-        #image0 = new Image()
-        #green.setDiffuseTexture(image0)
-
-        #image1 = new Image()
-        #white.setDiffuseTexture(image1)
+        green.setDiffuseImage(testImage0)
+        white.setDiffuseImage(testImage1)
 
         sphere = new Model(Models.testModelSphere)
         cube   = new Model(Models.testModelCube)
@@ -51,15 +48,6 @@ class Scene
         @addModel(cube2,  blue)
         @addModel(cube3,  yellow)
         @addModel(plane,  white)
-
-        #loaded = 0
-        #image0.onload = image1.onload = =>
-        #    loaded++
-        #    if loaded is 2
-        #        @uploadSceneData()
-
-        #image0.src = testImage0
-        #image1.src = testImage1
 
 
     toJSONEncodableObj: () ->
@@ -119,7 +107,7 @@ class Scene
             triangles.push(model.getTriangles(materialData.length)...)
             materialData.push(material.encode(images)...)
 
-        #@uploadImages(images)
+        @uploadImages(images)
 
         [treeUintBuffer, treeFloatBuffer] = new KDTree(triangles).encode()
 
@@ -133,13 +121,7 @@ class Scene
 
 
     uploadImages: (images) ->
-        size = new Vec2(0)
-
-        for image in images
-            size = size.max(new Vec2(image.width, image.height))
-
-        @materialTexArray = new ArrayTexture(@gl, size, images.length,
-            @gl.RGBA8, @gl.RGBA, @gl.UNSIGNED_BYTE, images, @gl.LINEAR)
+        console.log(images)
 
 
     bind: (program) ->

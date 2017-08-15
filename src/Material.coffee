@@ -10,26 +10,31 @@ class Material
         @setDiffuseMultiplier(new Vec3(1.0))
         @setSpecularMultiplier(new Vec3(1.0))
         @setEmissionMultiplier(new Vec3(0.0))
-        @setDiffuseTexture(null)
-        @setSpecularTexture(null)
-        @setEmissionTexture(null)
+        @setDiffuseImage(null)
+        @setSpecularImage(null)
+        @setEmissionImage(null)
 
 
     setSpecularity:        (@specularity)        ->
     setDiffuseMultiplier:  (@diffuseMultiplier)  ->
     setSpecularMultiplier: (@specularMultiplier) ->
     setEmissionMultiplier: (@emissionMultiplier) ->
-    setDiffuseTexture:     (@diffuseImage)       ->
-    setSpecularTexture:    (@specularImage)      ->
-    setEmissionTexture:    (@emissionImage)      ->
+    setDiffuseImage:       (@diffuseImage)       ->
+    setSpecularImage:      (@specularImage)      ->
+    setEmissionImage:      (@emissionImage)      ->
 
 
     toJSONEncodableObj: ->
-        obj = {}
-        obj.specularity        = @specularity
-        obj.diffuseMultiplier  = @diffuseMultiplier.array()
-        obj.specularMultiplier = @specularMultiplier.array()
-        obj.emissionMultiplier = @emissionMultiplier.array()
+        obj =
+            specularity:         @specularity
+            diffuseMultiplier:   @diffuseMultiplier.array()
+            specularMultiplier:  @specularMultiplier.array()
+            emissionMultiplier:  @emissionMultiplier.array()
+
+        if @diffuseImage?  then obj.diffuseImage  = @diffuseImage
+        if @specularImage? then obj.specularImage = @specularImage
+        if @emissionImage? then obj.emissionImage = @emissionImage
+
         obj
 
 
@@ -47,6 +52,11 @@ class Material
         material.setDiffuseMultiplier(new Vec3(obj.diffuseMultiplier...))
         material.setSpecularMultiplier(new Vec3(obj.specularMultiplier...))
         material.setEmissionMultiplier(new Vec3(obj.emissionMultiplier...))
+
+        if obj.diffuseImage?  then material.setDiffuseImage(obj.diffuseImage)
+        if obj.specularImage? then material.setSpecularImage(obj.specularImage)
+        if obj.emissionImage? then material.setEmissionImage(obj.emissionImage)
+
         material
 
 
