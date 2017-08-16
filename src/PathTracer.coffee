@@ -8,9 +8,9 @@ class PathTracer
         # Test JSON encoding
         originalScene = new Scene(@gl)
         originalScene.setupTestScene()
-        #encoded = JSON.stringify(originalScene.toJSONEncodableObj())
+        encoded = JSON.stringify(originalScene.toJSONEncodableObj())
 
-        @scene = originalScene#Scene.fromJSONEncodableObj(@gl, JSON.parse(encoded))
+        @scene = Scene.fromJSONEncodableObj(@gl, JSON.parse(encoded))
         @scene.uploadSceneData()
 
         @randomGen = new RandomGen(@gl)

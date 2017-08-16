@@ -12,20 +12,20 @@ class Scene
         white = new Material()
         yellow = new Material()
 
-        yellow.setEmissionMultiplier(new Vec3(5, 4, 0.0))
-        white.setSpecularMultiplier(new Vec3(0.2, 0.2, 0.2))
+        yellow.emissionMultiplier = new Vec3(5, 4, 0.0)
+        white.specularMultiplier = new Vec3(0.2, 0.2, 0.2)
 
-        red.setSpecularity(0.0)
-        green.setSpecularity(0.2)
-        blue.setSpecularity(0.2)
-        white.setSpecularity(0.1)
-        yellow.setSpecularity(0.1)
+        red.specularity = 0.0
+        green.specularity = 0.2
+        blue.specularity = 0.2
+        white.specularity = 0.1
+        yellow.specularity = 0.1
 
-        red.setDiffuseMultiplier(new Vec3(0.5, 0, 0))
-        green.setDiffuseMultiplier(new Vec3(1))
-        blue.setDiffuseMultiplier(new Vec3(0, 0, 0.5))
-        white.setDiffuseMultiplier(new Vec3(0.5, 0.5, 0.5))
-        yellow.setDiffuseMultiplier(new Vec3(1, 0.6, 0.0))
+        red.diffuseMultiplier = new Vec3(0.5, 0, 0)
+        green.diffuseMultiplier = new Vec3(1)
+        blue.diffuseMultiplier = new Vec3(0, 0, 0.5)
+        white.diffuseMultiplier = new Vec3(0.5, 0.5, 0.5)
+        yellow.diffuseMultiplier = new Vec3(1, 0.6, 0.0)
 
         green.setDiffuseImage(testImage0)
         white.setDiffuseImage(testImage1)
@@ -119,25 +119,17 @@ class Scene
         @materialDataTex = new DataTexture(@gl, @gl.FLOAT, materialData)
 
 
-    uploadImages: (imageSrcs) ->
+    uploadImages: (images) ->
         # TODO: restructure
 
-        loaded = 0
-        images = new Array(imageSrcs.length)
         size = new Vec2(0)
 
-        for src, index in imageSrcs
-            do (index) =>
-                image = new Image()
-                image.onload = =>
-                    images[index] = image
-                    size = size.max(new Vec2(image.width, image.height))
-                    loaded++
-                    if loaded is images.length
-                        @materialTexArray = new ArrayTexture(
-                            @gl, size, images.length, @gl.RGBA8, @gl.RGBA,
-                            @gl.UNSIGNED_BYTE, images, @gl.LINEAR)
-                image.src = src
+        for image in images
+            size = size.max(new Vec2(image.width, image.height))
+
+        @materialTexArray = new ArrayTexture(
+            @gl, size, images.length, @gl.RGBA8, @gl.RGBA, @gl.UNSIGNED_BYTE,
+            images, @gl.LINEAR)
 
 
 

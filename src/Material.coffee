@@ -6,22 +6,30 @@
 ###
 class Material
     constructor: () ->
-        @setSpecularity(0.5)
-        @setDiffuseMultiplier(new Vec3(1.0))
-        @setSpecularMultiplier(new Vec3(1.0))
-        @setEmissionMultiplier(new Vec3(0.0))
-        @setDiffuseImage(null)
-        @setSpecularImage(null)
-        @setEmissionImage(null)
+        @specularity        = 0.5
+        @diffuseMultiplier  = new Vec3(1.0)
+        @specularMultiplier = new Vec3(1.0)
+        @emissionMultiplier = new Vec3(0.0)
+        @diffuseImage  = null
+        @specularImage = null
+        @emissionImage = null
 
 
-    setSpecularity:        (@specularity)        ->
-    setDiffuseMultiplier:  (@diffuseMultiplier)  ->
-    setSpecularMultiplier: (@specularMultiplier) ->
-    setEmissionMultiplier: (@emissionMultiplier) ->
-    setDiffuseImage:       (@diffuseImage)       ->
-    setSpecularImage:      (@specularImage)      ->
-    setEmissionImage:      (@emissionImage)      ->
+    # TODO: make these block until the image has been loaded
+    setDiffuseImage: (diffuseImageSrc) ->
+        @diffuseImage  = new Image()
+        @diffuseImage.src = diffuseImageSrc
+
+
+    setSpecularImage: (specularImageSrc) ->
+        @specularImage = new Image()
+        @specularImage.src = specularImageSrc
+
+
+    setEmissionImage: (emissionImageSrc) ->
+        @emissionImage = new Image()
+        @emissionImage.src = emissionImageSrc
+
 
 
     toJSONEncodableObj: ->
@@ -31,9 +39,9 @@ class Material
             specularMultiplier:  @specularMultiplier.array()
             emissionMultiplier:  @emissionMultiplier.array()
 
-        if @diffuseImage?  then obj.diffuseImage  = @diffuseImage
-        if @specularImage? then obj.specularImage = @specularImage
-        if @emissionImage? then obj.emissionImage = @emissionImage
+        if @diffuseImage?  then obj.diffuseImage  = @diffuseImage.src
+        if @specularImage? then obj.specularImage = @specularImage.src
+        if @emissionImage? then obj.emissionImage = @emissionImage.src
 
         obj
 
@@ -48,10 +56,10 @@ class Material
         # TODO: validate data fully
 
         material = new Material()
-        material.setSpecularity(obj.specularity)
-        material.setDiffuseMultiplier(new Vec3(obj.diffuseMultiplier...))
-        material.setSpecularMultiplier(new Vec3(obj.specularMultiplier...))
-        material.setEmissionMultiplier(new Vec3(obj.emissionMultiplier...))
+        material.specularity = obj.specularity
+        material.diffuseMultiplier = new Vec3(obj.diffuseMultiplier...)
+        material.specularMultiplier = new Vec3(obj.specularMultiplier...)
+        material.emissionMultiplier = new Vec3(obj.emissionMultiplier...)
 
         if obj.diffuseImage?  then material.setDiffuseImage(obj.diffuseImage)
         if obj.specularImage? then material.setSpecularImage(obj.specularImage)
@@ -65,8 +73,7 @@ class Material
             unless image then return [-1, 0, 0]
             index = images.length
             images.push(image)
-            # TODO: find proper resolution
-            [index, 200, 200]#image.width, image.height]
+            [index, image.width, image.height]
 
         encoded = []
         encoded.push(@specularity)
