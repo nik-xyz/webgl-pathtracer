@@ -14,11 +14,9 @@ class Model
 
 
     toJSONEncodableObj: ->
-        obj =
-            data:     @data
-            position: @position.array()
-            size:     @size.array()
-        obj
+        data:     @data
+        position: @position.array()
+        size:     @size.array()
 
 
     @fromJSONEncodableObj: (obj) ->

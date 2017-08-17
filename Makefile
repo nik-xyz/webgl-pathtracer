@@ -10,8 +10,6 @@ SRCS += src/Material.coffee
 SRCS += src/Scene.coffee
 SRCS += src/PathTracer.coffee
 
-SRCS += models/TestModel.coffee
-
 SRCS += shaders/ShaderSources.coffee
 SRCS += shaders/DataTex.coffee
 SRCS += shaders/Frag.coffee
@@ -28,6 +26,3 @@ SRCS += shaders/Vert.coffee
 
 compile:
 	coffee --watch --join PathTracer.js --bare --compile $(SRCS)
-
-images:
-	python3 imageencode.py

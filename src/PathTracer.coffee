@@ -5,15 +5,13 @@ class PathTracer
         @createVertexData()
         @reset()
 
-        # Test JSON encoding
-        originalScene = new Scene(@gl)
-        originalScene.setupTestScene()
-        encoded = JSON.stringify(originalScene.toJSONEncodableObj())
-
-        @scene = Scene.fromJSONEncodableObj(@gl, JSON.parse(encoded))
-        @scene.uploadSceneData()
-
         @randomGen = new RandomGen(@gl)
+
+
+    loadScene: (encoded) ->
+        @scene = Scene.fromJSONEncodableObj(@gl, JSON.parse(encoded))
+
+        @scene.uploadSceneData()
 
 
     createContext: ->
