@@ -5,6 +5,11 @@
     (multiplier * texture), otherwise it is determined by the multiplier alone.
 ###
 class Material
+    # Value that is used to indicate that a material component has no
+    # associated texture
+    NO_IMAGE_ADDRESS = -1
+
+
     constructor: () ->
         @specularity        = 0.5
         @diffuseMultiplier  = new Vec3(1.0)
@@ -15,20 +20,28 @@ class Material
         @emissionImage = null
 
 
-    # TODO: make these block until the image has been loaded
+    # TODO: wait for these promises to resolve before doing anything with the images
+    # Right now, chromium requires the page to be at least once reloaded before it
+    # will work
     setDiffuseImage: (diffuseImageSrc) ->
-        @diffuseImage  = new Image()
+        @diffuseImage = new Image()
+        loadedPromise = new Promise((resolve) => @diffuseImage.onload = resolve)
         @diffuseImage.src = diffuseImageSrc
+        loadedPromise
 
 
     setSpecularImage: (specularImageSrc) ->
         @specularImage = new Image()
+        loadedPromise = new Promise((resolve) => @specularImage.onload = resolve)
         @specularImage.src = specularImageSrc
+        loadedPromise
 
 
     setEmissionImage: (emissionImageSrc) ->
         @emissionImage = new Image()
+        loadedPromise = new Promise((resolve) => @emissionImage.onload = resolve)
         @emissionImage.src = emissionImageSrc
+        loadedPromise
 
 
 
@@ -68,19 +81,25 @@ class Material
         material
 
 
-    encode: (images) ->
-        pushImageIfExists = (image) ->
-            unless image then return [-1, 0, 0]
-            index = images.length
+    encode: (existingImagesBaseIndex) ->
+        images = []
+
+        pushImageIfitExists = (image) ->
+            if image is null
+                return [NO_IMAGE_ADDRESS, 0, 0]
+
+            imageIndex = existingImagesBaseIndex + images.length
             images.push(image)
-            [index, image.width, image.height]
+
+            [imageIndex, image.width, image.height]
 
         encoded = []
         encoded.push(@specularity)
         encoded.push(@diffuseMultiplier.array()...)
         encoded.push(@specularMultiplier.array()...)
         encoded.push(@emissionMultiplier.array()...)
-        encoded.push(pushImageIfExists(@diffuseImage)...)
-        encoded.push(pushImageIfExists(@specularImage)...)
-        encoded.push(pushImageIfExists(@emissionImage)...)
-        encoded
+        encoded.push(pushImageIfitExists(@diffuseImage)...)
+        encoded.push(pushImageIfitExists(@specularImage)...)
+        encoded.push(pushImageIfitExists(@emissionImage)...)
+
+        [encoded, images]

@@ -98,15 +98,16 @@ class Scene
     uploadSceneData: () ->
         triangles = []
         materialData = []
-        materialCounter = 0
-
-        images = []
+        materialImages = []
 
         for [model, material] in @models
             triangles.push(model.getTriangles(materialData.length)...)
-            materialData.push(material.encode(images)...)
 
-        @uploadImages(images)
+            [data, images] = material.encode(materialImages.length)
+            materialData.push(data...)
+            materialImages.push(images...)
+
+        @uploadImages(materialImages)
 
         [treeUintBuffer, treeFloatBuffer] = new KDTree(triangles).encode()
 
