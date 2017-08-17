@@ -4,7 +4,6 @@ SRCS += src/GLCommon.coffee
 SRCS += src/KDTree.coffee
 SRCS += src/Model.coffee
 SRCS += src/RandomGen.coffee
-SRCS += src/Material.coffee
 SRCS += src/Scene.coffee
 SRCS += src/PathTracer.coffee
 
