@@ -25,7 +25,7 @@ class Model
 
         # TODO: validate data fully
 
-        new Model(obj.data, new Vec3(obj.position...), new Vec3(obj.size...))
+        `new Model(obj.data, new Vec3(...obj.position), new Vec3(...obj.size))`
 
 
     getTriangles: (materialIndex) ->
@@ -81,13 +81,13 @@ class Model
                 args = tokens.slice(1)
 
                 if command is "v"
-                    @posArray.push(new Vec3(parseFloats(3, args)...))
+                    `this.posArray.push(new Vec3(...parseFloats(3, args)))`
 
                 else if command is "vn"
-                    @norArray.push(new Vec3(parseFloats(3, args)...))
+                    `this.norArray.push(new Vec3(...parseFloats(3, args)))`
 
                 else if command is "vt"
-                    @texArray.push(new Vec2(parseFloats(2, args)...))
+                    `this.texArray.push(new Vec2(...parseFloats(2, args)))`
 
                 else if command is "f"
                     @faceArray.push(args.map(parseFaceVert))

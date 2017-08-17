@@ -27,7 +27,7 @@ class Scene
         # TODO: validate data fully
 
         scene = new Scene(gl)
-        scene.cameraPosition = new Vec3(obj.cameraPosition...)
+        `scene.cameraPosition = new Vec3(...obj.cameraPosition);`
 
         for modelObj in obj.models
             unless modelObj.model? and modelObj.material?
@@ -77,10 +77,10 @@ class Scene
     uploadImages: (images) ->
         # TODO: restructure
 
-        size = new Vec2(0)
+        `size = new Vec2(0)`
 
         for image in images
-            size = size.max(new Vec2(image.width, image.height))
+            `size = size.max(new Vec2(image.width, image.height))`
 
         @materialTexArray = new ArrayTexture(
             @gl, size, images.length, @gl.RGBA8, @gl.RGBA, @gl.UNSIGNED_BYTE,

@@ -1,7 +1,6 @@
 
 SRCS  = src/App.coffee
 SRCS += src/GLCommon.coffee
-SRCS += src/Vec.coffee
 SRCS += src/Triangle.coffee
 SRCS += src/KDTree.coffee
 SRCS += src/Model.coffee

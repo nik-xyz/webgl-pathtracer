@@ -70,9 +70,9 @@ class Material
 
         material = new Material()
         material.specularity = obj.specularity
-        material.diffuseMultiplier = new Vec3(obj.diffuseMultiplier...)
-        material.specularMultiplier = new Vec3(obj.specularMultiplier...)
-        material.emissionMultiplier = new Vec3(obj.emissionMultiplier...)
+        `material.diffuseMultiplier = new Vec3(...obj.diffuseMultiplier)`
+        `material.specularMultiplier = new Vec3(...obj.specularMultiplier)`
+        `material.emissionMultiplier = new Vec3(...obj.emissionMultiplier)`
 
         if obj.diffuseImage?  then material.setDiffuseImage(obj.diffuseImage)
         if obj.specularImage? then material.setSpecularImage(obj.specularImage)
