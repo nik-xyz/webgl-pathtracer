@@ -8,7 +8,7 @@ class Material {
     constructor() {
         // Value that is used to indicate that a material component has no
         // associated texture
-        this.NO_IMAGE_ADDRESS = -1
+        this.NO_IMAGE_ADDRESS = -1;
 
         this.specularity = 0.5;
         this.diffuseMultiplier  = new Vec3(1.0);
@@ -25,7 +25,8 @@ class Material {
     // will work
     setDiffuseImage(diffuseImageSrc) {
         this.diffuseImage = new Image();
-        const loadedPromise = new Promise((resolve) => this.diffuseImage.onload = resolve);
+        const loadedPromise = new Promise((resolve) =>
+            this.diffuseImage.onload = resolve);
         this.diffuseImage.src = diffuseImageSrc;
         return loadedPromise;
     }
@@ -33,7 +34,8 @@ class Material {
 
     setSpecularImage(specularImageSrc) {
         this.specularImage = new Image();
-        const loadedPromise = new Promise((resolve) => this.specularImage.onload = resolve);
+        const loadedPromise = new Promise((resolve) =>
+            this.specularImage.onload = resolve);
         this.specularImage.src = specularImageSrc;
         return loadedPromise;
     }
@@ -41,7 +43,8 @@ class Material {
 
     setEmissionImage(emissionImageSrc) {
         this.emissionImage = new Image();
-        const loadedPromise = new Promise((resolve) => this.emissionImage.onload = resolve);
+        const loadedPromise = new Promise((resolve) =>
+            this.emissionImage.onload = resolve);
         this.emissionImage.src = emissionImageSrc;
         return loadedPromise;
     }
@@ -71,17 +74,16 @@ class Material {
 
 
     static fromJSONEncodableObj(obj) {
-        // TODO: restructure & validate data fully
-        var valid = true;
-        valid = valid && (typeof obj.specularity        !== undefined);
-        valid = valid && (typeof obj.diffuseMultiplier  !== undefined);
-        valid = valid && (typeof obj.specularMultiplier !== undefined);
-        valid = valid && (typeof obj.emissionMultiplier !== undefined);
+        // TODO: validate data fully
+        var valid =
+            ("specularity"        in obj) &&
+            ("diffuseMultiplier"  in obj) &&
+            ("specularMultiplier" in obj) &&
+            ("emissionMultiplier" in obj);
 
         if(!valid) {
             throw new Error("Invalid JSON!");
         }
-
 
         var material = new Material();
         material.specularity = obj.specularity;
@@ -89,13 +91,14 @@ class Material {
         material.specularMultiplier = new Vec3(...obj.specularMultiplier);
         material.emissionMultiplier = new Vec3(...obj.emissionMultiplier);
 
-        if(obj.diffuseImage) {
+        // TODO: async!
+        if("diffuseImage" in obj) {
             material.setDiffuseImage(obj.diffuseImage);
         }
-        if(obj.specularImage) {
+        if("specularImage" in obj) {
             material.setSpecularImage(obj.specularImage);
         }
-        if(obj.emissionImage) {
+        if("emissionImage" in obj) {
             material.setEmissionImage(obj.emissionImage);
         }
 
@@ -104,7 +107,7 @@ class Material {
 
 
     encode(existingImagesBaseIndex) {
-        var images = []
+        var images = [];
 
         var pushImageIfitExists = (image) => {
             if(!image) {
@@ -117,7 +120,7 @@ class Material {
             return [imageIndex, image.width, image.height];
         }
 
-        var encoded = []
+        var encoded = [];
         encoded.push(this.specularity);
         encoded.push(...this.diffuseMultiplier.array());
         encoded.push(...this.specularMultiplier.array());
@@ -128,4 +131,4 @@ class Material {
 
         return [encoded, images];
     }
-}
+};

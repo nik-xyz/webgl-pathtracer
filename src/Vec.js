@@ -10,7 +10,7 @@ class Vec {
     scale(amt)  { return this.map(val => val * amt); }
     dist(other) { return this.sub(other).length(); }
     length()    { return Math.sqrt(this.dot(this)); }
-}
+};
 
 class Vec2 extends Vec {
     constructor(x = 0, y = x) {
@@ -33,7 +33,7 @@ class Vec2 extends Vec {
     array() {
         return [this.x, this.y];
     }
-}
+};
 
 
 class Vec3 extends Vec {
@@ -61,4 +61,4 @@ class Vec3 extends Vec {
     array() {
         return [this.x, this.y, this.z];
     }
-}
+};

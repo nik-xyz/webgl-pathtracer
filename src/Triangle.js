@@ -11,7 +11,7 @@ class TriangleVertex {
             this.tex.sub(other.tex)
         );
     }
-}
+};
 
 class Triangle {
     constructor(vert0, vert1, vert2, materialIndex) {
@@ -20,7 +20,7 @@ class Triangle {
         this.minBound = vert0.pos.min(vert1.pos).min(vert2.pos);
         this.maxBound = vert0.pos.max(vert1.pos).max(vert2.pos);
 
-        this.vert  = vert0;
+        this.vert = vert0;
         this.edge0 = vert1.sub(vert0);
         this.edge1 = vert2.sub(vert0);
     }
@@ -32,7 +32,7 @@ class Triangle {
     }
 
     encode() {
-        const verts = [this.vert, this.edge0, this.edge1]
+        const verts = [this.vert, this.edge0, this.edge1];
 
         const posData = verts.map((v) => v.pos.array());
         const norData = verts.map((v) => v.nor.array());
@@ -41,4 +41,4 @@ class Triangle {
         return Array.prototype.concat(
             ...posData, ...norData, ...texData, this.materialIndex);
     }
-}
+};
