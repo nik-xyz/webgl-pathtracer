@@ -3,7 +3,6 @@ SRCS  = src/App.coffee
 SRCS += src/GLCommon.coffee
 SRCS += src/KDTree.coffee
 SRCS += src/Model.coffee
-SRCS += src/RandomGen.coffee
 SRCS += src/PathTracer.coffee
 
 SRCS += shaders/ShaderSources.coffee
