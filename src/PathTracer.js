@@ -10,8 +10,9 @@ class PathTracer {
     }
 
 
-    loadScene(encoded) {
-        this.scene = Scene.fromJSONEncodableObj(this.gl, JSON.parse(encoded));
+    async loadScene(encoded) {
+        const obj = JSON.parse(encoded);
+        this.scene = await Scene.fromJSONEncodableObj(this.gl, obj);
         this.scene.uploadSceneData();
     }
 

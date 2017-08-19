@@ -22,7 +22,7 @@ class Scene {
     }
 
 
-    static fromJSONEncodableObj(gl, obj) {
+    static async fromJSONEncodableObj(gl, obj) {
         // TODO: validate data fully
 
         if(!("cameraPosition" in obj) || !("models" in obj)) {
@@ -37,8 +37,8 @@ class Scene {
                 throw new Error("Invalid JSON!");
             }
 
-            var model    = Model.fromJSONEncodableObj(modelObj.model);
-            var material = Material.fromJSONEncodableObj(modelObj.material);
+            var model = Model.fromJSONEncodableObj(modelObj.model);
+            var material = await Material.fromJSONEncodableObj(modelObj.material);
 
             scene.addModel(model, material);
         }

@@ -18,37 +18,28 @@ class Material {
         this.emissionImage = null;
     }
 
-
-    // TODO: wait for these promises to resolve before doing anything with the images
-    // Right now, chromium requires the page to be at least once reloaded before it
-    // will work
-    setDiffuseImage(diffuseImageSrc) {
-        this.diffuseImage = new Image();
-        const loadedPromise = new Promise((resolve) =>
-            this.diffuseImage.onload = resolve);
-        this.diffuseImage.src = diffuseImageSrc;
-        return loadedPromise;
+    static loadImage(imageSrc) {
+        const image = new Image();
+        const promise = new Promise((resolve) => {
+            image.onload = () => {
+                resolve(image);
+            };
+        });
+        image.src = imageSrc;
+        return promise;
     }
 
-
-    setSpecularImage(specularImageSrc) {
-        this.specularImage = new Image();
-        const loadedPromise = new Promise((resolve) =>
-            this.specularImage.onload = resolve);
-        this.specularImage.src = specularImageSrc;
-        return loadedPromise;
+    async setDiffuseImage(diffuseImageSrc) {
+        this.diffuseImage = await Material.loadImage(diffuseImageSrc);
     }
 
-
-    setEmissionImage(emissionImageSrc) {
-        this.emissionImage = new Image();
-        const loadedPromise = new Promise((resolve) =>
-            this.emissionImage.onload = resolve);
-        this.emissionImage.src = emissionImageSrc;
-        return loadedPromise;
+    async setSpecularImage(specularImageSrc) {
+        this.specularImage = await Material.loadImage(specularImageSrc);
     }
 
-
+    async setEmissionImage(emissionImageSrc) {
+        this.emissionImage = await Material.loadImage(emissionImageSrc);
+    }
 
     toJSONEncodableObj() {
         var obj = {
@@ -71,8 +62,7 @@ class Material {
         return obj;
     }
 
-
-    static fromJSONEncodableObj(obj) {
+    static async fromJSONEncodableObj(obj) {
         // TODO: validate data fully
         var valid =
             ("specularity"        in obj) &&
@@ -90,20 +80,18 @@ class Material {
         material.specularMultiplier = new Vec3(...obj.specularMultiplier);
         material.emissionMultiplier = new Vec3(...obj.emissionMultiplier);
 
-        // TODO: async!
         if("diffuseImage" in obj) {
-            material.setDiffuseImage(obj.diffuseImage);
+            await material.setDiffuseImage(obj.diffuseImage);
         }
         if("specularImage" in obj) {
-            material.setSpecularImage(obj.specularImage);
+            await material.setSpecularImage(obj.specularImage);
         }
         if("emissionImage" in obj) {
-            material.setEmissionImage(obj.emissionImage);
+            await material.setEmissionImage(obj.emissionImage);
         }
 
         return material;
     }
-
 
     encode(existingImagesBaseIndex) {
         var images = [];

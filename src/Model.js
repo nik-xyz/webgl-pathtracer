@@ -1,4 +1,12 @@
 class Model {
+    // Hack: define 'constants' with getters
+    static get NEWLINE_REGEX() {           return /[\r\n]+/g;  }
+    static get WHITESPACE_REGEX() {        return /[\s]+/g;    }
+    static get VERTEX_REGEX() {            return /\//g;       }
+    static get DEFAULT_VERTEX_TEXCOORD() { return new Vec2(0); }
+    static get DEFAULT_POSITION() {        return new Vec3(0); }
+    static get DEFAULT_SIZE() {            return new Vec3(1); }
+
     constructor(data, position = Model.DEFAULT_POSITION, size = Model.DEFAULT_SIZE) {
         this.data = data;
         this.position = position;
@@ -164,11 +172,3 @@ class Model {
         return values;
     }
 }
-
-// TODO: move
-Model.NEWLINE_REGEX    = /[\r\n]+/g;
-Model.WHITESPACE_REGEX = /[\s]+/g;
-Model.VERTEX_REGEX     = /\//g;
-Model.DEFAULT_VERTEX_TEXCOORD = new Vec2(0);
-Model.DEFAULT_POSITION        = new Vec3(0);
-Model.DEFAULT_SIZE            = new Vec3(1);
