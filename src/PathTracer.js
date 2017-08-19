@@ -142,4 +142,4 @@ class PathTracer {
             gl.COLOR_BUFFER_BIT, gl.NEAREST
         );
     }
-};
+}

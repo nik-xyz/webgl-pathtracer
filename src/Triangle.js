@@ -41,4 +41,4 @@ class Triangle {
         return Array.prototype.concat(
             ...posData, ...norData, ...texData, this.materialIndex);
     }
-};
+}

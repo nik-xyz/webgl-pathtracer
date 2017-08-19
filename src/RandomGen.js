@@ -25,6 +25,6 @@ class RandomGen {
         this.gl.uniform2uiv(program.uniforms["randomBufferAddrData"],
             this.randomDataTex.dataMaskAndShift);
     }
-};
+}
 
 RandomGen.RANDOM_DATA_LENGTH = 1 << 12;

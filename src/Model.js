@@ -163,7 +163,7 @@ class Model {
 
         return values;
     }
-};
+}
 
 // TODO: move
 Model.NEWLINE_REGEX    = /[\r\n]+/g;

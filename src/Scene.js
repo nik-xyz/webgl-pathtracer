@@ -123,4 +123,4 @@ class Scene {
         this.gl.uniform3fv(program.uniforms["cameraPosition"],
             this.cameraPosition.array());
     }
-};
+}

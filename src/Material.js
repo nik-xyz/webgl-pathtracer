@@ -131,4 +131,4 @@ class Material {
 
         return [encoded, images];
     }
-};
+}
