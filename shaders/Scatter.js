@@ -1,4 +1,4 @@
-ShaderSources.getScatterSource = -> """
+ShaderSources.getScatterSource = () => `
 struct ScatterResult {
     // The direction of the scattered ray
     vec3 dir;
@@ -42,6 +42,4 @@ ScatterResult scatterMaterial(
 
     return res;
 }
-
-
-"""
+`;

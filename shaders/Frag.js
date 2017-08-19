@@ -1,5 +1,4 @@
-ShaderSources.getFragShaderSource = -> """
-#version 300 es
+ShaderSources.getFragShaderSource = () => `#version 300 es
 
 precision mediump float;
 
@@ -7,16 +6,16 @@ in  highp vec2 fragPos;
 out highp vec4 fragColor;
 
 // Include other shader source components
-#{ShaderSources.getUniformsSource()}
-#{ShaderSources.getGeomTypesSource()}
-#{ShaderSources.getKDTreeSource()}
-#{ShaderSources.getMaterialSource()}
-#{ShaderSources.getDataTexSource()}
-#{ShaderSources.getRandomSource()}
-#{ShaderSources.getGeomHitTestSource()}
-#{ShaderSources.getSceneHitTestSource()}
-#{ShaderSources.getScatterSource()}
-#{ShaderSources.getPathTraceSource()}
+${ShaderSources.getUniformsSource()}
+${ShaderSources.getGeomTypesSource()}
+${ShaderSources.getKDTreeSource()}
+${ShaderSources.getMaterialSource()}
+${ShaderSources.getDataTexSource()}
+${ShaderSources.getRandomSource()}
+${ShaderSources.getGeomHitTestSource()}
+${ShaderSources.getSceneHitTestSource()}
+${ShaderSources.getScatterSource()}
+${ShaderSources.getPathTraceSource()}
 
 void main() {
     uint rngState = 0u;
@@ -32,6 +31,4 @@ void main() {
 
     fragColor = vec4(tracePath(ray, rngState), compositeAlpha);
 }
-
-
-"""
+`;

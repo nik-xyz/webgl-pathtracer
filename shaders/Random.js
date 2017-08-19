@@ -1,5 +1,5 @@
-ShaderSources.getRandomSource = -> """
-uint RANDOM_DATA_LENGTH = #{RandomGen.RANDOM_DATA_LENGTH}u;
+ShaderSources.getRandomSource = () => `
+uint RANDOM_DATA_LENGTH = ${RandomGen.RANDOM_DATA_LENGTH}u;
 
 
 uint cantorPairing(uvec2 pair) {
@@ -29,6 +29,4 @@ vec3 unitSphereRandom(inout uint rngState) {
     float phi   = acos(random(rngState) * 2.0 - 1.0);
     return vec3(cos(theta) * sin(phi), sin(theta) * sin(phi), cos(phi));
 }
-
-
-"""
+`;

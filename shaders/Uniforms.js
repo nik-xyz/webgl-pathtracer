@@ -1,4 +1,4 @@
-ShaderSources.getUniformsSource = -> """
+ShaderSources.getUniformsSource = () => `
 uniform sampler2D treeFloatBufferSampler;
 uniform uvec2 treeFloatBufferAddrData;
 
@@ -16,27 +16,25 @@ uniform highp sampler2DArray materialTexArraySampler;
 uniform vec3 cameraPosition;
 uniform vec2 subPixelJitter;
 uniform highp float compositeAlpha;
-
-
-"""
+`;
 
 ShaderSources.uniformNames = [
-    "treeFloatBufferSampler"
-    "treeFloatBufferAddrData"
+    "treeFloatBufferSampler",
+    "treeFloatBufferAddrData",
 
-    "treeUintBufferSampler"
-    "treeUintBufferAddrData"
+    "treeUintBufferSampler",
+    "treeUintBufferAddrData",
 
-    "materialBufferSampler"
-    "materialBufferAddrData"
+    "materialBufferSampler",
+    "materialBufferAddrData",
 
-    "randomBufferSampler"
-    "randomBufferAddrData"
+    "randomBufferSampler",
+    "randomBufferAddrData",
 
-    "materialTexArraySampler"
+    "materialTexArraySampler",
 
-    "cameraPosition"
+    "cameraPosition",
 
-    "subPixelJitter"
+    "subPixelJitter",
     "compositeAlpha"
-]
+];

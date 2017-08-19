@@ -1,4 +1,4 @@
-ShaderSources.getMaterialSource = -> """
+ShaderSources.getMaterialSource = () => `
 struct Material {
     float specularity;
     vec3 diffuseMultiplier;
@@ -9,6 +9,4 @@ struct Material {
     vec3 specularTexData;
     vec3 emissionTexData;
 };
-
-
-"""
+`;
