@@ -3,7 +3,6 @@ class TriangleVertex {
         [this.pos, this.nor, this.tex] = [pos, nor, tex];
     }
 
-
     sub(other) {
         return new TriangleVertex(
             this.pos.sub(other.pos),
@@ -11,7 +10,7 @@ class TriangleVertex {
             this.tex.sub(other.tex)
         );
     }
-};
+}
 
 class Triangle {
     constructor(vert0, vert1, vert2, materialIndex) {

@@ -42,7 +42,7 @@ class Material {
     }
 
     toJSONEncodableObj() {
-        var obj = {
+        const obj = {
             specularity:        this.specularity,
             diffuseMultiplier:  this.diffuseMultiplier.array(),
             specularMultiplier: this.specularMultiplier.array(),
@@ -64,7 +64,7 @@ class Material {
 
     static async fromJSONEncodableObj(obj) {
         // TODO: validate data fully
-        var valid =
+        const valid =
             ("specularity"        in obj) &&
             ("diffuseMultiplier"  in obj) &&
             ("specularMultiplier" in obj) &&
@@ -74,7 +74,7 @@ class Material {
             throw new Error("Invalid JSON!");
         }
 
-        var material = new Material();
+        const material = new Material();
         material.specularity = obj.specularity;
         material.diffuseMultiplier  = new Vec3(...obj.diffuseMultiplier);
         material.specularMultiplier = new Vec3(...obj.specularMultiplier);
@@ -94,20 +94,20 @@ class Material {
     }
 
     encode(existingImagesBaseIndex) {
-        var images = [];
+        const images = [];
 
-        var pushImageIfitExists = (image) => {
+        const pushImageIfitExists = (image) => {
             if(!image) {
                 return [Material.NO_IMAGE_ADDRESS, 0, 0];
             }
 
-            var imageIndex = existingImagesBaseIndex + images.length;
+            const imageIndex = existingImagesBaseIndex + images.length;
             images.push(image);
 
             return [imageIndex, image.width, image.height];
-        }
+        };
 
-        var encoded = [];
+        const encoded = [];
         encoded.push(this.specularity);
         encoded.push(...this.diffuseMultiplier.array());
         encoded.push(...this.specularMultiplier.array());

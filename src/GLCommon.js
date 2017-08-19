@@ -27,7 +27,7 @@ class ShaderProgram {
     }
 
     static createShaders(gl, shaderData) {
-        var shaders = [];
+        const shaders = [];
 
         for(const [type, source] of shaderData) {
             const shader = gl.createShader(type);
@@ -93,7 +93,6 @@ class Buffer {
         gl.bufferData(type, data, usage, 0);
     }
 
-
     bind() {
         this.gl.bindBuffer(this.type, this.buffer);
     }
@@ -143,7 +142,7 @@ class ArrayTexture {
         gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, internalFormat, size.x, size.y,
             images.length);
 
-        for(const index in images) {
+        for(let index = 0; index < images.length; index++) {
             const image = images[index];
             gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, index,
                 image.width, image.height, 1, format, type, image);
@@ -160,11 +159,10 @@ class ArrayTexture {
     }
 }
 
-
 class DataTexture extends Texture {
     constructor(gl, type, data) {
         // Find the array types and image formats for the data
-        var arrayType, internalFormat, format;
+        let arrayType, internalFormat, format;
         if(type === gl.FLOAT) {
             arrayType      = Float32Array;
             internalFormat = gl.R32F;

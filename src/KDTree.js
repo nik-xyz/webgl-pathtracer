@@ -23,9 +23,9 @@ class KDTree {
     }
 
     addTrianglesToChildren() {
-        var newTriangles = [];
-        var lowerChildTriangles = [];
-        var upperChildTriangles = [];
+        const newTriangles = [];
+        const lowerChildTriangles = [];
+        const upperChildTriangles = [];
 
         for(const triangle of this.triangles) {
             // If the triangle is entirely on one side of the split plane,
@@ -66,7 +66,7 @@ class KDTree {
     selectSplitPoint() {
         // TODO: Use better split point selection method
         // For now, use simple median
-        var points = this.triangles.map((tri) => tri.center().array()[this.splitAxis]);
+        const points = this.triangles.map((tri) => tri.center().array()[this.splitAxis]);
         points.sort();
         this.splitPoint = points[Math.floor(points.length / 2)];
     }
@@ -102,7 +102,7 @@ class KDTree {
 
         // Push children and set address pointers
         const children = [this.lowerChild, this.upperChild];
-        for(var index = 0; index < children.length; index++) {
+        for(let index = 0; index < children.length; index++) {
             const child = children[index];
             if(child) {
                 // Set child address

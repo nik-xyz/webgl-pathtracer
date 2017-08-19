@@ -6,8 +6,6 @@ class App {
     }
 
     render() {
-        console.log(this, this.pt)
-        window.f=this.pt
         this.pt.renderImage();
         this.pt.displayImage();
     }
@@ -61,4 +59,4 @@ class App {
 window.onload = () => {
     window.app = new App();
     app.run();
-}
+};

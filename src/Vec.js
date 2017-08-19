@@ -46,11 +46,7 @@ class Vec3 extends Vec {
     }
 
     combine(other, fn) {
-        return new Vec3(
-            fn(this.x, other.x),
-            fn(this.y, other.y),
-            fn(this.z, other.z)
-        );
+        return new Vec3(fn(this.x, other.x), fn(this.y, other.y), fn(this.z, other.z));
     }
 
     reduce(fn) {

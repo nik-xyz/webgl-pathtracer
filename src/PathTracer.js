@@ -9,13 +9,11 @@ class PathTracer {
         this.frameBuf = null;
     }
 
-
     async loadScene(encoded) {
         const obj = JSON.parse(encoded);
         this.scene = await Scene.fromJSONEncodableObj(this.gl, obj);
         this.scene.uploadSceneData();
     }
-
 
     createContext() {
         // Disable features that intefere with pixel transfer operations
@@ -47,26 +45,21 @@ class PathTracer {
                 ShaderSources.uniformNames, ["vertPos"]);
     }
 
-
     createVertexData() {
         this.vbo = new Buffer(this.gl, new Float32Array(
             [-1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1]
         ));
         this.vao = new VertexArray(this.gl);
-        this.vao.setupAttrib(this.program.uniforms["vertPos"],
-            this.vbo, 2, this.gl.FLOAT);
+        this.vao.setupAttrib(this.program.uniforms.vertPos, this.vbo, 2, this.gl.FLOAT);
     }
-
 
     reset() {
         this.sampleCounter = 0;
     }
 
-
     getCanvas() {
         return this.gl.canvas;
     }
-
 
     setResolution(frameRes) {
         this.frameRes = frameRes;
@@ -83,7 +76,6 @@ class PathTracer {
         this.reset();
     }
 
-
     setJitter() {
         const jitter = new Vec2()
             .map(Math.random)
@@ -92,17 +84,17 @@ class PathTracer {
             .div(this.frameRes)
             .array();
 
-        this.gl.uniform2fv(this.program.uniforms["subPixelJitter"], jitter);
+        this.gl.uniform2fv(this.program.uniforms.subPixelJitter, jitter);
     }
 
     setAlpha() {
         // Compute alpha to be used as a weight in the running average
         const alpha = 1 / (this.sampleCounter + 1);
-        this.gl.uniform1f(this.program.uniforms["compositeAlpha"], alpha);
+        this.gl.uniform1f(this.program.uniforms.compositeAlpha, alpha);
     }
 
     renderImage() {
-        var gl = this.gl;
+        const gl = this.gl;
 
         this.program.use();
 
@@ -131,16 +123,14 @@ class PathTracer {
     }
 
     displayImage() {
-        var gl = this.gl;
+        const gl = this.gl;
 
         gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.frameBuf.buf);
         gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
 
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        gl.blitFramebuffer(
-            ...this.frameBounds, ...this.frameBounds,
-            gl.COLOR_BUFFER_BIT, gl.NEAREST
-        );
+        gl.blitFramebuffer(...this.frameBounds, ...this.frameBounds, gl.COLOR_BUFFER_BIT,
+                gl.NEAREST);
     }
 }

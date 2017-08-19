@@ -1,11 +1,11 @@
 class Model {
     // Hack: define 'constants' with getters
-    static get NEWLINE_REGEX() {           return /[\r\n]+/g;  }
-    static get WHITESPACE_REGEX() {        return /[\s]+/g;    }
-    static get VERTEX_REGEX() {            return /\//g;       }
-    static get DEFAULT_VERTEX_TEXCOORD() { return new Vec2(0); }
-    static get DEFAULT_POSITION() {        return new Vec3(0); }
-    static get DEFAULT_SIZE() {            return new Vec3(1); }
+    static get NEWLINE_REGEX()    { return /[\r\n]+/g;  }
+    static get WHITESPACE_REGEX() { return /[\s]+/g;    }
+    static get VERTEX_REGEX()     { return /\//g;       }
+    static get DEFAULT_TEXCOORD() { return new Vec2(0); }
+    static get DEFAULT_POSITION() { return new Vec3(0); }
+    static get DEFAULT_SIZE()     { return new Vec3(1); }
 
     constructor(data, position = Model.DEFAULT_POSITION, size = Model.DEFAULT_SIZE) {
         this.data = data;
@@ -36,13 +36,12 @@ class Model {
     }
 
     getTriangles(materialIndex) {
-        var triangles = [];
+        const triangles = [];
 
-        for(var face of this.getFaces()) {
+        for(const face of this.getFaces()) {
             // Triangulate the face
-            for(var index = 0; index < face.length - 1; index++) {
-                const tri = new Triangle(
-                    face[0], face[index], face[index + 1], materialIndex);
+            for(let index = 0; index < face.length - 1; index++) {
+                const tri = new Triangle(face[0], face[index], face[index + 1], materialIndex);
                 triangles.push(tri);
             }
         }
@@ -53,17 +52,17 @@ class Model {
         // TODO: move elsewhere!
         const transform = pos => pos.mul(this.size).add(this.position);
 
-        var faces = [];
-        for(var face of this.faceArray) {
-            var faceVertices = [];
-            for(var indices of face) {
-                const vertex = new TriangleVertex(
-                    transform(Model.accessArray(this.posArray, indices.pos)),
-                    Model.accessArray(this.norArray, indices.nor),
-                    Model.accessArray(this.texArray, indices.tex,
-                        Model.DEFAULT_VERTEX_TEXCOORD)
-                );
-                faceVertices.push(vertex);
+        const faces = [];
+
+        for(const face of this.faceArray) {
+            const faceVertices = [];
+
+            for(const indices of face) {
+                const pos = Model.accessArray(this.posArray, indices.pos);
+                const nor = Model.accessArray(this.norArray, indices.nor);
+                const tex = Model.accessArray(this.texArray, indices.tex,
+                    Model.DEFAULT_TEXCOORD);
+                faceVertices.push(new TriangleVertex(transform(pos), nor, tex));
             }
             faces.push(faceVertices);
         }
@@ -78,7 +77,7 @@ class Model {
 
         const lines = this.data.split(Model.NEWLINE_REGEX);
 
-        for(const index in lines) {
+        for(let index = 0; index < lines.length; index++) {
             try {
                 this.parseLine(lines[index]);
             }
@@ -139,11 +138,11 @@ class Model {
             { key: "nor", tokenIndex: 2, required: true,  desc: "normal"}
         ];
 
-        var vertex = {};
+        const vertex = {};
 
         for(const comp of vertexComponents) {
             // Try to parse the component's token to get the array index
-            var arrayIndex = NaN;
+            let arrayIndex = NaN;
             if (tokens.length > comp.tokenIndex) {
                 arrayIndex = Number.parseInt(tokens[comp.tokenIndex]);
             }
@@ -163,7 +162,7 @@ class Model {
             throw new Error("not enough numbers provided");
         }
 
-        var values = tokens.slice(0, count).map(Number.parseFloat);
+        const values = tokens.slice(0, count).map(Number.parseFloat);
 
         if(values.some(Number.isNaN)) {
             throw new Error("invalid number provided");
