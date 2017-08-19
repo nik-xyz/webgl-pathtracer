@@ -18,7 +18,6 @@ class ShaderProgram {
             this.gl.deleteShader(shader);
         }
 
-
         this.setupUniforms(uniformNames);
         this.setupAttribs(attribNames);
     }
@@ -44,11 +43,11 @@ class ShaderProgram {
             if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
                 const log = gl.getShaderInfoLog(shader);
 
-                for(shaderToDelete of shaders) {
+                for(const shaderToDelete of shaders) {
                     gl.deleteShader(shaderToDelete);
                 }
 
-                throw new Error(`Shader compilation failed:\n${log}`);
+                throw new Error(`shader compilation failed:\n${log}`);
             }
         }
     }
@@ -59,7 +58,7 @@ class ShaderProgram {
         for(const name of names) {
             const loc = this.gl.getUniformLocation(this.program, name);
             if(!loc) {
-                console.error(`Failed to locate uniform ${name}`);
+                console.error(`failed to locate uniform ${name}`);
             }
 
             this.uniforms[name] = loc;
@@ -177,7 +176,7 @@ class DataTexture extends Texture {
             format         = gl.RED_INTEGER;
         }
         else {
-            throw new Error("Data type not supported");
+            throw new Error("data type not supported");
         }
         // TODO: might not need to do this with NPOT textures
         // Must pad the data to be a power-of-two length
@@ -187,7 +186,7 @@ class DataTexture extends Texture {
         // Check data fits inside texture size limits
         const sizeLimit = gl.getParameter(gl.MAX_TEXTURE_SIZE);
         if(paddedSize > sizeLimit * sizeLimit) {
-            throw new Error("Required texture size exceeds limit");
+            throw new Error("required texture size exceeds limit");
         }
         // Avoid copying if the original array meets the necessary requirements
         if(!(data instanceof arrayType) || (data.length === paddedSize)) {

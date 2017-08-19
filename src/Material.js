@@ -5,11 +5,10 @@
     (multiplier * texture), otherwise it is determined by the multiplier alone.
 */
 class Material {
-    constructor() {
-        // Value that is used to indicate that a material component has no
-        // associated texture
-        this.NO_IMAGE_ADDRESS = -1;
+    // Hack: define 'constants' with const getters
+    static get NO_IMAGE_ADDRESS() { return -1; }
 
+    constructor() {
         this.specularity = 0.5;
         this.diffuseMultiplier  = new Vec3(1.0);
         this.specularMultiplier = new Vec3(1.0);
@@ -111,7 +110,7 @@ class Material {
 
         var pushImageIfitExists = (image) => {
             if(!image) {
-                return [this.NO_IMAGE_ADDRESS, 0, 0];
+                return [Material.NO_IMAGE_ADDRESS, 0, 0];
             }
 
             var imageIndex = existingImagesBaseIndex + images.length;
