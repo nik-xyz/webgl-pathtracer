@@ -1,7 +1,5 @@
 
-SRCS  = src/App.coffee
-
-SRCS += shaders/ShaderSources.coffee
+SRCS  = shaders/ShaderSources.coffee
 SRCS += shaders/DataTex.coffee
 SRCS += shaders/Frag.coffee
 SRCS += shaders/GeomHitTest.coffee
