@@ -1,13 +1,21 @@
-class TriangleVertex {
+class Vertex {
     constructor(pos, nor, tex) {
         [this.pos, this.nor, this.tex] = [pos, nor, tex];
     }
 
     sub(other) {
-        return new TriangleVertex(
+        return new Vertex(
             this.pos.sub(other.pos),
             this.nor.sub(other.nor),
             this.tex.sub(other.tex)
+        );
+    }
+
+    transform(transforms) {
+        return new Vertex(
+            transforms.pos(this.pos),
+            transforms.nor(this.nor),
+            transforms.tex(this.tex)
         );
     }
 }
@@ -39,5 +47,27 @@ class Triangle {
 
         return Array.prototype.concat(
             ...posData, ...norData, ...texData, this.materialIndex);
+    }
+}
+
+class Polygon {
+    constructor(verts, materialIndex) {
+        this.verts = verts;
+        this.materialIndex = materialIndex;
+    }
+
+    /* Reduces polygon to triangle fan */
+    triangulate() {
+        const triangles = [];
+        for(let index = 0; index < this.verts.length - 1; index++) {
+            triangles.push(new Triangle(
+                this.verts[0],
+                this.verts[index + 0],
+                this.verts[index + 1],
+                this.materialIndex
+            ));
+        }
+
+        return triangles;
     }
 }

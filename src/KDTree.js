@@ -1,8 +1,8 @@
 class KDTree {
     // Hack: define 'constants' with const getters
-    static get NULL_NODE_ADDRESS() { return 0; }
-    static get SUBDIVISION_LIMIT() { return 10; }
-    static get MIN_BUCKET_SIZE()   { return 10; }
+    static get NULL_NODE_ADDRESS()  { return 0; }
+    static get SUBDIVISION_LIMIT()  { return 10; }
+    static get MIN_NODE_TIRANGLES() { return 10; }
 
     constructor(triangles, limit = KDTree.SUBDIVISION_LIMIT) {
         this.triangles = triangles;
@@ -43,14 +43,14 @@ class KDTree {
 
         this.triangles = newTriangles;
 
-        if(lowerChildTriangles.length > KDTree.MIN_BUCKET_SIZE) {
+        if(lowerChildTriangles.length > KDTree.MIN_NODE_TIRANGLES) {
             this.lowerChild = new KDTree(lowerChildTriangles, this.limit - 1);
         }
         else {
             this.triangles.push(...lowerChildTriangles);
         }
 
-        if(upperChildTriangles.length > KDTree.MIN_BUCKET_SIZE) {
+        if(upperChildTriangles.length > KDTree.MIN_NODE_TIRANGLES) {
             this.upperChild = new KDTree(upperChildTriangles, this.limit - 1);
         }
         else {
@@ -66,12 +66,12 @@ class KDTree {
     selectSplitPoint() {
         // TODO: Use better split point selection method
         // For now, use simple median
-        const points = this.triangles.map((tri) => tri.center().array()[this.splitAxis]);
+        const points = this.triangles.map((tri) => this.project(tri.center()));
         points.sort();
         this.splitPoint = points[Math.floor(points.length / 2)];
     }
 
-    // Projects a vector along this node's split axis
+    /* Projects a vector along this node's split axis */
     project(vec) {
         return vec.array()[this.splitAxis];
     }

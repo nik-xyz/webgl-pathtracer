@@ -4,69 +4,48 @@ class Model {
     static get WHITESPACE_REGEX() { return /[\s]+/g;    }
     static get VERTEX_REGEX()     { return /\//g;       }
     static get DEFAULT_TEXCOORD() { return new Vec2(0); }
-    static get DEFAULT_POSITION() { return new Vec3(0); }
-    static get DEFAULT_SIZE()     { return new Vec3(1); }
 
-    constructor(data, position = Model.DEFAULT_POSITION, size = Model.DEFAULT_SIZE) {
+    constructor(data) {
         this.data = data;
-        this.position = position;
-        this.size = size;
         this.parseLines();
     }
 
     toJSONEncodableObj() {
-        return {
-            data:     this.data,
-            position: this.position.array(),
-            size:     this.size.array()
-        };
+        return this.data;
     }
 
     static fromJSONEncodableObj(obj) {
-        if(!("data" in obj) || !("position" in obj) || !("size" in obj)) {
+        if(typeof obj !== "string") {
             throw new Error("invalid JSON");
         }
-        // TODO: validate data fully
 
-        return new Model(
-            obj.data,
-            new Vec3(...obj.position),
-            new Vec3(...obj.size)
+        return new Model(obj);
+    }
+
+    getTriangles(transforms, materialIndex) {
+        return (
+            this.getFaces(transforms, materialIndex)
+            .map(poly => poly.triangulate())
+            .reduce((a, b) => a.concat(b))
         );
     }
 
-    getTriangles(materialIndex) {
-        const triangles = [];
-
-        for(const face of this.getFaces()) {
-            // Triangulate the face
-            for(let index = 0; index < face.length - 1; index++) {
-                const tri = new Triangle(face[0], face[index], face[index + 1], materialIndex);
-                triangles.push(tri);
-            }
-        }
-        return triangles;
-    }
-
-    getFaces() {
-        // TODO: move elsewhere!
-        const transform = pos => pos.mul(this.size).add(this.position);
-
-        const faces = [];
+    getFaces(transforms, materialIndex) {
+        const facePolys = [];
 
         for(const face of this.faceArray) {
-            const faceVertices = [];
+            const vertices = [];
 
             for(const indices of face) {
                 const pos = Model.accessArray(this.posArray, indices.pos);
                 const nor = Model.accessArray(this.norArray, indices.nor);
-                const tex = Model.accessArray(this.texArray, indices.tex,
-                    Model.DEFAULT_TEXCOORD);
-                faceVertices.push(new TriangleVertex(transform(pos), nor, tex));
+                const tex = Model.accessArray(this.texArray, indices.tex, Model.DEFAULT_TEXCOORD);
+
+                vertices.push(new Vertex(pos, nor, tex).transform(transforms));
             }
-            faces.push(faceVertices);
+            facePolys.push(new Polygon(vertices, materialIndex));
         }
-        return faces;
+        return facePolys;
     }
 
     parseLines() {

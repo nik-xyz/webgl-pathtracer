@@ -35,7 +35,7 @@ class Scene {
                 throw new Error("Invalid JSON!");
             }
 
-            const model = Model.fromJSONEncodableObj(modelObj.model);
+            const model    = ModelInstance.fromJSONEncodableObj(modelObj.model);
             const material = await Material.fromJSONEncodableObj(modelObj.material);
 
             scene.addModel(model, material);
@@ -75,8 +75,8 @@ class Scene {
         }
 
         this.treeDataTex     = new DataTexture(this.gl, this.gl.UNSIGNED_INT, treeUintBuffer);
-        this.triangleDataTex = new DataTexture(this.gl, this.gl.FLOAT,        treeFloatBuffer);
-        this.materialDataTex = new DataTexture(this.gl, this.gl.FLOAT,        materialData);
+        this.triangleDataTex = new DataTexture(this.gl, this.gl.FLOAT, treeFloatBuffer);
+        this.materialDataTex = new DataTexture(this.gl, this.gl.FLOAT, materialData);
     }
 
     uploadImages(images) {
