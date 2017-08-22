@@ -18,17 +18,14 @@ class ModelInstance {
     }
 
     static fromJSONEncodableObj(obj) {
-        const valid = ["data", "position", "size"].every(key => key in obj);
-        if(!valid) {
-            throw new Error("invalid JSON");
+        if(["data", "position", "size"].every(key => key in obj)) {
+            return new ModelInstance(
+                Model.fromJSONEncodableObj(obj.data),
+                Vec3.fromJSONEncodableObj(obj.position).checkNumeric(),
+                Vec3.fromJSONEncodableObj(obj.size).checkNumeric()
+            );
         }
-        // TODO: validate data fully
-
-        return new ModelInstance(
-            Model.fromJSONEncodableObj(obj.data),
-            new Vec3(...obj.position),
-            new Vec3(...obj.size)
-        );
+        throw new Error("invalid JSON");
     }
 
     getTriangles(materialIndex) {

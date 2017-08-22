@@ -21,17 +21,15 @@ class Scene {
     }
 
     static async fromJSONEncodableObj(gl, obj) {
-        // TODO: validate data fully
-
-        if(!("cameraPosition" in obj) || !("models" in obj)) {
+        if(["cameraPosition", "models"].some(key => !(key in obj))) {
             throw new Error("Invalid JSON!");
         }
 
         const scene = new Scene(gl);
-        scene.cameraPosition = new Vec3(...obj.cameraPosition);
+        scene.cameraPosition = Vec3.fromJSONEncodableObj(obj.cameraPosition).checkNumeric();
 
         for(const modelObj of obj.models) {
-            if(!("model" in modelObj) || !("material" in modelObj)) {
+            if(["model", "material"].some(key => !(key in modelObj))) {
                 throw new Error("Invalid JSON!");
             }
 

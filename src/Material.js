@@ -10,9 +10,9 @@ class Material {
 
     constructor() {
         this.specularity = 0.5;
-        this.diffuseMultiplier  = new Vec3(1.0);
-        this.specularMultiplier = new Vec3(1.0);
-        this.emissionMultiplier = new Vec3(0.0);
+        this.diffuseCoeff  = new Vec3(1.0);
+        this.specularCoeff = new Vec3(1.0);
+        this.emissionCoeff = new Vec3(0.0);
         this.diffuseImage  = null;
         this.specularImage = null;
         this.emissionImage = null;
@@ -43,10 +43,10 @@ class Material {
 
     toJSONEncodableObj() {
         const obj = {
-            specularity:        this.specularity,
-            diffuseMultiplier:  this.diffuseMultiplier.array(),
-            specularMultiplier: this.specularMultiplier.array(),
-            emissionMultiplier: this.emissionMultiplier.array()
+            specularity:   this.specularity,
+            diffuseCoeff:  this.diffuseCoeff.array(),
+            specularCoeff: this.specularCoeff.array(),
+            emissionCoeff: this.emissionCoeff.array()
         };
 
         if (this.diffuseImage) {
@@ -63,22 +63,19 @@ class Material {
     }
 
     static async fromJSONEncodableObj(obj) {
-        // TODO: validate data fully
-        const valid =
-            ("specularity"        in obj) &&
-            ("diffuseMultiplier"  in obj) &&
-            ("specularMultiplier" in obj) &&
-            ("emissionMultiplier" in obj);
-
-        if(!valid) {
+        const requiredKeys = ["specularity", "diffuseCoeff", "specularCoeff", "emissionCoeff"];
+        if(!requiredKeys.every(key => key in obj)) {
             throw new Error("Invalid JSON!");
         }
 
         const material = new Material();
-        material.specularity = obj.specularity;
-        material.diffuseMultiplier  = new Vec3(...obj.diffuseMultiplier);
-        material.specularMultiplier = new Vec3(...obj.specularMultiplier);
-        material.emissionMultiplier = new Vec3(...obj.emissionMultiplier);
+        material.diffuseCoeff  = Vec3.fromJSONEncodableObj(obj.diffuseCoeff).checkNumeric();
+        material.specularCoeff = Vec3.fromJSONEncodableObj(obj.specularCoeff).checkNumeric();
+        material.emissionCoeff = Vec3.fromJSONEncodableObj(obj.emissionCoeff).checkNumeric();
+        material.specularity   = obj.specularity;
+        if(!Number.isFinite(material.specularity)) {
+            throw new Error("Invalid JSON!");
+        }
 
         if("diffuseImage" in obj) {
             await material.setDiffuseImage(obj.diffuseImage);
@@ -96,7 +93,7 @@ class Material {
     encode(existingImagesBaseIndex) {
         const images = [];
 
-        const pushImageIfitExists = (image) => {
+        const pushImageIfItExists = (image) => {
             if(!image) {
                 return [Material.NO_IMAGE_ADDRESS, 0, 0];
             }
@@ -109,12 +106,12 @@ class Material {
 
         const encoded = [];
         encoded.push(this.specularity);
-        encoded.push(...this.diffuseMultiplier.array());
-        encoded.push(...this.specularMultiplier.array());
-        encoded.push(...this.emissionMultiplier.array());
-        encoded.push(...pushImageIfitExists(this.diffuseImage));
-        encoded.push(...pushImageIfitExists(this.specularImage));
-        encoded.push(...pushImageIfitExists(this.emissionImage));
+        encoded.push(...this.diffuseCoeff.array());
+        encoded.push(...this.specularCoeff.array());
+        encoded.push(...this.emissionCoeff.array());
+        encoded.push(...pushImageIfItExists(this.diffuseImage));
+        encoded.push(...pushImageIfItExists(this.specularImage));
+        encoded.push(...pushImageIfItExists(this.emissionImage));
 
         return [encoded, images];
     }
