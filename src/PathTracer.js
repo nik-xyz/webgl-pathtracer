@@ -69,7 +69,7 @@ class PathTracer {
         this.gl.viewport(...this.frameBounds);
 
         if(this.frameBuf) {
-            this.frame.destroy();
+            this.frameBuf.destroy();
         }
         this.frameBuf = new Framebuffer(this.gl, this.frameRes);
 

@@ -2,8 +2,46 @@
 <html>
 <head>
     <title> Path Tracer </title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    html, body {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    input[type = button] {
+        font-size: 20px;
+        padding: 5px 8px;
+        margin: 5px;
+        cursor: pointer;
+        background-color: #BBB;
+        color: #222;
+        border: 1px solid #222;
+        border-radius: 5px;
+    }
+
+    #render-output, #render-controls {
+        float: left;
+        width: 50%;
+        height: 100%;
+    }
+
+    #render-output canvas {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    </style>
 </head>
 <body>
+    <div id="render-output"></div>
+    <div id="render-controls">
+    </div>
+
     <script type="text/javascript" src="shaders/ShaderSources.js"></script>
     <script type="text/javascript" src="shaders/DataTex.js"></script>
     <script type="text/javascript" src="shaders/Frag.js"></script>

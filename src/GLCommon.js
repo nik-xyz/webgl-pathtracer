@@ -249,7 +249,7 @@ class Framebuffer {
     }
 
     destroy() {
-        this.gl.destroyFramebuffer(this.buf);
-        this.gl.destroyRenderbuffer(this.rb);
+        this.gl.deleteFramebuffer(this.buf);
+        this.gl.deleteRenderbuffer(this.rb);
     }
 }
