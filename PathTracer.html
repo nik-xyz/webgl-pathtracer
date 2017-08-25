@@ -6,29 +6,49 @@
     * {
         margin: 0;
         padding: 0;
+        font-family: sans-serif;
     }
 
     html, body {
         height: 100%;
         width: 100%;
+        background-color: #CCC;
         overflow: hidden;
     }
 
-    input[type = button] {
-        font-size: 20px;
-        padding: 5px 8px;
-        margin: 5px;
+
+    .button {
+        display: inline-block;
+        line-height: 80%;
+        font-size: 1vw;
+        padding: 0.3vw 0.3vw;
         cursor: pointer;
         background-color: #BBB;
         color: #222;
-        border: 1px solid #222;
-        border-radius: 5px;
+        border: 0.1vmin solid #555;
+        border-radius: 0.2vw;
     }
 
-    #render-output, #render-controls {
+    .button:hover {
+        background-color: #888;
+    }
+
+    .button:active {
+        background-color: #777;
+    }
+
+
+    .layout-column {
         float: left;
-        width: 50%;
+        width: 30%;
         height: 100%;
+    }
+
+
+    #scene-models {
+        overflow-y: scroll;
+        background-color: red;
+        width: 50%;
     }
 
     #render-output canvas {
@@ -38,9 +58,25 @@
     </style>
 </head>
 <body>
-    <div id="render-output"></div>
-    <div id="render-controls">
+    <div class="layout-column">
+        <div id="render-output"></div>
+        <div id="render-controls">
+            <div class="button" id="load-button"> Load </div>
+            <div class="button" id="save-button"> Save </div>
+            <div class="button" id="render-button"> Render </div>
+        </div>
     </div>
+
+    <div class="layout-column">
+        Another column!
+        <div id="scene-model-list"></div>
+    </div>
+
+    <div class="layout-column">Another column!</div>
+
+    <template id="scene-model-row">
+        hello
+    </template>
 
     <script type="text/javascript" src="shaders/ShaderSources.js"></script>
     <script type="text/javascript" src="shaders/DataTex.js"></script>
@@ -66,6 +102,7 @@
     <script type="text/javascript" src="src/ModelInstance.js"></script>
     <script type="text/javascript" src="src/KDTree.js"></script>
     <script type="text/javascript" src="src/PathTracer.js"></script>
+    <script type="text/javascript" src="src/IO.js"></script>
     <script type="text/javascript" src="src/App.js"></script>
 </body>
 </html>

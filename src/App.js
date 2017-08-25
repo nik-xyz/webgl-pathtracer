@@ -1,75 +1,40 @@
 class App {
-    // Just testing code right now (i.e. not properly structured at all)
+    // Just testing code right now so it's not properly structured at all
     constructor() {
         this.pt = new PathTracer();
         this.pt.setResolution(new Vec2(512, 512));
+        this.scene = null;
+    }
+
+    async loadScene(encoded) {
+        this.scene = await Scene.fromJSONEncodableObj(this.pt.gl, JSON.parse(encoded));
+        this.scene.uploadSceneData();
     }
 
     render() {
-        this.pt.renderImage();
-        this.pt.displayImage();
-    }
-
-    load() {
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-
-        const loadPromise = new Promise((resolve, reject) => {
-            fileInput.addEventListener("change", event => {
-                event.preventDefault();
-                if(fileInput.files.length === 0) {
-                    reject();
-                }
-                else {
-                    resolve(fileInput.files[0]);
-                }
-            });
-        });
-
-        fileInput.click();
-        return loadPromise;
-    }
-
-    save(data, name) {
-        const link = document.createElement("a");
-        link.href = "data:text/plain," + encodeURIComponent(data);
-        link.download = name;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        if(this.scene) {
+            this.pt.renderImage(this.scene);
+            this.pt.displayImage();
+        }
     }
 
     run() {
-        const renderControls = document.getElementById("render-controls");
-
-        const loadButton = document.createElement("input");
-        loadButton.value = "Load scene";
-        loadButton.type = "button";
-        loadButton.addEventListener("click", async () => {
-            const file = await this.load();
+        document.getElementById("load-button").addEventListener("click", async () => {
+            const file = await loadFile();
             const fr = new FileReader();
-            fr.onloadend = () => this.pt.loadScene(fr.result);
+            fr.onloadend = () => this.loadScene(fr.result);
             fr.readAsText(file);
         });
-        renderControls.appendChild(loadButton);
 
-        const saveButton = document.createElement("input");
-        saveButton.value = "Save scene";
-        saveButton.type = "button";
-        saveButton.addEventListener("click", () => {
+        document.getElementById("save-button").addEventListener("click", () => {
             const data = JSON.stringify(this.pt.scene.toJSONEncodableObj());
-            this.save(data, "scene.json");
+            saveFile(data, "scene.json");
         });
-        renderControls.appendChild(saveButton);
 
-        const renderButton = document.createElement("input");
-        renderButton.value = "Render";
-        renderButton.type = "button";
-        renderButton.addEventListener("click", () => this.render());
-        renderControls.appendChild(renderButton);
+        document.getElementById("render-button")
+            .addEventListener("click", () => this.render());
 
-        const renderOutput = document.getElementById("render-output");
-        renderOutput.appendChild(this.pt.getCanvas());
+        document.getElementById("render-output").appendChild(this.pt.gl.canvas);
     }
 }
 

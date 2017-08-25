@@ -9,12 +9,6 @@ class PathTracer {
         this.frameBuf = null;
     }
 
-    async loadScene(encoded) {
-        const obj = JSON.parse(encoded);
-        this.scene = await Scene.fromJSONEncodableObj(this.gl, obj);
-        this.scene.uploadSceneData();
-    }
-
     createContext() {
         // Disable features that intefere with pixel transfer operations
         // or are not needed
@@ -57,10 +51,6 @@ class PathTracer {
         this.sampleCounter = 0;
     }
 
-    getCanvas() {
-        return this.gl.canvas;
-    }
-
     setResolution(frameRes) {
         this.frameRes = frameRes;
         this.frameBounds = [0, 0, this.frameRes.x, this.frameRes.y];
@@ -93,14 +83,14 @@ class PathTracer {
         this.gl.uniform1f(this.program.uniforms.compositeAlpha, alpha);
     }
 
-    renderImage() {
+    renderImage(scene) {
         const gl = this.gl;
 
         this.program.use();
 
         this.randomGen.createRandomData();
         this.randomGen.bind(this.program);
-        this.scene.bind(this.program);
+        scene.bind(this.program);
 
         this.setJitter();
         this.setAlpha();
