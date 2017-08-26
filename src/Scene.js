@@ -5,15 +5,9 @@ class Scene {
     }
 
     toJSONEncodableObj() {
-        const models = [];
-
-        for(const model of this.models) {
-            models.push(model.toJSONEncodableObj());
-        }
-
         return  {
             cameraPosition: this.cameraPosition.array(),
-            models: models
+            models: this.models.map(model => model.toJSONEncodableObj())
         };
     }
 
