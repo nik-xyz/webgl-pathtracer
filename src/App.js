@@ -24,7 +24,7 @@ class App {
         const rowTemplate = document.querySelector("#scene-model-row-template").content;
 
         let i = 0;
-        for(const [model, mat] of this.scene.models) {
+        for(const model of this.scene.models) {
             const row = document.importNode(rowTemplate, true);
 
             // TODO: assign sensible names

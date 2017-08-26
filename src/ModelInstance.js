@@ -3,24 +3,27 @@ class ModelInstance {
     static get DEFAULT_POSITION() { return new Vec3(0); }
     static get DEFAULT_SIZE()     { return new Vec3(1); }
 
-    constructor(model, position = Model.DEFAULT_POSITION, size = Model.DEFAULT_SIZE) {
+    constructor(model, material, position = Model.DEFAULT_POSITION, size = Model.DEFAULT_SIZE) {
         this.model    = model;
+        this.material = material;
         this.position = position;
         this.size     = size;
     }
 
     toJSONEncodableObj() {
         return {
-            data:     this.model.toJSONEncodableObj(),
+            material: this.material.toJSONEncodableObj(),
+            model:    this.model.toJSONEncodableObj(),
             position: this.position.array(),
             size:     this.size.array()
         };
     }
 
-    static fromJSONEncodableObj(obj) {
-        if(["data", "position", "size"].every(key => key in obj)) {
+    static async fromJSONEncodableObj(obj) {
+        if(["model", "material", "position", "size"].every(key => key in obj)) {
             return new ModelInstance(
-                Model.fromJSONEncodableObj(obj.data),
+                Model.fromJSONEncodableObj(obj.model),
+                await Material.fromJSONEncodableObj(obj.material),
                 Vec3.fromJSONEncodableObj(obj.position).checkNumeric(),
                 Vec3.fromJSONEncodableObj(obj.size).checkNumeric()
             );

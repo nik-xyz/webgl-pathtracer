@@ -7,11 +7,8 @@ class Scene {
     toJSONEncodableObj() {
         const models = [];
 
-        for(const [model, material] of this.models) {
-            models.push({
-                model:    model.toJSONEncodableObj(),
-                material: material.toJSONEncodableObj()
-            });
+        for(const model of this.models) {
+            models.push(model.toJSONEncodableObj());
         }
 
         return  {
@@ -29,20 +26,13 @@ class Scene {
         scene.cameraPosition = Vec3.fromJSONEncodableObj(obj.cameraPosition).checkNumeric();
 
         for(const modelObj of obj.models) {
-            if(["model", "material"].some(key => !(key in modelObj))) {
-                throw new Error("Invalid JSON!");
-            }
-
-            const model    = ModelInstance.fromJSONEncodableObj(modelObj.model);
-            const material = await Material.fromJSONEncodableObj(modelObj.material);
-
-            scene.addModel(model, material);
+            scene.addModel(await ModelInstance.fromJSONEncodableObj(modelObj));
         }
         return scene;
     }
 
-    addModel(model, material) {
-        this.models.push([model, material]);
+    addModel(model) {
+        this.models.push(model);
     }
 
     uploadSceneData() {
@@ -50,10 +40,10 @@ class Scene {
         const materialData = [];
         const materialImages = [];
 
-        for(const [model, material] of this.models) {
+        for(const model of this.models) {
             triangles.push(...model.getTriangles(materialData.length));
 
-            const [data, images] = material.encode(materialImages.length);
+            const [data, images] = model.material.encode(materialImages.length);
             materialData.push(...data);
             materialImages.push(...images);
         }
@@ -85,7 +75,7 @@ class Scene {
         }
 
         this.materialTexArray = new ArrayTexture(this.gl, size, images.length, this.gl.RGBA8,
-                this.gl.RGBA, this.gl.UNSIGNED_BYTE, images, this.gl.LINEAR);
+            this.gl.RGBA, this.gl.UNSIGNED_BYTE, images, this.gl.LINEAR);
     }
 
     bind(program) {
