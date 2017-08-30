@@ -1,4 +1,3 @@
-ShaderSources.getDataTexSource = () => `
 ivec2 getTexelForAddress(uint address, uvec2 maskAndShift) {
     return ivec2(address & maskAndShift.x, address >> maskAndShift.y);
 }
@@ -133,4 +132,3 @@ float readRandomFloat(uint address) {
         0
     ).r;
 }
-`;

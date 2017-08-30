@@ -1,4 +1,4 @@
-ShaderSources.getFragShaderSource = () => `#version 300 es
+ShaderSources.getFragShaderSource = async () => `#version 300 es
 
 precision mediump float;
 
@@ -6,16 +6,16 @@ in  highp vec2 fragPos;
 out highp vec4 fragColor;
 
 // Include other shader source components
-${ShaderSources.getUniformsSource()}
-${ShaderSources.getGeomTypesSource()}
-${ShaderSources.getKDTreeSource()}
-${ShaderSources.getMaterialSource()}
-${ShaderSources.getDataTexSource()}
-${ShaderSources.getRandomSource()}
-${ShaderSources.getGeomHitTestSource()}
-${ShaderSources.getSceneHitTestSource()}
-${ShaderSources.getScatterSource()}
-${ShaderSources.getPathTraceSource()}
+${await fetch("shaders/Uniforms.glsl")    .then(response => response.text())}
+${await fetch("shaders/GeomTypes.glsl")   .then(response => response.text())}
+${await fetch("shaders/KDTree.glsl")      .then(response => response.text())}
+${await fetch("shaders/Material.glsl")    .then(response => response.text())}
+${await fetch("shaders/DataTex.glsl")     .then(response => response.text())}
+${await fetch("shaders/Random.glsl")      .then(response => response.text())}
+${await fetch("shaders/GeomHitTest.glsl") .then(response => response.text())}
+${await fetch("shaders/SceneHitTest.glsl").then(response => response.text())}
+${await fetch("shaders/Scatter.glsl")     .then(response => response.text())}
+${await fetch("shaders/PathTrace.glsl")   .then(response => response.text())}
 
 void main() {
     uint rngState = 0u;

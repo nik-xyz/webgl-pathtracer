@@ -1,11 +1,5 @@
 class App {
     // Just testing code right now so it's not properly structured at all
-    constructor() {
-        this.pt = new PathTracer();
-        this.pt.setResolution(new Vec2(512, 512));
-        this.scene = null;
-    }
-
     async loadScene(encoded) {
         this.scene = await Scene.fromJSONEncodableObj(this.pt.gl, JSON.parse(encoded));
         this.scene.uploadSceneData();
@@ -37,7 +31,12 @@ class App {
         }
     }
 
-    run() {
+    async run() {
+        this.pt = new PathTracer();
+        await this.pt.init();
+        this.pt.setResolution(new Vec2(512, 512));
+        this.scene = null;
+
         document.querySelector("#render-output").appendChild(this.pt.gl.canvas);
 
         document.querySelector("#load-button").addEventListener("click", async () => {
@@ -58,7 +57,7 @@ class App {
     }
 }
 
-window.onload = () => {
+window.onload = async () => {
     window.app = new App();
     app.run();
 };

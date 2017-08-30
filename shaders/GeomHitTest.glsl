@@ -1,4 +1,3 @@
-ShaderSources.getGeomHitTestSource = () => `
 struct TriangleHitTestResult {
     bool hit;
     float edge0, edge1;
@@ -56,4 +55,3 @@ bool hitTestBox(Box box, Ray ray) {
     float far     = min(farVec.x,   min(farVec.y,   farVec.z));
     return close <= far;
 }
-`;

@@ -1,6 +1,5 @@
-ShaderSources.getSceneHitTestSource = () => `
 const uint SCENE_KDTREE_ROOT_ADDRESS = 0u;
-const uint KDTREE_STACK_SIZE = ${KDTree.SUBDIVISION_LIMIT + 1}u;
+const uint KDTREE_STACK_SIZE = 10u + 1u;
 const float RAY_CUTOFF_DISTANCE = 100000.0;
 
 
@@ -151,4 +150,3 @@ SceneHitTestResult hitTestScene(Ray ray) {
 }
 
 #undef stackTop
-`;

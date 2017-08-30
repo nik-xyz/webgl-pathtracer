@@ -1,7 +1,7 @@
 class PathTracer {
-    constructor() {
+    async init() {
         this.createContext();
-        this.createShader();
+        await this.createShader();
         this.createVertexData();
         this.reset();
 
@@ -30,13 +30,13 @@ class PathTracer {
         this.gl.clearColor(0, 0, 0, 0);
     }
 
-    createShader() {
+    async createShader() {
         const sources = [
-            [this.gl.VERTEX_SHADER,   ShaderSources.getVertShaderSource()],
-            [this.gl.FRAGMENT_SHADER, ShaderSources.getFragShaderSource()]
+            [this.gl.VERTEX_SHADER,   await ShaderSources.getVertShaderSource()],
+            [this.gl.FRAGMENT_SHADER, await ShaderSources.getFragShaderSource()]
         ];
         this.program = new ShaderProgram(this.gl, sources,
-                ShaderSources.uniformNames, ["vertPos"]);
+            ShaderSources.uniformNames, ["vertPos"]);
     }
 
     createVertexData() {

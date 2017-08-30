@@ -1,4 +1,3 @@
-ShaderSources.getKDTreeSource = () => `
 struct KDTree {
     uint triStartAddress;
     uint triEndAddress;
@@ -7,4 +6,3 @@ struct KDTree {
     float splitPoint;
     Box box;
 };
-`;

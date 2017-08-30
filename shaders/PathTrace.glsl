@@ -1,4 +1,3 @@
-ShaderSources.getPathTraceSource = () => `
 const uint BOUNCE_LIMIT = 5u;
 
 const float RAY_SURFACE_OFFSET = 0.001;
@@ -74,4 +73,3 @@ vec3 tracePath(Ray ray, inout uint rngState) {
 
     return incomingLight;
 }
-`;
