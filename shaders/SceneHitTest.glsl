@@ -1,5 +1,7 @@
+// Must match SUBDIVISION_LIMIT in KDTree.js
+const uint SUBDIVISION_LIMIT = 10u;
+const uint KDTREE_STACK_SIZE = SUBDIVISION_LIMIT + 1u;
 const uint SCENE_KDTREE_ROOT_ADDRESS = 0u;
-const uint KDTREE_STACK_SIZE = 10u + 1u;
 const float RAY_CUTOFF_DISTANCE = 100000.0;
 
 

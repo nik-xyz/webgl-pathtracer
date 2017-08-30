@@ -1,3 +1,4 @@
+// Must match RANDOM_DATA_LENGTH in RandomGen.js
 uint RANDOM_DATA_LENGTH = 1u << 12u;
 
 

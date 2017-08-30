@@ -31,12 +31,37 @@ class PathTracer {
     }
 
     async createShader() {
-        const sources = [
-            [this.gl.VERTEX_SHADER,   await ShaderSources.getVertShaderSource()],
-            [this.gl.FRAGMENT_SHADER, await ShaderSources.getFragShaderSource()]
+        const fetchShader = filename => fetch("shaders/" + filename).then(r => r.text());
+
+        const fetchShaders = async filenames => {
+            const sources = await Promise.all(filenames.map(fetchShader));
+            return sources.reduce((a, b) => a + b);
+        }
+        const vertexSource = await fetchShaders([
+            "Setup.glsl",
+            "Vertex.glsl"
+        ]);
+        const fragmentSource = await fetchShaders([
+            "Setup.glsl",
+            "Uniforms.glsl",
+            "GeomTypes.glsl",
+            "KDTree.glsl",
+            "Material.glsl",
+            "DataTex.glsl",
+            "Random.glsl",
+            "GeomHitTest.glsl",
+            "SceneHitTest.glsl",
+            "Scatter.glsl",
+            "PathTrace.glsl",
+            "Fragment.glsl"
+        ]);
+        const uniformData = await fetch("shaders/Uniforms.json").then(r => r.json());
+
+        const sourcesData = [
+            [this.gl.VERTEX_SHADER, vertexSource],
+            [this.gl.FRAGMENT_SHADER, fragmentSource]
         ];
-        this.program = new ShaderProgram(this.gl, sources,
-            ShaderSources.uniformNames, ["vertPos"]);
+        this.program = new ShaderProgram(this.gl, sourcesData, uniformData, ["vertPos"]);
     }
 
     createVertexData() {
@@ -120,7 +145,7 @@ class PathTracer {
 
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        gl.blitFramebuffer(...this.frameBounds, ...this.frameBounds, gl.COLOR_BUFFER_BIT,
-                gl.NEAREST);
+        gl.blitFramebuffer(...this.frameBounds, ...this.frameBounds,
+            gl.COLOR_BUFFER_BIT, gl.NEAREST);
     }
 }
