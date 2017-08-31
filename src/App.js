@@ -17,6 +17,8 @@ class App {
         const listElem    = document.querySelector("#scene-model-list");
         const rowTemplate = document.querySelector("#scene-model-row-template").content;
 
+        const formatVec = vec => vec.array().map(n => n.toPrecision(3));
+
         let i = 0;
         for(const model of this.scene.models) {
             const row = document.importNode(rowTemplate, true);
@@ -24,8 +26,8 @@ class App {
             // TODO: assign sensible names
             row.querySelector(".scene-model-name").innerText = `Model ${i++}`;
 
-            row.querySelector(".scene-model-position").innerText = model.position.array();
-            row.querySelector(".scene-model-size").innerText = model.size.array();
+            //row.querySelector(".scene-model-position").innerText = formatVec(model.position);
+            //row.querySelector(".scene-model-size").innerText = formatVec(model.size);
 
             listElem.appendChild(row);
         }
@@ -34,7 +36,7 @@ class App {
     async run() {
         this.pt = new PathTracer();
         await this.pt.init();
-        this.pt.setResolution(new Vec2(512, 512));
+        this.pt.setResolution(new Vec2(800, 800));
         this.scene = null;
 
         document.querySelector("#render-output").appendChild(this.pt.gl.canvas);

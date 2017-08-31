@@ -2,107 +2,28 @@
 <html>
 <head>
     <title> Path Tracer </title>
-    <style>
-
-    * {
-        margin: 0;
-        padding: 0;
-        font-family: sans-serif;
-    }
-
-    html, body {
-        height: 100%;
-        width: 100%;
-        background-color: #CCC;
-        overflow: hidden;
-    }
-
-
-    .button {
-        user-select: none;
-        display: inline-block;
-        line-height: 80%;
-        font-size: 1.2vw;
-        padding: 0.25vw 0.3vw 0.25vw 0.3vw;
-        cursor: pointer;
-        background-color: #BBB;
-        color: #222;
-        border: 0.1vmin solid #555;
-        border-radius: 0.2vw;
-    }
-
-    .button:hover {
-        background-color: #999;
-    }
-
-    .button:active {
-        background-color: #777;
-    }
-
-
-    .render-column {
-        float: left;
-        padding-top: 0.5vw;
-        padding-left: 0.5vw;
-        width: calc(98% / 3);
-        height: 100%;
-    }
-
-    .layout-column {
-        float: left;
-        padding-top: 0.5vw;
-        padding-left: 0.5vw;
-        width: calc(98% / 3);
-        height: 100%;
-    }
-
-
-    #scene-model-list {
-        height: 100%;
-        overflow-y: scroll;
-    }
-
-    .scene-model-row {
-        margin: 0vw 0.5vw 0.25vw 0vw;
-        display: block;
-    }
-
-    .scene-model-row div {
-        display: inline-block;
-        width: 30%;
-    }
-
-
-    #render-output canvas {
-        max-width: 100%;
-        max-height: 100%;
-    }
-    </style>
+    <link rel="stylesheet" href="ui.css" />
 </head>
 <body>
-    <div class="render-column">
-        <div id="render-output"></div>
-        <div id="render-controls">
-            <div class="button" id="load-button"> Load </div>
-            <div class="button" id="save-button"> Save </div>
-            <div class="button" id="render-button"> Render </div>
-        </div>
+    <div id="render-controls">
+        <div class="button" id="render-button"> Render </div>
     </div>
 
-    <div class="layout-column">
-        <div id="scene-model-list"></div>
+    <div id="scene-controls">
+        <div class="button" id="load-button"> Load Scene File </div>
+        <div class="button" id="load-default-button"> Load Demo </div>
+        <div class="button" id="save-button"> Save </div>
     </div>
 
-    <div class="layout-column">
+    <div id="render-output">
+        <!-- Canvas gets inserted here by JS code -->
     </div>
 
-    <template id="scene-model-row-template">
-        <div class="scene-model-row button">
-            <div class="scene-model-name"></div>
-            <div class="scene-model-position"></div>
-            <div class="scene-model-size"></div>
-        </div>
-    </template>
+    <div id="scene-model-list">
+        <!-- Clones of scene-model-row-template get inserted here by JS code -->
+    </div>
+
+    <div id="scene-material-list"></div>
 
     <script type="text/javascript" src="src/Vec.js"></script>
     <script type="text/javascript" src="src/Polygon.js"></script>
@@ -117,4 +38,19 @@
     <script type="text/javascript" src="src/IO.js"></script>
     <script type="text/javascript" src="src/App.js"></script>
 </body>
+
+<template id="scene-model-row-template">
+    <div class="scene-model-row button">
+        <div class="scene-model-name"></div>
+        <div class="scene-model-position"></div>
+        <div class="scene-model-size"></div>
+    </div>
+</template>
+
+<template id="vec3-template">
+    <div class="vector-component-x"></div>
+    <div class="vector-component-y"></div>
+    <div class="vector-component-z"></div>
+</template>
+
 </html>

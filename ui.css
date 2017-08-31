@@ -1,0 +1,80 @@
+* {
+    font-family: sans-serif;
+    margin:  0;
+    padding: 0;
+}
+
+html {
+    width:   100%;
+    height:  100%;
+}
+
+body {
+    width:   100%;
+    height:  100%;
+    overflow: hidden;
+    background-color: #FFF;
+
+    display: grid;
+    grid-template-columns: 60vw 1fr;
+    grid-template-rows: auto 1fr;
+    grid-gap: 0.5vw;
+    padding: 0.5vw;
+}
+
+#render-controls {
+    grid-area: 1 / 1;
+    display: flex;
+}
+
+#scene-controls {
+    grid-area: 1 / 2;
+    display: flex;
+}
+
+#render-output {
+    grid-area: 2 / 1;
+    display: flex;
+}
+
+#scene-model-list {
+    grid-area: 2 / 2;
+    display: flex;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.scene-model-row {
+    margin: 0vw 0.5vw 0.25vw 0vw;
+    display: block;
+}
+
+#render-output canvas {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+    image-rendering: pixelated;
+}
+
+.button {
+    user-select: none;
+    cursor:      pointer;
+
+    display: inline-block;
+    padding: 0.23vw 0.3vw 0.25vw 0.3vw;
+
+    line-height: 80%;
+    font-size:   1vw;
+
+    border:           #282828 0.05vw solid;
+    background-color: #DDD;
+    color:            #282828;
+}
+
+.button:hover {
+    background-color: #CCC;
+}
+
+.button:active {
+    background-color: #BBB;
+}
