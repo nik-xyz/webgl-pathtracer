@@ -128,8 +128,7 @@ class PathTracer {
 
         // Composite samples with additive blending
         gl.enable(gl.BLEND);
-        gl.blendFuncSeparate(gl.SRC_ALPHA,
-            gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
+        gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
 
         // Render
         this.vao.bind();
@@ -145,7 +144,11 @@ class PathTracer {
 
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        gl.blitFramebuffer(...this.frameBounds, ...this.frameBounds,
-            gl.COLOR_BUFFER_BIT, gl.NEAREST);
+        gl.blitFramebuffer(
+            ...this.frameBounds,
+            ...this.frameBounds,
+            gl.COLOR_BUFFER_BIT,
+            gl.NEAREST
+        );
     }
 }

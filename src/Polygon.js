@@ -38,6 +38,7 @@ class Triangle {
             .add(this.edge1.pos.scale(1 / 3));
     }
 
+    /* Encodes */
     encode() {
         const verts = [this.vert, this.edge0, this.edge1];
 
@@ -45,8 +46,7 @@ class Triangle {
         const norData = verts.map((v) => v.nor.array());
         const texData = verts.map((v) => v.tex.array());
 
-        return Array.prototype.concat(
-            ...posData, ...norData, ...texData, this.materialIndex);
+        return Array.prototype.concat(...posData, ...norData, ...texData, this.materialIndex);
     }
 }
 
@@ -56,7 +56,8 @@ class Polygon {
         this.materialIndex = materialIndex;
     }
 
-    /* Reduces polygon to triangle fan */
+    /*  Creates triangle-fan representation of the polygon.
+        Only handles convex polygons and assumes planarity. */
     triangulate() {
         const triangles = [];
         for(let index = 0; index < this.verts.length - 1; index++) {

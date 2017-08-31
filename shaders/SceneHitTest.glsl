@@ -40,10 +40,7 @@ SceneHitTestResult hitTestScene(Ray ray) {
     StackElem stack[KDTREE_STACK_SIZE];
 
     // Push root node onto stack
-    stackTop = StackElem(
-        readKDTree(SCENE_KDTREE_ROOT_ADDRESS),
-        0u
-    );
+    stackTop = StackElem(readKDTree(SCENE_KDTREE_ROOT_ADDRESS), 0u);
 
     // Traverse tree
     while(stackIndex >= 0) {
@@ -68,8 +65,7 @@ SceneHitTestResult hitTestScene(Ray ray) {
             else {
                 // Determine whether the ray will cross the plane
                 float rayDirAlongAxis = dot(ray.dir, stackTop.node.splitAxis);
-                bool goingToMissPlane =
-                    ((rayDirAlongAxis < 0.0) == originLessThanPlane);
+                bool goingToMissPlane = ((rayDirAlongAxis < 0.0) == originLessThanPlane);
 
                 // If the ray has already hit something on the near side of the
                 // plane or is not going to cross the plane, we do not need to

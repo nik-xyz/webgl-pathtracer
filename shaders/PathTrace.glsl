@@ -14,61 +14,31 @@ vec3 tracePath(Ray ray, inout uint rngState) {
     for(uint bounce = 0u; bounce < BOUNCE_LIMIT; bounce++) {
         SceneHitTestResult shtr = hitTestScene(ray);
 
-        if(shtr.hit) {
-            // Load material from buffer
-            Material material = readMaterial(shtr.materialIndex);
+        if(!shtr.hit) {
+            // TODO: sample background enviroment map instead.
+            // For now, create a square light above the scene instead.
+            float dist = max(abs(ray.dir.x), abs(ray.dir.z));
+            float light = dist < 0.4 && ray.dir.y > 0.0 ? 5.0 : 0.0;
 
-            // TODO: Move texture lookups sperate method
-
-            vec2 texSize = vec2(textureSize(materialTexArraySampler, 0).xy);
-
-            // Load diffuse texture if there is one
-            if(material.diffuseTexData.x > -0.5) {
-                // TODO: check texture orientation. The plane and ball seem to be
-                // in conflict
-                vec3 tex = vec3((vec2(1.0) - shtr.tex) * material.diffuseTexData.yz /
-                    texSize.xy, material.diffuseTexData.x);
-                material.diffuseMultiplier *= texture(materialTexArraySampler, tex).rgb;
-            }
-
-            // Load specular texture if there is one
-            if(material.specularTexData.x > -0.5) {
-                vec3 tex = vec3(shtr.tex * material.specularTexData.yz /
-                    texSize.xy, material.specularTexData.x);
-                material.diffuseMultiplier *= texture(materialTexArraySampler, tex).rgb;
-            }
-
-            // Load emission texture if there is one
-            if(material.emissionTexData.x > -0.5) {
-                vec3 tex = vec3(shtr.tex * material.emissionTexData.yz /
-                    texSize.xy, material.emissionTexData.x);
-                material.diffuseMultiplier *= texture(materialTexArraySampler, tex).rgb;
-            }
-
-            // Use scattering function to determine the new ray's direction
-            ScatterResult sr = scatterMaterial(
-                ray.dir, shtr.nor, material, rngState);
-
-            ray = createRay(shtr.pos + sr.dir * RAY_SURFACE_OFFSET, sr.dir);
-
-            // Accumulate emission from surface
-            incomingLight += transportCoeff * material.emissionMultiplier;
-
-            // Calculate the new overall transport coefficient using
-            // with the current material's transport coefficient
-            transportCoeff *= sr.transportCoeff;
-        }
-        else {
-            // TODO: sample background enviroment map instead
-            // For now, fake a square light
-            vec3 backgroundLight = vec3(
-                max(abs(ray.dir.x), abs(ray.dir.z)) < 0.4 && ray.dir.y > 0.0 ?
-                    5.0 : 0.0
-            );
-
-            incomingLight += transportCoeff * backgroundLight;
+            incomingLight += transportCoeff * vec3(light);
             break;
         }
+
+        // Load material from buffer
+        Material material = readMaterial(shtr.materialIndex);
+
+        // Use scattering function to determine the new ray's direction
+        ScatterResult sr = scatterMaterial(ray.dir, shtr.nor, shtr.tex, material, rngState);
+
+        // Accumulate emission from surface
+        incomingLight += transportCoeff * material.emissionCoeff;
+
+        // Calculate the new overall transport coefficient using
+        // with the current material's transport coefficient
+        transportCoeff *= sr.transportCoeff;
+
+        // Project scattered ray into scene for the next iteration
+        ray = createRay(shtr.pos + sr.dir * RAY_SURFACE_OFFSET, sr.dir);
     }
 
     return incomingLight;

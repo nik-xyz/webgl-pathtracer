@@ -3,8 +3,7 @@ ivec2 getTexelForAddress(uint address, uvec2 maskAndShift) {
 }
 
 
-
-// ---- Triangle ----
+// Triangle data loading functions
 float readTriangleFloat(uint address) {
     return texelFetch(
         treeFloatBufferSampler,
@@ -13,14 +12,12 @@ float readTriangleFloat(uint address) {
     ).r;
 }
 
-
 vec2 readTriangleVec2(uint address) {
     return vec2(
         readTriangleFloat(address + 0u),
         readTriangleFloat(address + 1u)
     );
 }
-
 
 vec3 readTriangleVec3(uint address) {
     return vec3(
@@ -30,7 +27,6 @@ vec3 readTriangleVec3(uint address) {
     );
 }
 
-
 TrianglePositions readTrianglePositions(uint address) {
     return TrianglePositions(
         readTriangleVec3(address + 0u),
@@ -38,7 +34,6 @@ TrianglePositions readTrianglePositions(uint address) {
         readTriangleVec3(address + 6u)
     );
 }
-
 
 TriangleAuxAttribs readTriangleAuxAttribs(uint address) {
     return TriangleAuxAttribs(
@@ -53,8 +48,7 @@ TriangleAuxAttribs readTriangleAuxAttribs(uint address) {
 }
 
 
-
-// ---- KDTree ----
+// KDTree data loading functions
 uint readKDTreeUint(uint address) {
     return texelFetch(
         treeUintBufferSampler,
@@ -62,7 +56,6 @@ uint readKDTreeUint(uint address) {
         0
     ).r;
 }
-
 
 KDTree readKDTree(uint address) {
     uint triangleStart = readKDTreeUint(address + 0u);
@@ -90,8 +83,7 @@ KDTree readKDTree(uint address) {
 }
 
 
-
-// ---- Material ----
+// Material data loading functions
 float readMaterialFloat(uint address) {
     return texelFetch(
         materialBufferSampler,
@@ -99,7 +91,6 @@ float readMaterialFloat(uint address) {
         0
     ).r;
 }
-
 
 vec3 readMaterialVec3(uint address) {
     return vec3(
@@ -109,22 +100,30 @@ vec3 readMaterialVec3(uint address) {
     );
 }
 
+MaterialTexData readMaterialTexData(uint address) {
+    return MaterialTexData(
+        readMaterialFloat(address + 0u),
+        vec2(
+            readMaterialFloat(address + 1u),
+            readMaterialFloat(address + 2u)
+        )
+    );
+}
 
 Material readMaterial(uint address) {
     return Material(
-        readMaterialFloat(address + 0u),
-        readMaterialVec3( address + 1u),
-        readMaterialVec3( address + 4u),
-        readMaterialVec3( address + 7u),
-        readMaterialVec3( address + 10u),
-        readMaterialVec3( address + 13u),
-        readMaterialVec3( address + 16u)
+        readMaterialFloat(   address + 0u),
+        readMaterialVec3(    address + 1u),
+        readMaterialVec3(    address + 4u),
+        readMaterialVec3(    address + 7u),
+        readMaterialTexData( address + 10u),
+        readMaterialTexData( address + 13u),
+        readMaterialTexData( address + 16u)
     );
 }
 
 
-
-// ---- Random data ----
+// Random data loading function
 float readRandomFloat(uint address) {
     return texelFetch(
         randomBufferSampler,

@@ -10,8 +10,7 @@ struct ScatterResult {
 // Probabilistically scatters the ray according to the Lambertian distribution.
 vec3 scatterLambertian(vec3 normal, inout uint rngState) {
     vec3 spherePoint = unitSphereRandom(rngState);
-    vec3 hemispherePoint = dot(normal, spherePoint) < 0.0 ?
-        -spherePoint : spherePoint;
+    vec3 hemispherePoint = dot(normal, spherePoint) < 0.0 ? -spherePoint : spherePoint;
 
     float lengthAlongNormal = dot(hemispherePoint, normal);
     float remappedLength = sqrt(lengthAlongNormal);
@@ -23,20 +22,23 @@ vec3 scatterLambertian(vec3 normal, inout uint rngState) {
 
 
 // Probabilistically scatters the ray using the scattering function
-// defined by the given material
+// that is defined by the given material.
 ScatterResult scatterMaterial(
-    vec3 incident, vec3 normal,
-    Material material, inout uint rngState
+    vec3 incident,
+    vec3 normal,
+    vec2 texCoord,
+    Material material,
+    inout uint rngState
 ) {
     ScatterResult res;
 
     if(random(rngState) < material.specularity) {
         res.dir = reflect(incident, normal);
-        res.transportCoeff = material.specularMultiplier;
+        res.transportCoeff = getMaterialSpecularValue(material, texCoord);
     }
     else {
         res.dir = scatterLambertian(normal, rngState);
-        res.transportCoeff = material.diffuseMultiplier;
+        res.transportCoeff = getMaterialDiffuseValue(material, texCoord);
     }
 
     return res;
