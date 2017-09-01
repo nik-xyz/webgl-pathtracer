@@ -15,7 +15,7 @@ vec3 tracePath(Ray ray, inout uint rngState) {
         SceneHitTestResult shtr = hitTestScene(ray);
 
         if(!shtr.hit) {
-            // TODO: sample background enviroment map instead.
+            // TODO: sample background enviroment map.
             // For now, create a square light above the scene instead.
             float dist = max(abs(ray.dir.x), abs(ray.dir.z));
             float light = dist < 0.4 && ray.dir.y > 0.0 ? 5.0 : 0.0;
@@ -31,7 +31,7 @@ vec3 tracePath(Ray ray, inout uint rngState) {
         ScatterResult sr = scatterMaterial(ray.dir, shtr.nor, shtr.tex, material, rngState);
 
         // Accumulate emission from surface
-        incomingLight += transportCoeff * material.emissionCoeff;
+        incomingLight += transportCoeff * getMaterialEmissionValue(material, shtr.tex);
 
         // Calculate the new overall transport coefficient using
         // with the current material's transport coefficient

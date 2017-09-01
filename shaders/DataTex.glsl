@@ -100,25 +100,13 @@ vec3 readMaterialVec3(uint address) {
     );
 }
 
-MaterialTexData readMaterialTexData(uint address) {
-    return MaterialTexData(
-        readMaterialFloat(address + 0u),
-        vec2(
-            readMaterialFloat(address + 1u),
-            readMaterialFloat(address + 2u)
-        )
-    );
-}
-
 Material readMaterial(uint address) {
     return Material(
-        readMaterialFloat(   address + 0u),
-        readMaterialVec3(    address + 1u),
-        readMaterialVec3(    address + 4u),
-        readMaterialVec3(    address + 7u),
-        readMaterialTexData( address + 10u),
-        readMaterialTexData( address + 13u),
-        readMaterialTexData( address + 16u)
+        readMaterialFloat(address + 0u),
+        uint(round(readMaterialFloat(address + 1u))),
+        readMaterialVec3(address + 2u),
+        readMaterialVec3(address + 5u),
+        readMaterialVec3(address + 8u)
     );
 }
 

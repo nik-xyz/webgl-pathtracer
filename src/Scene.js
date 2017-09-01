@@ -36,10 +36,7 @@ class Scene {
 
         for(const model of this.models) {
             triangles.push(...model.getTriangles(materialData.length));
-
-            const [data, images] = model.material.encode(materialImages.length);
-            materialData.push(...data);
-            materialImages.push(...images);
+            materialData.push(...model.material.encode(materialImages));
         }
 
         this.uploadImages(materialImages);

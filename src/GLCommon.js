@@ -3,8 +3,8 @@ class ShaderProgram {
         this.gl = gl;
 
         const shaders = ShaderProgram.createShaders(gl, shaderData);
+        window.x=shaderData
         ShaderProgram.checkShaders(this.gl, shaders);
-
         this.program = this.gl.createProgram();
 
         for(const shader of shaders) {

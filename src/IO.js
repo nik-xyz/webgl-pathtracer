@@ -27,3 +27,11 @@ const saveFile = (data, name) =>  {
     link.click();
     document.body.removeChild(link);
 };
+
+const assertJSONHasKeys = (json, keys) => {
+    for(const key of keys) {
+        if(!(key in json)) {
+            throw new Error(`invalid JSON: missing required key ${key}`);
+        }
+    }
+};
