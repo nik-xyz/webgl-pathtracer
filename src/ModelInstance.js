@@ -3,32 +3,27 @@ class ModelInstance {
     static get DEFAULT_POSITION() { return new Vec3(0); }
     static get DEFAULT_SIZE()     { return new Vec3(1); }
 
-    constructor(model, material, position = Model.DEFAULT_POSITION, size = Model.DEFAULT_SIZE) {
-        this.model    = model;
-        this.material = material;
-        this.position = position;
-        this.size     = size;
+    static async fromJSONEncodableObj(obj) {
+        assertJSONHasKeys(obj, ["name", "model", "material", "position", "size"]);
+
+        const model = new ModelInstance();
+        model.name     = obj.name;
+        model.model    = Model.fromJSONEncodableObj(obj.model);
+        model.material = await Material.fromJSONEncodableObj(obj.material);
+        model.position = Vec3.fromJSONEncodableObj(obj.position).checkNumeric();
+        model.size     = Vec3.fromJSONEncodableObj(obj.size).checkNumeric();
+
+        return model;
     }
 
     toJSONEncodableObj() {
         return {
-            material: this.material.toJSONEncodableObj(),
+            name:     this.name,
             model:    this.model.toJSONEncodableObj(),
+            material: this.material.toJSONEncodableObj(),
             position: this.position.array(),
             size:     this.size.array()
         };
-    }
-
-    static async fromJSONEncodableObj(obj) {
-        if(["model", "material", "position", "size"].every(key => key in obj)) {
-            return new ModelInstance(
-                Model.fromJSONEncodableObj(obj.model),
-                await Material.fromJSONEncodableObj(obj.material),
-                Vec3.fromJSONEncodableObj(obj.position).checkNumeric(),
-                Vec3.fromJSONEncodableObj(obj.size).checkNumeric()
-            );
-        }
-        throw new Error("invalid JSON");
     }
 
     getTriangles(materialIndex) {

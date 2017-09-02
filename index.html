@@ -19,11 +19,11 @@
         <!-- Canvas gets inserted here by JS code -->
     </div>
 
-    <div id="scene-model-list">
-        <!-- Clones of scene-model-row-template get inserted here by JS code -->
+    <div id="model-list">
+        <!-- Clones of model-template get inserted here by JS code -->
     </div>
 
-    <div id="scene-material-list"></div>
+    <div id="material-list"></div>
 
     <script type="text/javascript" src="src/Vec.js"></script>
     <script type="text/javascript" src="src/Polygon.js"></script>
@@ -39,18 +39,44 @@
     <script type="text/javascript" src="src/App.js"></script>
 </body>
 
-<template id="scene-model-row-template">
-    <div class="scene-model-row button">
-        <div class="scene-model-name"></div>
-        <div class="scene-model-position"></div>
-        <div class="scene-model-size"></div>
+<template id="model-template">
+    <div class="model">
+        <div class="model-name"></div>
+        <div class="model-grid">
+            <div> Position </div>
+            <div class="model-position"></div>
+
+            <div> Size </div>
+            <div class="model-size"></div>
+
+            <div> Material </div>
+            <div class="model-material"></div>
+        </div>
+    </div>
+</template>
+
+<template id="material-template">
+    <div class="material">
+        <div> Specularity </div>
+        <input type="number" class="material-specularity" />
+
+        <div> Diffuse </div>
+        <input type="color" class="material-diffuse" />
+
+        <div> Specular </div>
+        <input type="color" class="material-specular" />
+
+        <div> Emission </div>
+        <input type="color" class="material-emission" />
     </div>
 </template>
 
 <template id="vec3-template">
-    <div class="vector-component-x"></div>
-    <div class="vector-component-y"></div>
-    <div class="vector-component-z"></div>
+    <div class="vec3">
+        <input type="number" class="vec3-x" />
+        <input type="number" class="vec3-y" />
+        <input type="number" class="vec3-z" />
+    </div>
 </template>
 
 </html>

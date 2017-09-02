@@ -1,5 +1,7 @@
+// TODO: Refactor this entire file
+
+
 class App {
-    // Just testing code right now so it's not properly structured at all
     async loadScene(encoded) {
         this.scene = await Scene.fromJSONEncodableObj(this.pt.gl, JSON.parse(encoded));
         this.scene.uploadSceneData();
@@ -14,23 +16,66 @@ class App {
     }
 
     updateModelList() {
-        const listElem    = document.querySelector("#scene-model-list");
-        const rowTemplate = document.querySelector("#scene-model-row-template").content;
+        const listElem    = document.querySelector("#model-list");
+        const rowTemplate = document.querySelector("#model-template").content;
 
-        const formatVec = vec => vec.array().map(n => n.toPrecision(3));
+        listElem.innerText = "TODO: Make this editable";
 
-        let i = 0;
         for(const model of this.scene.models) {
             const row = document.importNode(rowTemplate, true);
 
-            // TODO: assign sensible names
-            row.querySelector(".scene-model-name").innerText = `Model ${i++}`;
+            row.querySelector(".model-name").innerText = `${model.name}`;
 
-            //row.querySelector(".scene-model-position").innerText = formatVec(model.position);
-            //row.querySelector(".scene-model-size").innerText = formatVec(model.size);
+            row.querySelector(".model-position").appendChild(
+                this.createVec3Element(model.position));
+            row.querySelector(".model-size").appendChild(
+                this.createVec3Element(model.size));
+            row.querySelector(".model-material").appendChild(
+                this.createMaterialElement(model.material));
 
             listElem.appendChild(row);
         }
+    }
+
+    createMaterialElement(material) {
+        const template = document.querySelector("#material-template").content;
+        const materialElem = document.importNode(template, true);
+
+        const asHex = vec => "#" + vec
+            .map(a => a * 255)
+            .map(Math.floor)
+            .map(a => ("00" + a.toString(16)).substr(-2))
+            .reduce((a, b) => a + b);
+
+        materialElem.querySelector(".material-specularity").value = material.specularity;
+        if(material.diffuse.isFlat) {
+            materialElem.querySelector(".material-diffuse").value = asHex(material.diffuse.value);
+        }
+        if(material.specular.isFlat) {
+            materialElem.querySelector(".material-specular").value = asHex(material.specular.value);
+        }
+        if(material.emission.isFlat) {
+            materialElem.querySelector(".material-emission").value = asHex(material.emission.value);
+        }
+
+        return materialElem;
+    }
+
+    createVec3Element(vec, precision = 6) {
+        const template = document.querySelector("#vec3-template").content;
+        const vec3Elem = document.importNode(template, true);
+
+        const query = selector => vec3Elem.querySelector(selector);
+        const componentElems = [".vec3-x", ".vec3-y", ".vec3-z"].map(query);
+
+        for(const index in componentElems) {
+            const componentElem = componentElems[index];
+            componentElem.value = vec.array()[index].toPrecision(precision + 1);
+            componentElem.step = Math.pow(0.1, precision);
+            //componentElem.addEventListener("change", )
+        }
+
+        return vec3Elem;
     }
 
     async run() {
