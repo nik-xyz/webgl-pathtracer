@@ -13,6 +13,7 @@
         <div class="button" id="load-button"> Load Scene File </div>
         <div class="button" id="load-default-button"> Load Demo </div>
         <div class="button" id="save-button"> Save </div>
+        <div class="button" id="edit-button"> Add Model </div>
     </div>
 
     <div id="render-output">
@@ -25,31 +26,31 @@
 
     <div id="material-list"></div>
 
-    <script type="text/javascript" src="src/Vec.js"></script>
-    <script type="text/javascript" src="src/Polygon.js"></script>
-    <script type="text/javascript" src="src/Material.js"></script>
-    <script type="text/javascript" src="src/GLCommon.js"></script>
-    <script type="text/javascript" src="src/RandomGen.js"></script>
-    <script type="text/javascript" src="src/Scene.js"></script>
-    <script type="text/javascript" src="src/Model.js"></script>
-    <script type="text/javascript" src="src/ModelInstance.js"></script>
-    <script type="text/javascript" src="src/KDTree.js"></script>
-    <script type="text/javascript" src="src/PathTracer.js"></script>
-    <script type="text/javascript" src="src/IO.js"></script>
-    <script type="text/javascript" src="src/App.js"></script>
+    <script type="text/javascript" src="src/vec.js"></script>
+    <script type="text/javascript" src="src/polygon.js"></script>
+    <script type="text/javascript" src="src/material.js"></script>
+    <script type="text/javascript" src="src/gl-common.js"></script>
+    <script type="text/javascript" src="src/random-gen.js"></script>
+    <script type="text/javascript" src="src/scene.js"></script>
+    <script type="text/javascript" src="src/model.js"></script>
+    <script type="text/javascript" src="src/model-instance.js"></script>
+    <script type="text/javascript" src="src/kd-tree.js"></script>
+    <script type="text/javascript" src="src/path-tracer.js"></script>
+    <script type="text/javascript" src="src/io.js"></script>
+    <script type="text/javascript" src="src/ui/app.js"></script>
 </body>
 
 <template id="model-template">
     <div class="model">
         <div class="model-name"></div>
         <div class="model-grid">
-            <div> Position </div>
+            <div class="input-label"> Position </div>
             <div class="model-position"></div>
 
-            <div> Size </div>
+            <div class="input-label"> Size </div>
             <div class="model-size"></div>
 
-            <div> Material </div>
+            <div class="input-label"> Material </div>
             <div class="model-material"></div>
         </div>
     </div>
@@ -57,25 +58,34 @@
 
 <template id="material-template">
     <div class="material">
-        <div> Specularity </div>
+        <div class="input-label"> Specularity </div>
         <input type="number" class="material-specularity" />
 
-        <div> Diffuse </div>
-        <input type="color" class="material-diffuse" />
+        <div class="input-label"> Diffuse </div>
+        <div class="material-component material-diffuse"></div>
 
-        <div> Specular </div>
-        <input type="color" class="material-specular" />
+        <div class="input-label"> Specular </div>
+        <div class="material-component material-specular"></div>
 
-        <div> Emission </div>
-        <input type="color" class="material-emission" />
+        <div class="input-label"> Emission </div>
+        <div class="material-component material-emission"></div>
     </div>
 </template>
 
 <template id="vec3-template">
     <div class="vec3">
-        <input type="number" class="vec3-x" />
-        <input type="number" class="vec3-y" />
-        <input type="number" class="vec3-z" />
+        <div class="vec3-component">
+            <div class="vec3-component-label"> X </div>
+            <input type="number" class="vec3-x vec3-component-value" />
+        </div>
+        <div class="vec3-component">
+            <div class="vec3-component-label"> Y </div>
+            <input type="number" class="vec3-y vec3-component-value" />
+        </div>
+        <div class="vec3-component">
+            <div class="vec3-component-label"> Z </div>
+            <input type="number" class="vec3-z vec3-component-value" />
+        </div>
     </div>
 </template>
 

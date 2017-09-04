@@ -19,8 +19,6 @@ class App {
         const listElem    = document.querySelector("#model-list");
         const rowTemplate = document.querySelector("#model-template").content;
 
-        listElem.innerText = "TODO: Make this editable";
-
         for(const model of this.scene.models) {
             const row = document.importNode(rowTemplate, true);
 
@@ -41,41 +39,80 @@ class App {
         const template = document.querySelector("#material-template").content;
         const materialElem = document.importNode(template, true);
 
+        const specularityElem = materialElem.querySelector(".material-specularity");
+        this.enforceNumberInputFormat(specularityElem, material.specularity, [0, 1]);
+
+        const materialDiffuseElem = materialElem.querySelector(".material-diffuse");
+        const materialSpecularElem = materialElem.querySelector(".material-specular");
+        const materialEmissionElem = materialElem.querySelector(".material-emission");
+
+        materialDiffuseElem.appendChild(this.createMaterialComponentElement(material.diffuse));
+        materialSpecularElem.appendChild(this.createMaterialComponentElement(material.specular));
+        materialEmissionElem.appendChild(this.createMaterialComponentElement(material.emission));
+
+        return materialElem;
+    }
+
+    createMaterialComponentElement(materialComponent) {
+        if(materialComponent.isFlat) {
+            return this.createColorInputElement(materialComponent.value);
+        }
+        else {
+            return materialComponent.value;
+        }
+    }
+
+    createColorInputElement(initialColor) {
         const asHex = vec => "#" + vec
             .map(a => a * 255)
             .map(Math.floor)
             .map(a => ("00" + a.toString(16)).substr(-2))
             .reduce((a, b) => a + b);
 
-        materialElem.querySelector(".material-specularity").value = material.specularity;
-        if(material.diffuse.isFlat) {
-            materialElem.querySelector(".material-diffuse").value = asHex(material.diffuse.value);
-        }
-        if(material.specular.isFlat) {
-            materialElem.querySelector(".material-specular").value = asHex(material.specular.value);
-        }
-        if(material.emission.isFlat) {
-            materialElem.querySelector(".material-emission").value = asHex(material.emission.value);
-        }
-
-        return materialElem;
+        const elem = document.createElement("input");
+        elem.type = "color";
+        elem.value = asHex(initialColor);
+        return elem;
     }
 
     createVec3Element(vec, precision = 6) {
         const template = document.querySelector("#vec3-template").content;
         const vec3Elem = document.importNode(template, true);
 
-        const query = selector => vec3Elem.querySelector(selector);
-        const componentElems = [".vec3-x", ".vec3-y", ".vec3-z"].map(query);
+        const componentElems = ["x", "y", "z"].map(axis => vec3Elem.querySelector(".vec3-" + axis));
 
         for(const index in componentElems) {
-            const componentElem = componentElems[index];
-            componentElem.value = vec.array()[index].toPrecision(precision + 1);
-            componentElem.step = Math.pow(0.1, precision);
-            //componentElem.addEventListener("change", )
+            const limits = [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY];
+            this.enforceNumberInputFormat(componentElems[index], vec.array()[index], limits);
         }
 
         return vec3Elem;
+    }
+
+    enforceNumberInputFormat(elem, initialValue, limits, precision = 6) {
+        // Suggest that the browser maintain this format
+        elem.step = Math.pow(0.1, precision);
+        elem.min = limits[0];
+        elem.max = limits[1];
+
+        const setWithFormat = value => {
+            elem.value = value.toFixed(precision);
+        };
+
+        setWithFormat(initialValue);
+
+        // Value to return to if the input becomes invalid
+        let lastGoodValue = initialValue;
+
+        // Only register for the blur event, because altering the text while the user is trying to
+        // edit it is extremely annoying
+        elem.addEventListener("blur", () => {
+            const newValue = Number.parseFloat(elem.value);
+            const safeValue = Number.isNaN(newValue) ? lastGoodValue : newValue;
+            const clampedValue = Math.min(Math.max(safeValue, limits[0]), limits[1]);
+            lastGoodValue = clampedValue;
+            setWithFormat(clampedValue);
+        });
     }
 
     async run() {
@@ -84,7 +121,7 @@ class App {
         this.pt.setResolution(new Vec2(800, 800));
         this.scene = null;
 
-        document.querySelector("#render-output").appendChild(this.pt.gl.canvas);
+        document.querySelector("#render-output").appendChild(this.pt.canvas);
 
         document.querySelector("#load-button").addEventListener("click", async () => {
             const file = await loadFile();

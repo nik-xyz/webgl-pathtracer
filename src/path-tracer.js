@@ -30,6 +30,10 @@ class PathTracer {
         this.gl.clearColor(0, 0, 0, 0);
     }
 
+    get canvas() {
+        return this.gl.canvas;
+    }
+
     async createShader() {
         const fetchShader = filename => fetch("shaders/" + filename).then(r => r.text());
 
@@ -38,24 +42,24 @@ class PathTracer {
             return sources.reduce((a, b) => a + b);
         }
         const vertexSource = await fetchShaders([
-            "Setup.glsl",
-            "Vertex.glsl"
+            "setup.glsl",
+            "vertex.glsl"
         ]);
         const fragmentSource = await fetchShaders([
-            "Setup.glsl",
-            "Uniforms.glsl",
-            "GeomTypes.glsl",
-            "KDTree.glsl",
-            "Material.glsl",
-            "DataTex.glsl",
-            "Random.glsl",
-            "GeomHitTest.glsl",
-            "SceneHitTest.glsl",
-            "Scatter.glsl",
-            "PathTrace.glsl",
-            "Fragment.glsl"
+            "setup.glsl",
+            "uniforms.glsl",
+            "geom-types.glsl",
+            "kd-tree.glsl",
+            "material.glsl",
+            "data-tex.glsl",
+            "random.glsl",
+            "geom-hit-test.glsl",
+            "scene-hit-test.glsl",
+            "scatter.glsl",
+            "path-trace.glsl",
+            "fragment.glsl"
         ]);
-        const uniformData = await fetch("shaders/Uniforms.json").then(r => r.json());
+        const uniformData = await fetch("shaders/uniforms.json").then(r => r.json());
 
         const sourcesData = [
             [this.gl.VERTEX_SHADER, vertexSource],
