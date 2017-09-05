@@ -73,6 +73,15 @@ class Material {
         };
     }
 
+    static get DEFAULT_MATERIAL_JSON() {
+        return {
+            specularity: 0.5,
+            diffuse:  { flat: true, value: [1.0, 1.0, 1.0] },
+            specular: { flat: true, value: [1.0, 1.0, 1.0] },
+            emission: { flat: true, value: [0.0, 0.0, 0.0] },
+        }
+    }
+
     // Encodes the material into an array using the same format as struct Material
     // in Material.glsl. Also pushes images onto the stack that is provided.
     encode(imageStack) {

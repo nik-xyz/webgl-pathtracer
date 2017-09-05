@@ -29,7 +29,33 @@ class Scene {
         this.models.push(model);
     }
 
+    addModelAtStart(model) {
+        this.models.unshift(model);
+    }
+
+    releaseSceneDate() {
+        const resources = [
+            this.treeDataTex,
+            this.triangleDataTex,
+            this.materialDataTex,
+            this.materialTexArray
+        ];
+
+        for(const resource of resources) {
+            if(resource) {
+                resource.destroy();
+            }
+        }
+
+        this.treeDataTex      = null;
+        this.triangleDataTex  = null;
+        this.materialDataTex  = null;
+        this.materialTexArray = null;
+    }
+
     uploadSceneData() {
+        this.releaseSceneDate();
+
         const triangles = [];
         const materialData = [];
         const materialImages = [];
@@ -39,56 +65,45 @@ class Scene {
             materialData.push(...model.material.encode(materialImages));
         }
 
-        this.uploadImages(materialImages);
+        if(materialImages.length > 0) {
+            const size = materialImages
+                .map(image => new Vec2(image.width, image.height))
+                .reduce((a, b) => a.max(b));
+
+            this.materialTexArray = new ArrayTexture(
+                this.gl, size, materialImages.length, this.gl.RGBA8,
+                this.gl.RGBA, this.gl.UNSIGNED_BYTE, materialImages, this.gl.LINEAR
+            );
+        }
 
         const [treeUintBuffer, treeFloatBuffer] = new KDTree(triangles).encode();
-
-        if(this.treeDataTex) {
-            this.treeDataTex.destroy();
-        }
-        if(this.triangleDataTex) {
-            this.triangleDataTex.destroy();
-        }
-        if(this.materialDataTex) {
-            this.materialDataTex.destroy();
-        }
-
         this.treeDataTex     = new DataTexture(this.gl, this.gl.UNSIGNED_INT, treeUintBuffer);
         this.triangleDataTex = new DataTexture(this.gl, this.gl.FLOAT, treeFloatBuffer);
         this.materialDataTex = new DataTexture(this.gl, this.gl.FLOAT, materialData);
     }
 
-    uploadImages(images) {
-        let size = new Vec2(0);
+    bind(program) {
+        const gl = this.gl;
+        const uniforms = program.uniforms;
 
-        for(const image of images) {
-            size = size.max(new Vec2(image.width, image.height));
+        this.triangleDataTex.bind(gl.TEXTURE0);
+        this.treeDataTex    .bind(gl.TEXTURE1);
+        this.materialDataTex.bind(gl.TEXTURE2);
+
+        gl.uniform1i(uniforms.treeFloatBufferSampler, 0);
+        gl.uniform2uiv(uniforms.treeFloatBufferAddrData, this.triangleDataTex.dataMaskAndShift);
+
+        gl.uniform1i(uniforms.treeUintBufferSampler, 1);
+        gl.uniform2uiv(uniforms.treeUintBufferAddrData, this.treeDataTex.dataMaskAndShift);
+
+        gl.uniform1i(uniforms.materialBufferSampler, 2);
+        gl.uniform2uiv(uniforms.materialBufferAddrData, this.materialDataTex.dataMaskAndShift);
+
+        if(this.materialTexArray) {
+            this.materialTexArray.bind(gl.TEXTURE4);
+            gl.uniform1i(uniforms.materialTexArraySampler, 4);
         }
 
-        this.materialTexArray = new ArrayTexture(this.gl, size, images.length, this.gl.RGBA8,
-            this.gl.RGBA, this.gl.UNSIGNED_BYTE, images, this.gl.LINEAR);
-    }
-
-    bind(program) {
-        this.triangleDataTex.bind(this.gl.TEXTURE0);
-        this.treeDataTex.bind(this.gl.TEXTURE1);
-        this.materialDataTex.bind(this.gl.TEXTURE2);
-
-        this.gl.uniform1i(program.uniforms.treeFloatBufferSampler, 0);
-        this.gl.uniform2uiv(program.uniforms.treeFloatBufferAddrData,
-            this.triangleDataTex.dataMaskAndShift);
-
-        this.gl.uniform1i(program.uniforms.treeUintBufferSampler, 1);
-        this.gl.uniform2uiv(program.uniforms.treeUintBufferAddrData,
-            this.treeDataTex.dataMaskAndShift);
-
-        this.gl.uniform1i(program.uniforms.materialBufferSampler, 2);
-        this.gl.uniform2uiv(program.uniforms.materialBufferAddrData,
-            this.materialDataTex.dataMaskAndShift);
-
-        this.materialTexArray.bind(this.gl.TEXTURE4);
-        this.gl.uniform1i(program.uniforms.materialTexArraySampler, 4);
-
-        this.gl.uniform3fv(program.uniforms.cameraPosition, this.cameraPosition.array());
+        gl.uniform3fv(uniforms.cameraPosition, this.cameraPosition.array());
     }
 }

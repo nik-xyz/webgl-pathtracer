@@ -6,7 +6,7 @@ class ModelInstance {
     static async fromJSONEncodableObj(obj) {
         assertJSONHasKeys(obj, ["name", "model", "material", "position", "size"]);
 
-        const model = new ModelInstance();
+        const model    = new ModelInstance();
         model.name     = obj.name;
         model.model    = Model.fromJSONEncodableObj(obj.model);
         model.material = await Material.fromJSONEncodableObj(obj.material);

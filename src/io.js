@@ -1,4 +1,4 @@
-const loadFile = () => {
+const loadFileText = () => {
     const fileInput = document.createElement("input");
     fileInput.type = "file";
 
@@ -9,7 +9,9 @@ const loadFile = () => {
                 reject();
             }
             else {
-                resolve(fileInput.files[0]);
+                const fr = new FileReader();
+                fr.onloadend = () => resolve(fr.result);
+                fr.readAsText(fileInput.files[0]);
             }
         });
     });

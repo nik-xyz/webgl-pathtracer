@@ -38,7 +38,8 @@ class Triangle {
             .add(this.edge1.pos.scale(1 / 3));
     }
 
-    /* Encodes */
+    // Encodes the triangle in a format that matches the structures TrianglePositions and
+    // TriangleAuxAttribs in geom-types.glsl.
     encode() {
         const verts = [this.vert, this.edge0, this.edge1];
 

@@ -1,14 +1,17 @@
-// TODO: Refactor this entire file
-
-
 class App {
     async loadScene(encoded) {
         this.scene = await Scene.fromJSONEncodableObj(this.pt.gl, JSON.parse(encoded));
-        this.scene.uploadSceneData();
         this.updateModelList();
+        this.sceneChanged = true;
     }
 
     render() {
+        if(this.sceneChanged) {
+            this.pt.reset();
+            this.scene.uploadSceneData();
+            this.sceneChanged = false;
+        }
+
         if(this.scene) {
             this.pt.renderImage(this.scene);
             this.pt.displayImage();
@@ -16,41 +19,62 @@ class App {
     }
 
     updateModelList() {
-        const listElem    = document.querySelector("#model-list");
-        const rowTemplate = document.querySelector("#model-template").content;
+        const elem = document.querySelector("#model-list");
+
+        // Clear list
+        while(elem.lastChild) {
+            elem.removeChild(elem.lastChild);
+        }
 
         for(const model of this.scene.models) {
-            const row = document.importNode(rowTemplate, true);
-
-            row.querySelector(".model-name").innerText = `${model.name}`;
-
-            row.querySelector(".model-position").appendChild(
-                this.createVec3Element(model.position));
-            row.querySelector(".model-size").appendChild(
-                this.createVec3Element(model.size));
-            row.querySelector(".model-material").appendChild(
-                this.createMaterialElement(model.material));
-
-            listElem.appendChild(row);
+            elem.appendChild(this.createModelElement(model));
         }
+    }
+
+    async addModel() {
+        const text = await loadFileText();
+        const model = await ModelInstance.fromJSONEncodableObj({
+            name:     "Unnamed Model",
+            model:    text,
+            material: Material.DEFAULT_MATERIAL_JSON,
+            position: ModelInstance.DEFAULT_POSITION.array(),
+            size:     ModelInstance.DEFAULT_SIZE.array()
+        });
+
+        this.scene.addModelAtStart(model);
+        this.updateModelList();
+
+        this.sceneChanged = true;
+    }
+
+    createModelElement(model) {
+        const template = document.querySelector("#model-template").content;
+        const elem = document.importNode(template, true);
+
+        const fill = (selector, value) => elem.querySelector(selector).appendChild(value);
+
+        fill(".model-name",     document.createTextNode(model.name));
+        fill(".model-position", this.createVec3Element(model.position));
+        fill(".model-size",     this.createVec3Element(model.size));
+        fill(".model-material", this.createMaterialElement(model.material));
+
+        return elem;
     }
 
     createMaterialElement(material) {
         const template = document.querySelector("#material-template").content;
-        const materialElem = document.importNode(template, true);
+        const elem = document.importNode(template, true);
 
-        const specularityElem = materialElem.querySelector(".material-specularity");
+        const specularityElem = elem.querySelector(".material-specularity");
         this.enforceNumberInputFormat(specularityElem, material.specularity, [0, 1]);
 
-        const materialDiffuseElem = materialElem.querySelector(".material-diffuse");
-        const materialSpecularElem = materialElem.querySelector(".material-specular");
-        const materialEmissionElem = materialElem.querySelector(".material-emission");
+        const fill = (selector, value) => elem.querySelector(selector).appendChild(value);
 
-        materialDiffuseElem.appendChild(this.createMaterialComponentElement(material.diffuse));
-        materialSpecularElem.appendChild(this.createMaterialComponentElement(material.specular));
-        materialEmissionElem.appendChild(this.createMaterialComponentElement(material.emission));
+        fill(".material-diffuse",  this.createMaterialComponentElement(material.diffuse));
+        fill(".material-specular", this.createMaterialComponentElement(material.specular));
+        fill(".material-emission", this.createMaterialComponentElement(material.emission));
 
-        return materialElem;
+        return elem;
     }
 
     createMaterialComponentElement(materialComponent) {
@@ -58,7 +82,9 @@ class App {
             return this.createColorInputElement(materialComponent.value);
         }
         else {
-            return materialComponent.value;
+            const img = new Image();
+            img.src = materialComponent.value.src;
+            return img;
         }
     }
 
@@ -104,8 +130,8 @@ class App {
         // Value to return to if the input becomes invalid
         let lastGoodValue = initialValue;
 
-        // Only register for the blur event, because altering the text while the user is trying to
-        // edit it is extremely annoying
+        // Only register for the blur event, because altering the text while the user is
+        // trying to edit it is extremely annoying
         elem.addEventListener("blur", () => {
             const newValue = Number.parseFloat(elem.value);
             const safeValue = Number.isNaN(newValue) ? lastGoodValue : newValue;
@@ -124,10 +150,7 @@ class App {
         document.querySelector("#render-output").appendChild(this.pt.canvas);
 
         document.querySelector("#load-button").addEventListener("click", async () => {
-            const file = await loadFile();
-            const fr = new FileReader();
-            fr.onloadend = () => this.loadScene(fr.result);
-            fr.readAsText(file);
+            this.loadScene(await loadFileText());
         });
 
         document.querySelector("#save-button").addEventListener("click", () => {
@@ -138,6 +161,8 @@ class App {
         });
 
         document.querySelector("#render-button").addEventListener("click", () => this.render());
+
+        document.querySelector("#add-model-button").addEventListener("click", () => this.addModel());
     }
 }
 
