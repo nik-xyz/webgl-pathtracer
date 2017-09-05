@@ -53,9 +53,19 @@ class App {
 
         const fill = (selector, value) => elem.querySelector(selector).appendChild(value);
 
+        const handlePositionChange = value => {
+            model.position = value;
+            this.sceneChanged = true;
+        };
+
+        const handleSizeChange = value => {
+            model.size = value;
+            this.sceneChanged = true;
+        };
+
         fill(".model-name",     document.createTextNode(model.name));
-        fill(".model-position", this.createVec3Element(model.position));
-        fill(".model-size",     this.createVec3Element(model.size));
+        fill(".model-position", this.createVec3Element(model.position, handlePositionChange));
+        fill(".model-size",     this.createVec3Element(model.size, handleSizeChange));
         fill(".model-material", this.createMaterialElement(model.material));
 
         return elem;
@@ -78,8 +88,13 @@ class App {
     }
 
     createMaterialComponentElement(materialComponent) {
+        const handleChange = value => {
+            materialComponent.value = value;
+            this.sceneChanged = true;
+        };
+
         if(materialComponent.isFlat) {
-            return this.createColorInputElement(materialComponent.value);
+            return this.createColorInputElement(materialComponent.value, handleChange);
         }
         else {
             const img = new Image();
@@ -88,55 +103,71 @@ class App {
         }
     }
 
-    createColorInputElement(initialColor) {
+    createColorInputElement(initialColor, handleChange) {
         const asHex = vec => "#" + vec
             .map(a => a * 255)
             .map(Math.floor)
             .map(a => ("00" + a.toString(16)).substr(-2))
             .reduce((a, b) => a + b);
 
+        const asVec = hex => Vec3.fromJSONEncodableObj([1, 3, 5]
+            .map(index => hex.substr(index, 2))
+            .map(num   => Number.parseInt(num, 16) / 255.0)
+        );
+
         const elem = document.createElement("input");
         elem.type = "color";
         elem.value = asHex(initialColor);
+
+        elem.addEventListener("change", () => {
+            handleChange(asVec(elem.value));
+        });
+
         return elem;
     }
 
-    createVec3Element(vec, precision = 6) {
+    createVec3Element(vec, handleChange, precision = 5) {
         const template = document.querySelector("#vec3-template").content;
         const vec3Elem = document.importNode(template, true);
 
-        const componentElems = ["x", "y", "z"].map(axis => vec3Elem.querySelector(".vec3-" + axis));
+        let currentValue = vec;
 
-        for(const index in componentElems) {
-            const limits = [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY];
-            this.enforceNumberInputFormat(componentElems[index], vec.array()[index], limits);
+        for(let axis of ["x", "y", "z"]) {
+            const component = vec3Elem.querySelector(`.vec3-${axis}`);
+            this.enforceNumberInputFormat(component, currentValue[axis], null, precision);
+            component.addEventListener("blur", () => {
+                currentValue[axis] = Number.parseFloat(component.value);
+                handleChange(currentValue);
+            });
         }
 
         return vec3Elem;
     }
 
-    enforceNumberInputFormat(elem, initialValue, limits, precision = 6) {
+    enforceNumberInputFormat(elem, initialValue, limits, precision) {
         // Suggest that the browser maintain this format
         elem.step = Math.pow(0.1, precision);
-        elem.min = limits[0];
-        elem.max = limits[1];
+        if(limits) {
+            elem.min = limits[0];
+            elem.max = limits[1];
+        }
 
+        let lastGoodValue;
         const setWithFormat = value => {
+            lastGoodValue = value;
             elem.value = value.toFixed(precision);
         };
 
         setWithFormat(initialValue);
-
-        // Value to return to if the input becomes invalid
-        let lastGoodValue = initialValue;
 
         // Only register for the blur event, because altering the text while the user is
         // trying to edit it is extremely annoying
         elem.addEventListener("blur", () => {
             const newValue = Number.parseFloat(elem.value);
             const safeValue = Number.isNaN(newValue) ? lastGoodValue : newValue;
-            const clampedValue = Math.min(Math.max(safeValue, limits[0]), limits[1]);
-            lastGoodValue = clampedValue;
+            const clampedValue = limits ? Math.min(Math.max(safeValue, limits[0]), limits[1]) :
+                safeValue;
+
             setWithFormat(clampedValue);
         });
     }
@@ -155,14 +186,17 @@ class App {
 
         document.querySelector("#save-button").addEventListener("click", () => {
             if(this.scene) {
-                const data = JSON.stringify(this.scene.toJSONEncodableObj());
-                saveFile(data, "scene.json");
+                saveFile(JSON.stringify(this.scene.toJSONEncodableObj()), "scene.json");
             }
         });
 
-        document.querySelector("#render-button").addEventListener("click", () => this.render());
+        document.querySelector("#render-button").addEventListener("click", () => {
+            this.render();
+        });
 
-        document.querySelector("#add-model-button").addEventListener("click", () => this.addModel());
+        document.querySelector("#add-model-button").addEventListener("click", () => {
+            this.addModel();
+        });
     }
 }
 

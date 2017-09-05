@@ -73,7 +73,7 @@ body {
 .model-grid {
     margin-top: 0.5vw;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto 1fr;
     grid-template-rows: auto auto auto auto;
     grid-gap: 0.5vw;
 }
@@ -157,6 +157,7 @@ input::-webkit-color-swatch-wrapper, input::-webkit-color-swatch {
 .material-component img {
     width: calc(100% - 2 * 0.05vw);
     border: #282828 0.05vw solid;
+    image-rendering: pixelated;
 }
 
 .vec3 {
