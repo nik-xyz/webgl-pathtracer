@@ -33,6 +33,10 @@ class Scene {
         this.models.unshift(model);
     }
 
+    removeModel(model) {
+        this.models.splice(this.models.indexOf(model), 1);
+    }
+
     releaseSceneDate() {
         const resources = [
             this.treeDataTex,

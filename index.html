@@ -26,8 +26,6 @@
         <!-- Clones of model-template get inserted here by JS code -->
     </div>
 
-    <div id="material-list"></div>
-
     <script type="text/javascript" src="src/vec.js"></script>
     <script type="text/javascript" src="src/polygon.js"></script>
     <script type="text/javascript" src="src/material.js"></script>
@@ -44,16 +42,22 @@
 
 <template id="model-template">
     <div class="model">
-        <div class="model-name"></div>
-        <div class="model-grid">
-            <div class="input-label"> Position </div>
-            <div class="model-position"></div>
+        <div class="model-banner">
+            <div class="model-name"></div>
+            <div class="button model-edit-button"></div>
+            <div class="button model-delete-button"> Delete </div>
+        </div>
+        <div class="model-data-section">
+            <div class="model-grid">
+                <div class="input-label"> Position </div>
+                <div class="model-position"></div>
 
-            <div class="input-label"> Scale </div>
-            <div class="model-size"></div>
+                <div class="input-label"> Scale </div>
+                <div class="model-size"></div>
 
-            <div class="input-label"> Material </div>
-            <div class="model-material"></div>
+                <div class="input-label"> Material </div>
+                <div class="model-material"></div>
+            </div>
         </div>
     </div>
 </template>
@@ -71,6 +75,12 @@
 
         <div class="input-label"> Emission </div>
         <div class="material-component material-emission"></div>
+    </div>
+</template>
+
+<template id="material-component-template">
+    <div class="material-component">
+        <div id=""> </div>
     </div>
 </template>
 

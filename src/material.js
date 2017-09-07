@@ -48,6 +48,8 @@ class MaterialComponent {
 }
 
 class Material {
+    static get SPECULARITY_LIMITS() { return [0, 1]; }
+
     static async fromJSONEncodableObj(obj) {
         assertJSONHasKeys(obj, ["specularity", "diffuse", "specular", "emission"]);
 

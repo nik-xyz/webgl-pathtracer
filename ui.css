@@ -70,6 +70,28 @@ body {
     padding: 0.5vw;
 }
 
+.model-banner {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    grid-gap: 0.5vw;
+}
+
+.model-edit-button:after {
+    content: "Edit";
+}
+
+.edit-enabled .model-edit-button:after {
+    content: "Hide";
+}
+
+.model-data-section {
+    display: none;
+}
+
+.edit-enabled .model-data-section {
+    display: block;
+}
+
 .model-grid {
     margin-top: 0.5vw;
     display: grid;
