@@ -66,9 +66,15 @@ class App {
             this.sceneChanged = true;
         };
 
-        fill(".model-name",     document.createTextNode(model.name));
+        const handleNameChange = value => {
+            model.name = value;
+            this.sceneChanged = true;
+        };
+
+
+        fill(".model-name", this.createTextInputElement(model.name, handleNameChange));
         fill(".model-position", this.createVec3InputElement(model.position, handlePositionChange));
-        fill(".model-size",     this.createVec3InputElement(model.size, handleSizeChange));
+        fill(".model-size", this.createVec3InputElement(model.size, handleSizeChange));
         fill(".model-material", this.createMaterialElement(model.material));
 
         elem.querySelector(".model-delete-button").addEventListener("click", () => {
@@ -148,7 +154,20 @@ class App {
                 component.setFlat(new Vec3(0));
             }
 
+            this.sceneChanged = true;
             updateComponent();
+        });
+
+        return elem;
+    }
+
+    createTextInputElement(initialValue, handleChange) {
+        const elem = document.createElement("input");
+        elem.type = "text";
+        elem.value = initialValue;
+
+        elem.addEventListener("change", () => {
+            handleChange(elem.value);
         });
 
         return elem;

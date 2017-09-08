@@ -76,6 +76,20 @@ body {
     grid-gap: 0.5vw;
 }
 
+.model-name {
+    display: grid;
+}
+
+.model-name input {
+    font-size: 1rem;
+    padding: 0 0.2vw;
+    border: none;
+}
+
+.edit-enabled .model-name input {
+    border: #282828 0.05vw solid;
+}
+
 /* Display the text that is appropriate for the current editing state */
 .model-edit-button-disabled-text,
 .edit-enabled .model-edit-button-enabled-text {
@@ -183,6 +197,10 @@ body {
     background-color: #BBB;
 }
 
+.small-button {
+    font-size: 0.8rem;
+}
+
 .input-label {
     color: #222;
 }
@@ -206,7 +224,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 input[type="color"] {
     -webkit-appearance: none;
     border: #282828 0.05vw solid;
-    height: 1.25vw;
+    height: 1.05vw;
     width: 100%;
     cursor: pointer;
 }
