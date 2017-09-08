@@ -18,13 +18,16 @@ class App {
         }
     }
 
-    updateModelList() {
-        const elem = document.querySelector("#model-list");
-
-        // Clear list
+    clearElement(elem) {
         while(elem.lastChild) {
             elem.removeChild(elem.lastChild);
         }
+    }
+
+    updateModelList() {
+        const elem = document.querySelector("#model-list");
+
+        this.clearElement(elem);
 
         for(const model of this.scene.models) {
             elem.appendChild(this.createModelElement(model));
@@ -106,23 +109,49 @@ class App {
         return elem;
     }
 
-    createMaterialComponentElement(materialComponent) {
+    createMaterialComponentElement(component) {
         const handleChange = value => {
-            materialComponent.value = value;
+            component.value = value;
             this.sceneChanged = true;
         };
 
         const template = document.querySelector("#material-component-template").content;
         const elem = document.importNode(template, true);
 
-        if(materialComponent.isFlat) {
-            return this.createColorInputElement(materialComponent.value, handleChange);
-        }
-        else {
-            const img = new Image();
-            img.src = materialComponent.value.src;
-            return img;
-        }
+        const materialElem = elem.querySelector(".material-component");
+        const buttonElem = elem.querySelector(".material-component-button");
+        const valueElem = elem.querySelector(".material-component-value");
+
+        const updateComponent = () => {
+            this.clearElement(valueElem);
+
+            if(component.isFlat) {
+                const flat = this.createColorInputElement(component.value, handleChange);
+                valueElem.appendChild(flat);
+                materialElem.classList.add("material-component-flat");
+            }
+            else {
+                const image = new Image();
+                image.src = component.value.src;
+                valueElem.appendChild(image);
+                materialElem.classList.remove("material-component-flat");
+            }
+        };
+
+        updateComponent();
+
+        buttonElem.addEventListener("click", async () => {
+            if(materialElem.classList.contains("material-component-flat")) {
+                component.setImage(await loadFileAsURL());
+            }
+            else {
+                component.setFlat(new Vec3(0));
+            }
+
+            updateComponent();
+        });
+
+        return elem;
     }
 
     createColorInputElement(initialColor, handleChange) {
@@ -186,10 +215,17 @@ class App {
         });
     }
 
+
+    async loadDemo() {
+        fetch("scenes/scene.json")
+            .then(response => response.text())
+            .then(text => this.loadScene(text));
+    }
+
     async run() {
         this.pt = new PathTracer();
         await this.pt.init();
-        this.pt.setResolution(new Vec2(800, 800));
+        this.pt.setResolution(new Vec2(1000, 1000));
         this.scene = null;
 
         document.querySelector("#render-output").appendChild(this.pt.canvas);

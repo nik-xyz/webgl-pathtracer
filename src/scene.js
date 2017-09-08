@@ -12,9 +12,7 @@ class Scene {
     }
 
     static async fromJSONEncodableObj(gl, obj) {
-        if(["cameraPosition", "models"].some(key => !(key in obj))) {
-            throw new Error("Invalid JSON!");
-        }
+        assertJSONHasKeys(obj, ["cameraPosition", "models"]);
 
         const scene = new Scene(gl);
         scene.cameraPosition = Vec3.fromJSONEncodableObj(obj.cameraPosition).checkNumeric();

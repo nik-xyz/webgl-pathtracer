@@ -21,7 +21,7 @@ struct Material {
 
 vec3 getMaterialArrayTexCoords(vec2 texCoord, vec3 data) {
     vec2 texSize = vec2(textureSize(materialTexArraySampler, 0).xy);
-    return vec3(texCoord * data.yz / texSize, data.x);
+    return vec3(vec2(texCoord.x, 1.0 - texCoord.y) * data.yz / texSize, data.x);
 }
 
 vec3 getMaterialDiffuseValue(Material material, vec2 tex) {

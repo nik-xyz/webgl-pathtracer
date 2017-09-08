@@ -76,12 +76,16 @@ body {
     grid-gap: 0.5vw;
 }
 
-.model-edit-button:after {
-    content: "Edit";
+/* Display the text that is appropriate for the current editing state */
+.model-edit-button-disabled-text,
+.edit-enabled .model-edit-button-enabled-text {
+    display: inline-block;
 }
 
-.edit-enabled .model-edit-button:after {
-    content: "Hide";
+/* Hide text that is not appropriate for the current editing state */
+.edit-enabled .model-edit-button-disabled-text,
+.model-edit-button-enabled-text {
+    display: none;
 }
 
 .model-data-section {
@@ -109,9 +113,50 @@ body {
     font-size: 0.8rem;
     padding: 0.5vw;
     display: grid;
-    grid-template-columns: auto 12vw;
+    grid-template-columns: auto 18vw;
     grid-template-rows: auto auto auto auto;
     grid-gap: 0.5vw;
+}
+
+.material-component {
+    display: grid;
+    grid-gap: 0.5vw;
+    grid-template-columns: auto;
+    grid-template-rows: auto auto;
+}
+
+.material-component-button {
+    width: 96%;
+}
+
+.material-component-value {
+    display: flex;
+}
+
+.material-specularity {
+    border: #282828 0.05vw solid;
+}
+
+.material-component-value img {
+    object-fit: contain;
+    object-position: 50% 50%;
+    background: #DDD;
+    width: calc(100% - 2 * 0.05vw);
+    max-height: 12vw;
+    border: #282828 0.05vw solid;
+    image-rendering: pixelated;
+}
+
+/* Display the text that is appropriate for the material component type */
+.material-component-flat .material-component-button-color-text,
+.material-component-button-image-text {
+    display: inline-block;
+}
+
+/* Hide text that is not appropriate for the material component type */
+.material-component-button-color-text,
+.material-component-flat .material-component-button-image-text {
+    display: none;
 }
 
 .button {
@@ -161,7 +206,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 input[type="color"] {
     -webkit-appearance: none;
     border: #282828 0.05vw solid;
-    height: 1vw;
+    height: 1.25vw;
     width: 100%;
     cursor: pointer;
 }
@@ -170,16 +215,6 @@ input::-webkit-color-swatch-wrapper, input::-webkit-color-swatch {
     padding: 0;
     margin: 0;
     border: none;
-}
-
-.material-specularity {
-    border: #282828 0.05vw solid;
-}
-
-.material-component img {
-    width: calc(100% - 2 * 0.05vw);
-    border: #282828 0.05vw solid;
-    image-rendering: pixelated;
 }
 
 .vec3 {
