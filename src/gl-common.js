@@ -1,5 +1,5 @@
 class ShaderProgram {
-    constructor(gl, shaderData, uniformNames = [], attribNames = []) {
+    constructor(gl, shaderData, uniformNames = []) {
         this.gl = gl;
 
         const shaders = ShaderProgram.createShaders(gl, shaderData);
@@ -19,7 +19,6 @@ class ShaderProgram {
         }
 
         this.setupUniforms(uniformNames);
-        this.setupAttribs(attribNames);
     }
 
     use() {
@@ -63,38 +62,6 @@ class ShaderProgram {
 
             this.uniforms[name] = loc;
         }
-    }
-
-    setupAttribs(names) {
-        this.attribs = {};
-
-        for(const name of names) {
-            const loc = this.gl.getAttribLocation(this.program, name);
-            if(loc === -1) {
-                throw new Error(`Failed to locate attrib ${name}`);
-            }
-
-            this.attribs[name] = loc;
-        }
-    }
-}
-
-class Buffer {
-    constructor(
-        gl, data,
-        type  = WebGL2RenderingContext.ARRAY_BUFFER,
-        usage = WebGL2RenderingContext.STATIC_DRAW
-    ) {
-        this.gl = gl;
-        this.type = type;
-
-        this.buffer = gl.createBuffer();
-        this.bind();
-        gl.bufferData(type, data, usage, 0);
-    }
-
-    bind() {
-        this.gl.bindBuffer(this.type, this.buffer);
     }
 }
 

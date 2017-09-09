@@ -2,7 +2,6 @@ class PathTracer {
     async init() {
         this.createContext();
         await this.createShader();
-        this.createVertexData();
         this.reset();
 
         this.randomGen = new RandomGen(this.gl);
@@ -11,7 +10,6 @@ class PathTracer {
 
     createContext() {
         // Disable features that intefere with pixel transfer operations
-        // or are not needed
         const attribs = {
             antialias: false,
             depth:     false,
@@ -65,15 +63,7 @@ class PathTracer {
             [this.gl.VERTEX_SHADER, vertexSource],
             [this.gl.FRAGMENT_SHADER, fragmentSource]
         ];
-        this.program = new ShaderProgram(this.gl, sourcesData, uniformData, ["vertPos"]);
-    }
-
-    createVertexData() {
-        this.vbo = new Buffer(this.gl, new Float32Array(
-            [-1, -1, -1, +1, +1, +1, +1, +1, +1, -1, -1, -1]
-        ));
-        this.vao = new VertexArray(this.gl);
-        this.vao.setupAttrib(this.program.uniforms.vertPos, this.vbo, 2, this.gl.FLOAT);
+        this.program = new ShaderProgram(this.gl, sourcesData, uniformData, []);
     }
 
     reset() {
@@ -135,7 +125,6 @@ class PathTracer {
         gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
 
         // Render
-        this.vao.bind();
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         gl.finish();
     }
