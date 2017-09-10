@@ -2,6 +2,8 @@
     font-family: sans-serif;
     margin: 0;
     padding: 0;
+    background-color: inherit;
+    color: inherit;
 }
 
 html {
@@ -14,6 +16,7 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    background-color: #D8D8D8;
 
     display: grid;
     grid-template-columns: auto 50vw 30vw auto;
@@ -22,29 +25,21 @@ body {
     padding: 0.5vw;
 }
 
-#render-controls {
-    grid-area: 1 / 2;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    grid-gap: 0.5vw;
+#render-output {
+    grid-area: 1 / 2 / span 2 / span 1;
+    display: flex;
 }
 
-#scene-controls {
-    grid-area: 1 / 3;
+#controls {
+    grid-area: 1 / 3 / 2 / 4;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: auto auto;
     grid-gap: 0.5vw;
 }
 
-#render-output {
-    grid-area: 2 / 2;
-    display: flex;
-}
-
 #model-list {
-    grid-area: 2 / 3;
+    grid-area: 2 / 3 / 3 / 4;
     display: block;
     max-height: 100%;
     max-width: 100%;
@@ -53,21 +48,19 @@ body {
 
 #render-output canvas {
     object-fit: contain;
+    object-position: 50% 0%;
     width: 100%;
     height: 100%;
-
     image-rendering: pixelated;
 }
 
-#add-model-button {
-    grid-area: 2 / 1 / 3 / 4;
-}
-
 .model {
-    border: #282828 0.05vw solid;
     font-size: 0.8rem;
-    margin-bottom: 0.5vw;
     padding: 0.5vw;
+    margin-bottom: 0.5vw;
+    border: #282828 0.05vw solid;
+    border-radius: 0.2vw;
+    background-color: #AAA;
 }
 
 .model-banner {
@@ -82,11 +75,17 @@ body {
 
 .model-name input {
     font-size: 1rem;
+    text-shadow: 0 0 0.2vw #CCC;
     padding: 0 0.2vw;
     border: none;
 }
 
+.model-name input {
+    background-color: inherit;
+}
+
 .edit-enabled .model-name input {
+    background-color: #FFF;
     border: #282828 0.05vw solid;
 }
 
@@ -114,7 +113,6 @@ body {
     margin-top: 0.5vw;
     display: grid;
     grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto auto auto;
     grid-gap: 0.5vw;
 }
 
@@ -122,20 +120,11 @@ body {
     font-size: 1rem;
 }
 
-.material {
-    border: #282828 0.05vw solid;
-    font-size: 0.8rem;
-    padding: 0.5vw;
-    display: grid;
-    grid-template-columns: auto 18vw;
-    grid-template-rows: auto auto auto auto;
-    grid-gap: 0.5vw;
-}
-
 .material-component {
+    margin-right: calc(0.5vw - 0.1vw);
     display: grid;
-    grid-gap: 0.5vw;
-    grid-template-columns: auto;
+    grid-column-gap: 0.5vw;
+    grid-template-columns: 2.18fr 1fr;
     grid-template-rows: auto auto;
 }
 
@@ -154,7 +143,7 @@ body {
 .material-component-value img {
     object-fit: contain;
     object-position: 50% 50%;
-    background: #DDD;
+    background: #FFF;
     width: calc(100% - 2 * 0.05vw);
     max-height: 12vw;
     border: #282828 0.05vw solid;
@@ -184,25 +173,32 @@ body {
     font-size: 1rem;
     text-align: center;
 
+    border-radius: 0.2vw;
     border: #282828 0.05vw solid;
-    background-color: #DDD;
-    color: #282828;
+    background-color: #FFF;
 }
 
 .button:hover {
-    background-color: #CCC;
+    background-color: #DDD;
 }
 
 .button:active {
-    background-color: #BBB;
+    background-color: #CCC;
 }
 
 .small-button {
     font-size: 0.8rem;
+    padding: 0.23vw 0.3vw 0.27vw 0.3vw;
 }
 
 .input-label {
     color: #222;
+}
+
+input {
+    border-radius: 0.2vw;
+    border: #282828 0.05vw solid;
+    background-color: #FFF;
 }
 
 input:focus {
@@ -212,7 +208,7 @@ input:focus {
 input[type="number"] {
     text-align: right;
     font-size: 0.8rem;
-    padding: 0 0.2vw;
+    padding: 0.1vw 0.2vw 0.1vw 0.2vw;
 }
 
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
@@ -223,8 +219,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 
 input[type="color"] {
     -webkit-appearance: none;
-    border: #282828 0.05vw solid;
-    height: 1.05vw;
+    height: 1.11vw;
     width: 100%;
     cursor: pointer;
 }
@@ -233,6 +228,7 @@ input::-webkit-color-swatch-wrapper, input::-webkit-color-swatch {
     padding: 0;
     margin: 0;
     border: none;
+    border-radius: 0.15vw;
 }
 
 .vec3 {
@@ -244,18 +240,22 @@ input::-webkit-color-swatch-wrapper, input::-webkit-color-swatch {
 
 .vec3-component {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 0.5vw 1fr;
     grid-template-rows: 1fr;
     border: #282828 0.05vw solid;
     padding-left: 0.2vw;
+    border-radius: 0.2vw;
+    background-color: #FFF;
+    cursor: text;
 }
 
 .vec3-component-label {
     margin: 0;
+    padding: 0.1vw 0vw 0.1vw 0vw;
     color: #777;
 }
 
 .vec3-component-value {
     border: none;
-    width: 5vw;
+    width: calc(100% - 0.4vw);
 }

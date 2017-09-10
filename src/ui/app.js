@@ -1,8 +1,14 @@
 class App {
     async loadScene(encoded) {
-        this.scene = await Scene.fromJSONEncodableObj(this.pt.gl, JSON.parse(encoded));
-        this.updateModelList();
-        this.sceneChanged = true;
+        try {
+            const newScene = await Scene.fromJSONEncodableObj(this.pt.gl, JSON.parse(encoded));
+            this.scene = newScene;
+            this.updateModelList();
+            this.sceneChanged = true;
+        }
+        catch(err) {
+            alert(`Failed to load scene:\n${err.message}`);
+        }
     }
 
     render() {
@@ -35,19 +41,23 @@ class App {
     }
 
     async addModel() {
-        const text = await loadFileText();
-        const model = await ModelInstance.fromJSONEncodableObj({
-            name:     "Unnamed Model",
-            model:    text,
-            material: Material.DEFAULT_MATERIAL_JSON,
-            position: ModelInstance.DEFAULT_POSITION.array(),
-            size:     ModelInstance.DEFAULT_SIZE.array()
-        });
+        try {
+            const model = await ModelInstance.fromJSONEncodableObj({
+                name:     "Unnamed Model",
+                model:    await loadFileText(),
+                material: Material.DEFAULT_MATERIAL_JSON,
+                position: ModelInstance.DEFAULT_POSITION.array(),
+                size:     ModelInstance.DEFAULT_SIZE.array()
+            });
 
-        this.scene.addModelAtStart(model);
-        this.updateModelList();
+            this.scene.addModelAtStart(model);
+            this.updateModelList();
 
-        this.sceneChanged = true;
+            this.sceneChanged = true;
+        }
+        catch(err) {
+            alert(`Failed to load model:\n${err.message}`);
+        }
     }
 
     createModelElement(model) {
@@ -75,7 +85,7 @@ class App {
         fill(".model-name", this.createTextInputElement(model.name, handleNameChange));
         fill(".model-position", this.createVec3InputElement(model.position, handlePositionChange));
         fill(".model-size", this.createVec3InputElement(model.size, handleSizeChange));
-        fill(".model-material", this.createMaterialElement(model.material));
+        fill(".model-grid", this.createMaterialElement(model.material));
 
         elem.querySelector(".model-delete-button").addEventListener("click", () => {
             if(confirm(`Delete ${model.name}?`)) {

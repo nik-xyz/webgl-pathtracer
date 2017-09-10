@@ -6,15 +6,11 @@
 </head>
 <body>
 
-
-    <div id="render-controls">
-        <div class="button" id="render-button"> Render </div>
-    </div>
-
-    <div id="scene-controls">
+    <div id="controls">
         <div class="button" id="load-button"> Load Scene File </div>
         <div class="button" id="load-default-button"> Load Demo </div>
         <div class="button" id="save-button"> Save </div>
+            <div class="button" id="render-button"> Render </div>
         <div class="button" id="add-model-button"> Add Model </div>
     </div>
 
@@ -57,35 +53,29 @@
 
                 <div class="input-label"> Scale </div>
                 <div class="model-size"></div>
-
-                <div class="input-label"> Material </div>
-                <div class="model-material"></div>
             </div>
         </div>
     </div>
 </template>
 
 <template id="material-template">
-    <div class="material">
-        <div class="input-label"> Specularity </div>
-        <input type="number" class="material-specularity" />
+    <div class="input-label"> Specularity </div>
+    <input type="number" class="material-specularity" />
 
-        <div class="input-label"> Diffuse </div>
-        <div class="material-diffuse"></div>
+    <div class="input-label"> Diffuse </div>
+    <div class="material-diffuse"></div>
 
-        <div class="input-label"> Specular </div>
-        <div class="material-specular"></div>
+    <div class="input-label"> Specular </div>
+    <div class="material-specular"></div>
 
-        <div class="input-label"> Emission </div>
-        <div class="material-emission"></div>
-    </div>
+    <div class="input-label"> Emission </div>
+    <div class="material-emission"></div>
 </template>
 
 <template id="material-component-template">
     <div class="material-component">
-        <div>
-            <div class="material-component-value"> </div>
-        </div>
+
+        <div class="material-component-value"> </div>
         <div>
             <div class="button small-button material-component-button">
                 <span class="material-component-button-color-text"> Use Image Instead </span>
@@ -97,18 +87,24 @@
 
 <template id="vec3-template">
     <div class="vec3">
-        <div class="vec3-component">
-            <div class="vec3-component-label"> X </div>
-            <input type="number" class="vec3-x vec3-component-value" />
-        </div>
-        <div class="vec3-component">
-            <div class="vec3-component-label"> Y </div>
-            <input type="number" class="vec3-y vec3-component-value" />
-        </div>
-        <div class="vec3-component">
-            <div class="vec3-component-label"> Z </div>
-            <input type="number" class="vec3-z vec3-component-value" />
-        </div>
+        <label>
+            <div class="vec3-component">
+                <div class="vec3-component-label"> X </div>
+                <input type="number" class="vec3-x vec3-component-value" />
+            </div>
+        </label>
+        <label>
+            <div class="vec3-component">
+                <div class="vec3-component-label"> Y </div>
+                <input type="number" class="vec3-y vec3-component-value" />
+            </div>
+        </label>
+        <label>
+            <div class="vec3-component">
+                <div class="vec3-component-label"> Z </div>
+                <input type="number" class="vec3-z vec3-component-value" />
+            </div>
+        </label>
     </div>
 </template>
 
