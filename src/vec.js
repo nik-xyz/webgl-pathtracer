@@ -11,6 +11,7 @@ class Vec {
     scale(amt)  { return this.map(val => val * amt); }
     dist(other) { return this.sub(other).length(); }
     length()    { return Math.sqrt(this.dot(this)); }
+    normalize() { return this.scale(1 / this.length()); }
 
     reduce(fn)  { return this.array().reduce(fn); }
 
@@ -28,7 +29,7 @@ class Vec2 extends Vec {
         [this.x, this.y] = [x, y];
     }
 
-    static fromJSONEncodableObj(obj) {
+    static fromJSON(obj) {
         if((0 in obj) && (1 in obj)) {
             return new Vec2(obj[0], obj[1]);
         }
@@ -46,6 +47,15 @@ class Vec2 extends Vec {
     array() {
         return [this.x, this.y];
     }
+
+    rotate(angle) {
+        const cosAngle = Math.cos(angle);
+        const sinAngle = Math.sin(angle);
+        return new Vec2(
+            this.x * cosAngle - this.y * sinAngle,
+            this.x * sinAngle + this.y * cosAngle
+        );
+    }
 }
 
 class Vec3 extends Vec {
@@ -54,7 +64,7 @@ class Vec3 extends Vec {
         [this.x, this.y, this.z] = [x, y, z];
     }
 
-    static fromJSONEncodableObj(obj) {
+    static fromJSON(obj) {
         if((0 in obj) && (1 in obj) && (2 in obj)) {
             return new Vec3(obj[0], obj[1], obj[2]);
         }
@@ -71,5 +81,24 @@ class Vec3 extends Vec {
 
     array() {
         return [this.x, this.y, this.z];
+    }
+
+    rotateX(angle) {
+        const rotated = new Vec2(this.y, this.z).rotate(angle);
+        return new Vec3(this.x, rotated.x, rotated.y);
+    }
+
+    rotateY(angle) {
+        const rotated = new Vec2(this.x, this.z).rotate(angle);
+        return new Vec3(rotated.x, this.y, rotated.y);
+    }
+
+    rotateZ(angle) {
+        const rotated = new Vec2(this.x, this.y).rotate(angle);
+        return new Vec3(rotated.x, rotated.y, this.z);
+    }
+
+    rotateEuler(angles) {
+        return this.rotateX(angles.x).rotateY(angles.y).rotateZ(angles.z);
     }
 }

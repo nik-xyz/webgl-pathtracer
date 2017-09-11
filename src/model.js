@@ -10,11 +10,11 @@ class Model {
         this.parseLines();
     }
 
-    toJSONEncodableObj() {
+    toJSON() {
         return this.data;
     }
 
-    static fromJSONEncodableObj(obj) {
+    static fromJSON(obj) {
         if(typeof obj !== "string") {
             throw new Error("invalid JSON");
         }
@@ -23,11 +23,9 @@ class Model {
     }
 
     getTriangles(transforms, materialIndex) {
-        return (
-            this.getFaces(transforms, materialIndex)
+        return this.getFaces(transforms, materialIndex)
             .map(poly => poly.triangulate())
-            .reduce((a, b) => a.concat(b))
-        );
+            .reduce((a, b) => a.concat(b));
     }
 
     getFaces(transforms, materialIndex) {

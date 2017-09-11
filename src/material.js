@@ -1,11 +1,11 @@
 // Represents an element of material that can either be a constant value or a texture
 class MaterialComponent {
-    static async fromJSONEncodableObj(obj) {
+    static async fromJSON(obj) {
         assertJSONHasKeys(obj, ["flat", "value"]);
 
         const component = new MaterialComponent();
         if(obj.flat) {
-            component.setFlat(Vec3.fromJSONEncodableObj(obj.value));
+            component.setFlat(Vec3.fromJSON(obj.value));
         }
         else {
             await component.setImage(obj.value);
@@ -13,7 +13,7 @@ class MaterialComponent {
         return component;
     }
 
-    toJSONEncodableObj() {
+    toJSON() {
         return {
             flat:  this.isFlat,
             value: this.isFlat ? this.value.array() : this.value.src
@@ -50,7 +50,7 @@ class MaterialComponent {
 class Material {
     static get SPECULARITY_LIMITS() { return [0, 1]; }
 
-    static async fromJSONEncodableObj(obj) {
+    static async fromJSON(obj) {
         assertJSONHasKeys(obj, ["specularity", "diffuse", "specular", "emission"]);
 
         if(!Number.isFinite(obj.specularity)) {
@@ -59,19 +59,19 @@ class Material {
 
         const material = new Material();
         material.specularity = obj.specularity;
-        material.diffuse  = await MaterialComponent.fromJSONEncodableObj(obj.diffuse);
-        material.specular = await MaterialComponent.fromJSONEncodableObj(obj.specular);
-        material.emission = await MaterialComponent.fromJSONEncodableObj(obj.emission);
+        material.diffuse  = await MaterialComponent.fromJSON(obj.diffuse);
+        material.specular = await MaterialComponent.fromJSON(obj.specular);
+        material.emission = await MaterialComponent.fromJSON(obj.emission);
 
         return material;
     }
 
-    toJSONEncodableObj() {
+    toJSON() {
         return {
             specularity: this.specularity,
-            diffuse:     this.diffuse.toJSONEncodableObj(),
-            specular:    this.specular.toJSONEncodableObj(),
-            emission:    this.emission.toJSONEncodableObj()
+            diffuse:     this.diffuse.toJSON(),
+            specular:    this.specular.toJSON(),
+            emission:    this.emission.toJSON()
         };
     }
 

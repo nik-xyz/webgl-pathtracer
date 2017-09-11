@@ -13,5 +13,7 @@ uniform uvec2 randomBufferAddrData;
 uniform highp sampler2DArray materialTexArraySampler;
 
 uniform vec3 cameraPosition;
+uniform mat3 cameraProjectionMatrix;
+
 uniform vec2 subPixelJitter;
 uniform highp float compositeAlpha;

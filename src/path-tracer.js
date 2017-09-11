@@ -109,7 +109,8 @@ class PathTracer {
 
         this.randomGen.createRandomData();
         this.randomGen.bind(this.program);
-        scene.bind(this.program);
+        scene.bindSceneData(this.program);
+        scene.camera.bindCamera(gl, this.program, this.frameRes.x / this.frameRes.y);
 
         this.setJitter();
         this.setAlpha();

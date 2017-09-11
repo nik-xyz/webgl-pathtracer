@@ -19,8 +19,8 @@ body {
     background-color: #D8D8D8;
 
     display: grid;
-    grid-template-columns: auto 50vw 30vw auto;
-    grid-template-rows: auto 1fr;
+    grid-template-columns: auto 98vh 30vw auto;
+    grid-template-rows: auto 1fr 0.5vw;
     grid-gap: 0.5vw;
     padding: 0.5vw;
 }
@@ -61,6 +61,10 @@ body {
     border: #282828 0.05vw solid;
     border-radius: 0.2vw;
     background-color: #AAA;
+}
+
+.model:last-child {
+    margin-bottom: 0;
 }
 
 .model-banner {

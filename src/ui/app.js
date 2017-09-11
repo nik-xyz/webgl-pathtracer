@@ -1,7 +1,7 @@
 class App {
     async loadScene(encoded) {
         try {
-            const newScene = await Scene.fromJSONEncodableObj(this.pt.gl, JSON.parse(encoded));
+            const newScene = await Scene.fromJSON(this.pt.gl, JSON.parse(encoded));
             this.scene = newScene;
             this.updateModelList();
             this.sceneChanged = true;
@@ -30,6 +30,7 @@ class App {
         }
     }
 
+
     updateModelList() {
         const elem = document.querySelector("#model-list");
 
@@ -42,7 +43,7 @@ class App {
 
     async addModel() {
         try {
-            const model = await ModelInstance.fromJSONEncodableObj({
+            const model = await ModelInstance.fromJSON({
                 name:     "Unnamed Model",
                 model:    await loadFileText(),
                 material: Material.DEFAULT_MATERIAL_JSON,
@@ -190,10 +191,12 @@ class App {
             .map(a => ("00" + a.toString(16)).substr(-2))
             .reduce((a, b) => a + b);
 
-        const colorAsVec = hex => Vec3.fromJSONEncodableObj([1, 3, 5]
-            .map(index => hex.substr(index, 2))
-            .map(num   => Number.parseInt(num, 16) / 255.0)
-        );
+        const colorAsVec = hex => {
+            const rgb = [1, 3, 5]
+                .map(index => hex.substr(index, 2))
+                .map(num   => Number.parseInt(num, 16) / 255.0);
+            return new Vec3(...rgb);
+        }
 
         const elem = document.createElement("input");
         elem.type = "color";
@@ -265,7 +268,7 @@ class App {
 
         document.querySelector("#save-button").addEventListener("click", () => {
             if(this.scene) {
-                saveFile(JSON.stringify(this.scene.toJSONEncodableObj()), "scene.json");
+                saveFile(JSON.stringify(this.scene.toJSON()), "scene.json");
             }
         });
 

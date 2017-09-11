@@ -3,24 +3,24 @@ class ModelInstance {
     static get DEFAULT_POSITION() { return new Vec3(0); }
     static get DEFAULT_SIZE()     { return new Vec3(1); }
 
-    static async fromJSONEncodableObj(obj) {
+    static async fromJSON(obj) {
         assertJSONHasKeys(obj, ["name", "model", "material", "position", "size"]);
 
         const model    = new ModelInstance();
         model.name     = obj.name;
-        model.model    = Model.fromJSONEncodableObj(obj.model);
-        model.material = await Material.fromJSONEncodableObj(obj.material);
-        model.position = Vec3.fromJSONEncodableObj(obj.position).checkNumeric();
-        model.size     = Vec3.fromJSONEncodableObj(obj.size).checkNumeric();
+        model.model    = Model.fromJSON(obj.model);
+        model.material = await Material.fromJSON(obj.material);
+        model.position = Vec3.fromJSON(obj.position).checkNumeric();
+        model.size     = Vec3.fromJSON(obj.size).checkNumeric();
 
         return model;
     }
 
-    toJSONEncodableObj() {
+    toJSON() {
         return {
             name:     this.name,
-            model:    this.model.toJSONEncodableObj(),
-            material: this.material.toJSONEncodableObj(),
+            model:    this.model.toJSON(),
+            material: this.material.toJSON(),
             position: this.position.array(),
             size:     this.size.array()
         };

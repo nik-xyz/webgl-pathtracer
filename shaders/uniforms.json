@@ -9,6 +9,7 @@
     "randomBufferAddrData",
     "materialTexArraySampler",
     "cameraPosition",
+    "cameraProjectionMatrix",
     "subPixelJitter",
     "compositeAlpha"
 ]

@@ -1,26 +1,24 @@
 class Scene {
-    constructor(gl) {
-        this.gl = gl;
-        this.models = [];
-    }
+    static async fromJSON(gl, json) {
+        assertJSONHasKeys(json, ["camera", "models"]);
 
-    toJSONEncodableObj() {
-        return  {
-            cameraPosition: this.cameraPosition.array(),
-            models: this.models.map(model => model.toJSONEncodableObj())
-        };
-    }
+        const scene = new Scene();
+        scene.gl = gl;
+        scene.models = [];
 
-    static async fromJSONEncodableObj(gl, obj) {
-        assertJSONHasKeys(obj, ["cameraPosition", "models"]);
-
-        const scene = new Scene(gl);
-        scene.cameraPosition = Vec3.fromJSONEncodableObj(obj.cameraPosition).checkNumeric();
-
-        for(const modelObj of obj.models) {
-            scene.addModel(await ModelInstance.fromJSONEncodableObj(modelObj));
+        scene.camera = Camera.fromJSON(json.camera);
+        for(const modelObj of json.models) {
+            scene.addModel(await ModelInstance.fromJSON(modelObj));
         }
+
         return scene;
+    }
+
+    toJSON() {
+        return {
+            camera: this.camera.toJSON(),
+            models: this.models.map(model => model.toJSON())
+        };
     }
 
     addModel(model) {
@@ -84,7 +82,7 @@ class Scene {
         this.materialDataTex = new DataTexture(this.gl, this.gl.FLOAT, materialData);
     }
 
-    bind(program) {
+    bindSceneData(program) {
         const gl = this.gl;
         const uniforms = program.uniforms;
 
@@ -105,7 +103,5 @@ class Scene {
             this.materialTexArray.bind(gl.TEXTURE4);
             gl.uniform1i(uniforms.materialTexArraySampler, 4);
         }
-
-        gl.uniform3fv(uniforms.cameraPosition, this.cameraPosition.array());
     }
 }
