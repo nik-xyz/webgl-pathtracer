@@ -16,30 +16,38 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background-color: #D8D8D8;
+    background-color: #EEE;
 
     display: grid;
     grid-template-columns: auto 98vh 30vw auto;
-    grid-template-rows: auto 1fr 0.5vw;
+    grid-template-rows: auto auto 1fr;
     grid-gap: 0.5vw;
     padding: 0.5vw;
 }
 
 #render-output {
-    grid-area: 1 / 2 / span 2 / span 1;
+    grid-area: 1 / 2 / span 3 / span 1;
     display: flex;
 }
 
 #controls {
-    grid-area: 1 / 3 / 2 / 4;
+    grid-area: 1 / 3 / span 1 / span 1;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: auto auto;
     grid-gap: 0.5vw;
 }
 
+#camera-container {
+    grid-area: 2 / 3 / span 1 / span 1;
+    display: block;
+    max-height: 100%;
+    max-width: 100%;
+    overflow-y: auto;
+}
+
 #model-list {
-    grid-area: 2 / 3 / 3 / 4;
+    grid-area: 3 / 3 / span 1 / span 1;
     display: block;
     max-height: 100%;
     max-width: 100%;
@@ -60,7 +68,7 @@ body {
     margin-bottom: 0.5vw;
     border: #282828 0.05vw solid;
     border-radius: 0.2vw;
-    background-color: #AAA;
+    background-color: #CCC;
 }
 
 .model:last-child {
@@ -136,12 +144,9 @@ body {
     width: 96%;
 }
 
-.material-component-value {
-    display: flex;
-}
-
+.material-component-value,
 .material-specularity {
-    border: #282828 0.05vw solid;
+    display: flex;
 }
 
 .material-component-value img {
@@ -182,6 +187,29 @@ body {
     background-color: #FFF;
 }
 
+.camera {
+    font-size: 0.8rem;
+    padding: 0.5vw;
+    border: #282828 0.05vw solid;
+    border-radius: 0.2vw;
+    background-color: #CCC;
+}
+
+.camera-title {
+    font-size: 1rem;
+    margin-bottom: 0.5vw;
+}
+
+.camera-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-gap: 0.5vw;
+}
+
+.camera-fovy {
+    display: flex;
+}
+
 .button:hover {
     background-color: #DDD;
 }
@@ -197,42 +225,6 @@ body {
 
 .input-label {
     color: #222;
-}
-
-input {
-    border-radius: 0.2vw;
-    border: #282828 0.05vw solid;
-    background-color: #FFF;
-}
-
-input:focus {
-    outline: none;
-}
-
-input[type="number"] {
-    text-align: right;
-    font-size: 0.8rem;
-    padding: 0.1vw 0.2vw 0.1vw 0.2vw;
-}
-
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    padding: 0;
-    margin: 0;
-}
-
-input[type="color"] {
-    -webkit-appearance: none;
-    height: 1.11vw;
-    width: 100%;
-    cursor: pointer;
-}
-
-input::-webkit-color-swatch-wrapper, input::-webkit-color-swatch {
-    padding: 0;
-    margin: 0;
-    border: none;
-    border-radius: 0.15vw;
 }
 
 .vec3 {
@@ -260,6 +252,48 @@ input::-webkit-color-swatch-wrapper, input::-webkit-color-swatch {
 }
 
 .vec3-component-value {
-    border: none;
+    display: grid;
     width: calc(100% - 0.4vw);
+}
+
+.vec3-component-value input {
+    width: 100%;
+    border: none;
+}
+
+input {
+    border-radius: 0.2vw;
+    border: #282828 0.05vw solid;
+    background-color: #FFF;
+}
+
+input:focus {
+    outline: none;
+}
+
+input[type="number"] {
+    width: 100%;
+    text-align: right;
+    font-size: 0.8rem;
+    padding: 0.1vw 0.2vw 0.1vw 0.2vw;
+}
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    padding: 0;
+    margin: 0;
+}
+
+input[type="color"] {
+    -webkit-appearance: none;
+    height: 1.11vw;
+    width: 100%;
+    cursor: pointer;
+}
+
+input::-webkit-color-swatch-wrapper, input::-webkit-color-swatch {
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0.15vw;
 }

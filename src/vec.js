@@ -98,7 +98,10 @@ class Vec3 extends Vec {
         return new Vec3(rotated.x, rotated.y, this.z);
     }
 
-    rotateEuler(angles) {
+    rotateEuler(angles, convertFromDegrees = false) {
+        if(convertFromDegrees) {
+            angles = angles.scale(Math.PI / 180);
+        }
         return this.rotateX(angles.x).rotateY(angles.y).rotateZ(angles.z);
     }
 }

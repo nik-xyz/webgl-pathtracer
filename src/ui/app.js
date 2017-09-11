@@ -3,11 +3,37 @@ class App {
         try {
             const newScene = await Scene.fromJSON(this.pt.gl, JSON.parse(encoded));
             this.scene = newScene;
-            this.updateModelList();
+            this.updateUI();
             this.sceneChanged = true;
         }
         catch(err) {
-            alert(`Failed to load scene:\n${err.message}`);
+            alert(`Failed to load scene:\n${err.message}`);throw err
+        }
+    }
+
+    async loadDemo() {
+        fetch("scenes/scene.json")
+            .then(response => response.text())
+            .then(text => this.loadScene(text));
+    }
+
+    async addModel() {
+        try {
+            const model = await ModelInstance.fromJSON({
+                name:     "Unnamed Model",
+                model:    await loadFileText(),
+                material: Material.DEFAULT_MATERIAL_JSON,
+                position: ModelInstance.DEFAULT_POSITION.array(),
+                size:     ModelInstance.DEFAULT_SIZE.array()
+            });
+
+            this.scene.addModelAtStart(model);
+            this.updateUI();
+
+            this.sceneChanged = true;
+        }
+        catch(err) {
+            alert(`Failed to load model:\n${err.message}`);
         }
     }
 
@@ -24,74 +50,85 @@ class App {
         }
     }
 
+
     clearElement(elem) {
         while(elem.lastChild) {
             elem.removeChild(elem.lastChild);
         }
     }
 
+    updateUI() {
+        const cameraContainer = document.querySelector("#camera-container");
+        const modelContainer = document.querySelector("#model-list");
 
-    updateModelList() {
-        const elem = document.querySelector("#model-list");
+        this.clearElement(cameraContainer);
+        this.clearElement(modelContainer);
 
-        this.clearElement(elem);
+        cameraContainer.appendChild(this.createCameraElement(this.scene.camera));
 
         for(const model of this.scene.models) {
-            elem.appendChild(this.createModelElement(model));
+            modelContainer.appendChild(this.createModelElement(model));
         }
     }
 
-    async addModel() {
-        try {
-            const model = await ModelInstance.fromJSON({
-                name:     "Unnamed Model",
-                model:    await loadFileText(),
-                material: Material.DEFAULT_MATERIAL_JSON,
-                position: ModelInstance.DEFAULT_POSITION.array(),
-                size:     ModelInstance.DEFAULT_SIZE.array()
-            });
+    createCameraElement(camera) {
+        const template = document.querySelector("#camera-template").content;
+        const elem = document.importNode(template, true);
 
-            this.scene.addModelAtStart(model);
-            this.updateModelList();
+        const fill = (selector, value) => elem.querySelector(selector).appendChild(value);
 
+        fill(".camera-position", this.createVec3InputElement(camera.position, value => {
+            camera.position = value;
             this.sceneChanged = true;
-        }
-        catch(err) {
-            alert(`Failed to load model:\n${err.message}`);
-        }
+        }));
+
+        fill(".camera-rotation", this.createVec3InputElement(camera.rotation, value => {
+            camera.rotation = value;
+            this.sceneChanged = true;
+        }));
+
+        const handleFovyChange = value => {
+            camera.fovy = value;
+            this.sceneChanged = true;
+        };
+        fill(".camera-fovy", this.createNumberInputElement(
+            camera.fovy, Camera.FOVY_RANGE, 2, handleFovyChange
+        ));
+
+        return elem;
     }
 
     createModelElement(model) {
         const template = document.querySelector("#model-template").content;
         const elem = document.importNode(template, true);
-
         const fill = (selector, value) => elem.querySelector(selector).appendChild(value);
 
-        const handlePositionChange = value => {
-            model.position = value;
-            this.sceneChanged = true;
-        };
-
-        const handleSizeChange = value => {
-            model.size = value;
-            this.sceneChanged = true;
-        };
-
-        const handleNameChange = value => {
+        fill(".model-name", this.createTextInputElement(model.name, value => {
             model.name = value;
             this.sceneChanged = true;
-        };
+        }));
 
+        fill(".model-position", this.createVec3InputElement(model.position, value => {
+            model.position = value;
+            this.sceneChanged = true;
+        }));
 
-        fill(".model-name", this.createTextInputElement(model.name, handleNameChange));
-        fill(".model-position", this.createVec3InputElement(model.position, handlePositionChange));
-        fill(".model-size", this.createVec3InputElement(model.size, handleSizeChange));
+        fill(".model-rotation", this.createVec3InputElement(model.rotation, value => {
+            model.rotation = value;
+            this.sceneChanged = true;
+        }));
+
+        fill(".model-size", this.createVec3InputElement(model.size, value => {
+            model.size = value;
+            this.sceneChanged = true;
+        }));
+
         fill(".model-grid", this.createMaterialElement(model.material));
 
         elem.querySelector(".model-delete-button").addEventListener("click", () => {
             if(confirm(`Delete ${model.name}?`)) {
                 this.scene.removeModel(model);
-                this.updateModelList();
+                this.updateUI();
                 this.sceneChanged = true;
             }
         });
@@ -108,17 +145,16 @@ class App {
         const template = document.querySelector("#material-template").content;
         const elem = document.importNode(template, true);
 
-        const specularityElem = elem.querySelector(".material-specularity");
-        this.enforceNumberInputFormat(
-            specularityElem, material.specularity, Material.SPECULARITY_LIMITS, 3);
-
-        specularityElem.addEventListener("change", () => {
-            material.specularity = Number.parseFloat(specularityElem.value);
-            this.sceneChanged = true;
-        });
-
         const fill = (selector, value) => elem.querySelector(selector).appendChild(value);
 
+        const handleSpecularityChange = value => {
+            material.specularity = value;
+            this.sceneChanged = true;
+        };
+
+        fill(".material-specularity", this.createNumberInputElement(
+            material.specularity, Material.SPECULARITY_RANGE, 3, handleSpecularityChange
+        ));
         fill(".material-diffuse",  this.createMaterialComponentElement(material.diffuse));
         fill(".material-specular", this.createMaterialComponentElement(material.specular));
         fill(".material-emission", this.createMaterialComponentElement(material.emission));
@@ -209,49 +245,50 @@ class App {
         return elem;
     }
 
-    createVec3InputElement(vec, handleChange, precision = 5) {
+    createVec3InputElement(currentValue, handleChange, precision = 5) {
         const template = document.querySelector("#vec3-template").content;
-        const vec3Elem = document.importNode(template, true);
-
-        let currentValue = vec;
+        const elem = document.importNode(template, true);
+        const fill = (selector, value) => elem.querySelector(selector).appendChild(value);
 
         for(let axis of ["x", "y", "z"]) {
-            const component = vec3Elem.querySelector(`.vec3-${axis}`);
-            const limits = [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY];
-            this.enforceNumberInputFormat(component, currentValue[axis], limits, precision);
+            const input = this.createNumberInputElement(
+                currentValue[axis],
+                [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY],
+                precision,
+                axisValue => {
+                    currentValue[axis] = axisValue;
+                    handleChange(currentValue);
+                }
+            );
 
-            component.addEventListener("blur", () => {
-                currentValue[axis] = Number.parseFloat(component.value);
-                handleChange(currentValue);
-            });
+            fill(`.vec3-${axis}`, input);
         }
 
-        return vec3Elem;
+        return elem;
     }
 
-    enforceNumberInputFormat(elem, initialValue, limits, precision) {
-        let lastGoodValue;
+    createNumberInputElement(currentValue, limits, precision, handleChange) {
+        const elem = document.createElement("input");
+        elem.type = "number";
+
         const setWithFormat = value => {
-            lastGoodValue = value;
+            currentValue = value;
             elem.value = value.toFixed(precision);
         };
 
-        setWithFormat(initialValue);
+        setWithFormat(currentValue);
 
         elem.addEventListener("blur", () => {
             const newValue = Number.parseFloat(elem.value);
-            const safeValue = Number.isNaN(newValue) ? lastGoodValue : newValue;
+            const safeValue = Number.isNaN(newValue) ? currentValue : newValue;
             const clampedValue = Math.min(Math.max(safeValue, limits[0]), limits[1]);
 
             setWithFormat(clampedValue);
+
+            handleChange(clampedValue);
         });
-    }
 
-
-    async loadDemo() {
-        fetch("scenes/scene.json")
-            .then(response => response.text())
-            .then(text => this.loadScene(text));
+        return elem;
     }
 
     async run() {
