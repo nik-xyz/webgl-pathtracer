@@ -9,13 +9,23 @@ uint cantorPairing(uvec2 pair) {
 
 
 float random(inout uint rngState) {
-    uvec2 coord = uvec2(gl_FragCoord);
+    // Doesn't work well near zero, so bias it
+    uvec2 coord = uvec2(gl_FragCoord) + uvec2(10u, 10u);
 
-    // Combine the coordinates and seed using Cantor's pairing
-    // function, which avoids noticeable patterns in the end result.
+    // Need to reduce 2D coordinate to 1D seed. Cantor's pairing function works
+    // well because both dimensions have a similar affect on the output, which
+    // avoids anisotropic patterns if it is used carefully.
     uint addr = cantorPairing(coord);
+
+    // Mix it up a bit further
     addr = cantorPairing(uvec2(addr, coord.x * coord.y));
-    addr = cantorPairing(uvec2(addr, rngState));
+
+    // Use quadratic probing to ensure that similar values of addr
+    // don't generate overlapping sequences.
+    addr += rngState * rngState;
+
+    // Compute the address mod the buffer length. The buffer length is a power of
+    // two, so the value can be computed quickly with a bitmask.
     addr = addr & (RANDOM_DATA_LENGTH - 1u);
 
     rngState += 1u;
