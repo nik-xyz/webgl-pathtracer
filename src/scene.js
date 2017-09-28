@@ -61,7 +61,10 @@ class Scene {
         const materialImages = [];
 
         for(const model of this.models) {
-            triangles.push(...model.getTriangles(materialData.length));
+            for(const triangle of model.getTriangles(materialData.length)) {
+                triangles.push(triangle);
+            }
+
             materialData.push(...model.material.encode(materialImages));
         }
 
@@ -91,13 +94,13 @@ class Scene {
         this.materialDataTex.bind(gl.TEXTURE2);
 
         gl.uniform1i(uniforms.treeFloatBufferSampler, 0);
-        gl.uniform2uiv(uniforms.treeFloatBufferAddrData, this.triangleDataTex.dataMaskAndShift);
+        gl.uniform2uiv(uniforms.treeFloatBufferAddrData, this.triangleDataTex.addrData);
 
         gl.uniform1i(uniforms.treeUintBufferSampler, 1);
-        gl.uniform2uiv(uniforms.treeUintBufferAddrData, this.treeDataTex.dataMaskAndShift);
+        gl.uniform2uiv(uniforms.treeUintBufferAddrData, this.treeDataTex.addrData);
 
         gl.uniform1i(uniforms.materialBufferSampler, 2);
-        gl.uniform2uiv(uniforms.materialBufferAddrData, this.materialDataTex.dataMaskAndShift);
+        gl.uniform2uiv(uniforms.materialBufferAddrData, this.materialDataTex.addrData);
 
         if(this.materialTexArray) {
             this.materialTexArray.bind(gl.TEXTURE4);

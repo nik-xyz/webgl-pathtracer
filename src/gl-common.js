@@ -3,7 +3,7 @@ class ShaderProgram {
         this.gl = gl;
 
         const shaders = ShaderProgram.createShaders(gl, shaderData);
-        window.x=shaderData
+
         ShaderProgram.checkShaders(this.gl, shaders);
         this.program = this.gl.createProgram();
 
@@ -111,8 +111,11 @@ class ArrayTexture {
 
         for(let index = 0; index < images.length; index++) {
             const image = images[index];
-            gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, index,
-                image.width, image.height, 1, format, type, image);
+            gl.texSubImage3D(
+                gl.TEXTURE_2D_ARRAY, 0,
+                0, 0, index, image.width, image.height, 1,
+                format, type, image
+            );
         }
     }
 
@@ -143,51 +146,38 @@ class DataTexture extends Texture {
         else {
             throw new Error("data type not supported");
         }
-        // TODO: might not need to do this with NPOT textures
-        // Must pad the data to be a power-of-two length
-        // so that it can be uploaded to a power-of-two texture
-        const paddedSize = Math.pow(2, Math.ceil(Math.log2(data.length)));
+
+        const size = DataTexture.calculateDimensions(gl, data.length);
+
+        // Copy data with padding to buffer and create texture
+        const paddedData = new arrayType(size.x * size.y);
+        paddedData.set(data);
+        super(gl, size, internalFormat, format, type, paddedData);
+
+        // Calculate address mask and shift values to allow the texture to be accessed
+        // with a 1D index.
+        this.addrData = [size.x - 1, Math.log2(size.x)];
+    }
+
+    static calculateDimensions(gl, dataLength) {
+        const sizeLimit = gl.getParameter(gl.MAX_TEXTURE_SIZE);
 
         // Check data fits inside texture size limits
-        const sizeLimit = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-        if(paddedSize > sizeLimit * sizeLimit) {
+        if(dataLength > sizeLimit * sizeLimit) {
             throw new Error("required texture size exceeds limit");
         }
-        // Avoid copying if the original array meets the necessary requirements
-        if(!(data instanceof arrayType) || (data.length === paddedSize)) {
-            const paddedData = new arrayType(paddedSize);
-            paddedData.set(data);
-            data = paddedData;
-        }
-        // Choose width and height so that the texture is large enough
-        // to store the data while staying inside the size limits
-        const width = Math.min(paddedSize, sizeLimit);
-        const height = paddedSize / Math.max(width, 1);
 
-        // Create texture
-        super(gl, new Vec2(width, height), internalFormat, format, type, data);
+        // The total data size must be a multiple of the width, so to reduce losses,
+        // make the width as small as possible while still allowing all the data to
+        // fit into the texture.
+        const roundUpToPowerOfTwo = x => Math.pow(2, Math.ceil(Math.log2(x)));
+        const minSufficientWidth = roundUpToPowerOfTwo(dataLength / sizeLimit);
+        const minEfficientWidth = 256;
+        const width = Math.max(minEfficientWidth, minSufficientWidth);
 
-        // Calculate address mask and shift values to allow
-        // the texture to be accessed with a 1D index
-        this.dataMaskAndShift = [width - 1, Math.log2(width)];
-    }
-}
+        const height = Math.ceil(dataLength / width);
 
-class VertexArray {
-    constructor(gl){
-        this.gl = gl;
-        this.vao = gl.createVertexArray();
-    }
-
-    setupAttrib(location, buffer, size, type, stride = 0, offset = 0) {
-        this.bind();
-        buffer.bind();
-        this.gl.enableVertexAttribArray(location);
-        this.gl.vertexAttribPointer(location, size, type, false, stride, offset);
-    }
-
-    bind() {
-        this.gl.bindVertexArray(this.vao);
+        return new Vec2(width, height);
     }
 }
 

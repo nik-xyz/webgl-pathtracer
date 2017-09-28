@@ -22,8 +22,8 @@ class RandomGen {
     bind(program) {
         this.randomDataTex.bind(this.gl.TEXTURE3);
 
-        this.gl.uniform1i(program.uniforms.randomBufferSampler, 3);
-        this.gl.uniform2uiv(program.uniforms.randomBufferAddrData,
-            this.randomDataTex.dataMaskAndShift);
+        const uniforms = program.uniforms;
+        this.gl.uniform1i(uniforms.randomBufferSampler, 3);
+        this.gl.uniform2uiv(uniforms.randomBufferAddrData, this.randomDataTex.addrData);
     }
 }

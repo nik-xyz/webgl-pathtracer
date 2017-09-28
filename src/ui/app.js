@@ -7,7 +7,7 @@ class App {
             this.sceneChanged = true;
         }
         catch(err) {
-            alert(`Failed to load scene:\n${err.message}`);throw err
+            alert(`Failed to load scene:\n${err.message}`);
         }
     }
 
@@ -24,6 +24,7 @@ class App {
                 model:    await loadFileText(),
                 material: Material.DEFAULT_MATERIAL_JSON,
                 position: ModelInstance.DEFAULT_POSITION.array(),
+                rotation: ModelInstance.DEFAULT_ROTATION.array(),
                 size:     ModelInstance.DEFAULT_SIZE.array()
             });
 
