@@ -38,6 +38,10 @@ class Triangle {
             .add(this.edge1.pos.scale(1 / 3));
     }
 
+    area() {
+        return this.edge0.pos.cross(this.edge1.pos).length() * 0.5;
+    }
+
     // Encodes the triangle in a format that matches the structures TrianglePositions and
     // TriangleAuxAttribs in geom-types.glsl.
     encode() {
@@ -57,8 +61,8 @@ class Polygon {
         this.materialIndex = materialIndex;
     }
 
-    /*  Creates triangle-fan representation of the polygon.
-        Only handles convex polygons and assumes planarity. */
+    // Creates triangle-fan representation of the polygon.
+    // Only handles convex polygons and assumes planarity.
     triangulate() {
         const triangles = [];
         for(let index = 0; index < this.verts.length - 1; index++) {

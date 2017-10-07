@@ -74,15 +74,18 @@ class Model {
 
         switch(tokens[0]) {
             case "v":
-                this.posArray.push(new Vec3(...Model.parseFloats(3, args)));
+                const pos = new Vec3(...Model.parseFloats(3, args)).mul(new Vec3(-1, 1, 1));
+                this.posArray.push(pos);
                 break;
 
             case "vn":
-                this.norArray.push(new Vec3(...Model.parseFloats(3, args)));
+                const nor = new Vec3(...Model.parseFloats(3, args)).mul(new Vec3(-1, 1, 1));
+                this.norArray.push(nor);
                 break;
 
             case "vt":
-                this.texArray.push(new Vec2(...Model.parseFloats(2, args)));
+                const tex = new Vec2(...Model.parseFloats(2, args));
+                this.texArray.push(tex);
                 break;
 
             case "f":
@@ -93,7 +96,6 @@ class Model {
 
     static accessArray(array, index, alt) {
         if(Number.isSafeInteger(index)) {
-            // The index starts from one
             if (1 <= index && index <= array.length) {
                 return array[index - 1];
             }

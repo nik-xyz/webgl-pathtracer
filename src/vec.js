@@ -1,19 +1,55 @@
 class Vec {
-    add(other)  { return this.combine(other, (a, b) => a + b); }
-    sub(other)  { return this.combine(other, (a, b) => a - b); }
-    mul(other)  { return this.combine(other, (a, b) => a * b); }
-    div(other)  { return this.combine(other, (a, b) => a / b); }
-    less(other) { return this.combine(other, (a, b) => a < b); }
-    min(other)  { return this.combine(other, Math.min);        }
-    max(other)  { return this.combine(other, Math.max);        }
+    add(other)  {
+        return this.combine(other, (a, b) => a + b);
+    }
 
-    dot(other)  { return this.mul(other).reduce((a, b) => a + b); }
-    scale(amt)  { return this.map(val => val * amt); }
-    dist(other) { return this.sub(other).length(); }
-    length()    { return Math.sqrt(this.dot(this)); }
-    normalize() { return this.scale(1 / this.length()); }
+    sub(other)  {
+        return this.combine(other, (a, b) => a - b);
+    }
 
-    reduce(fn)  { return this.array().reduce(fn); }
+    mul(other)  {
+        return this.combine(other, (a, b) => a * b);
+    }
+
+    div(other)  {
+        return this.combine(other, (a, b) => a / b);
+    }
+
+    less(other) {
+        return this.combine(other, (a, b) => a < b);
+    }
+
+    min(other) {
+        return this.combine(other, Math.min);
+    }
+
+    max(other) {
+        return this.combine(other, Math.max);
+    }
+
+    dot(other) {
+        return this.mul(other).reduce((a, b) => a + b);
+    }
+
+    scale(amt) {
+        return this.map(val => val * amt);
+    }
+
+    dist(other) {
+        return this.sub(other).length();
+    }
+
+    length() {
+        return Math.sqrt(this.dot(this));
+    }
+
+    normalize() {
+        return this.scale(1 / this.length());
+    }
+
+    reduce(fn) {
+        return this.array().reduce(fn);
+    }
 
     checkNumeric() {
         if(this.array().every(Number.isFinite)) {
@@ -103,5 +139,13 @@ class Vec3 extends Vec {
             angles = angles.scale(Math.PI / 180);
         }
         return this.rotateX(angles.x).rotateY(angles.y).rotateZ(angles.z);
+    }
+
+    cross(other) {
+        return new Vec3(
+            this.y * other.z - other.y * this.z,
+            this.x * other.z - other.x * this.z,
+            this.y * other.x - other.y * this.x
+        );
     }
 }

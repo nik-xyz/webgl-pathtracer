@@ -16,11 +16,13 @@ vec3 tracePath(Ray ray, inout uint rngState) {
 
         if(!shtr.hit) {
             // TODO: sample background enviroment map.
-            // For now, create a square light above the scene instead.
-            float dist = max(abs(ray.dir.x), abs(ray.dir.z));
-            float light = dist < 0.4 && ray.dir.y > 0.0 ? 5.0 : 0.0;
+            float angle = acos(ray.dir.y) / 3.141592 * 2.0;
 
-            incomingLight += transportCoeff * vec3(light);
+            // Very poor approximation
+            vec3 sun = vec3(1.0, 0.9, 0.7) * 1.4 * smoothstep(0.0, 1.0, max(1.0 - angle * 6.0, 0.0));
+            vec3 sky = vec3(0.64, 0.75, 1.0) * (1.3 - angle * 0.2);
+
+            incomingLight += transportCoeff * vec3(sky + sun);
             break;
         }
 

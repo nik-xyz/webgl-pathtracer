@@ -2,7 +2,7 @@ class KDTree {
     // Hack: define 'constants' with const getters
     static get NULL_NODE_ADDRESS()  { return 0; }
     static get SUBDIVISION_LIMIT()  { return 10; }
-    static get MIN_NODE_TIRANGLES() { return 10; }
+    static get MIN_NODE_TIRANGLES() { return 50; }
 
     constructor(triangles, limit = KDTree.SUBDIVISION_LIMIT) {
         this.triangles = triangles;
@@ -58,20 +58,43 @@ class KDTree {
         }
     }
 
+    // Selects axis to split along by cycling through axes
     selectSplitAxis() {
-        // TODO: Use better axis selection method. For now, cycle through axes
         this.splitAxis = this.limit % 3;
     }
 
+    // Selects split point using Surface Area Heuristic (SAH)
     selectSplitPoint() {
-        // TODO: Use better split point selection method
-        // For now, use simple median
-        const points = this.triangles.map((tri) => this.project(tri.center()));
-        points.sort();
-        this.splitPoint = points[Math.floor(points.length / 2)];
+        const compare = (a, b) => this.project(a.center()) > this.project(b.center());
+        const sortedTris = this.triangles.slice().sort(compare);
+
+        const areaSums = [];
+
+        let totalArea = 0;
+        for(let index = 0; index < sortedTris.length; index++) {
+            totalArea += sortedTris[index].area();
+            areaSums.push(totalArea);
+        }
+
+        let bestSplitIndex = 0;
+        let bestCost = Number.POSITIVE_INFINITY;
+
+        for(let index = 0; index < sortedTris.length; index++) {
+            const lowerArea = areaSums[index];
+            const upperArea = totalArea - lowerArea;
+            const cost = (lowerArea * (index)) +
+                         (upperArea * (sortedTris.length - index));
+
+            if(cost < bestCost) {
+                bestCost = cost;
+                bestSplitIndex = index;
+            }
+        }
+
+        console.log(bestSplitIndex, sortedTris.length, totalArea)
+        this.splitPoint = this.project(sortedTris[bestSplitIndex].center());
     }
 
-    /* Projects a vector along this node's split axis */
     project(vec) {
         return vec.array()[this.splitAxis];
     }
