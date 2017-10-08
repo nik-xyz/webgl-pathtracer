@@ -44,12 +44,13 @@ const loadFileAsURL = async () => {
 
 const saveFile = (data, name) =>  {
     const link = document.createElement("a");
-    link.href = "data:text/plain," + encodeURIComponent(data);
+    link.href = URL.createObjectURL(new Blob([data]));
     link.download = name;
     link.style.display = "none";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
 };
 
 const assertJSONHasKeys = (json, keys) => {

@@ -91,7 +91,6 @@ class KDTree {
             }
         }
 
-        console.log(bestSplitIndex, sortedTris.length, totalArea)
         this.splitPoint = this.project(sortedTris[bestSplitIndex].center());
     }
 
